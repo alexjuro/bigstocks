@@ -1,12 +1,12 @@
 {
   "server": { "https": false, "port": 3000 },
   "db": {
-    "use": "in-memory-db",
+    "use": "dbmongo",
     "connect": {
-      "user": "myapp",
-      "host": "localhost",
-      "database": "myapp",
-      "password": "wifhm",
+      "user": "user",
+      "host": "stud-vm-6291.fh-muenster.de",
+      "database": "bigstocks",
+      "password": "PillDropLANA",
       "port": {
         "mongodb": 27017,
         "psql": 5432
