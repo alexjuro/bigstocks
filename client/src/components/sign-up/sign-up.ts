@@ -7,12 +7,12 @@ import { router } from '../../router/router.js';
 import { PageMixin } from '../page.mixin.js';
 
 import sharedStyle from '../shared.css?inline';
-//import componentStyle from './sign-up.css?inline';
+import componentStyle from '../sign-in/style.css?inline';
 
 @customElement('sign-up')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class SignUpComponent extends PageMixin(LitElement) {
-  static styles = [sharedStyle];
+  static styles = [componentStyle, sharedStyle];
 
   @query('form') private form!: HTMLFormElement;
 
@@ -27,32 +27,39 @@ class SignUpComponent extends PageMixin(LitElement) {
   render() {
     return html`
       ${this.renderNotification()}
-      <h1>Sign-Up</h1>
-      <form novalidate>
-        <div>
-          <label for="name">Name</label>
-          <input type="text" autofocus required id="name" />
-          <div class="invalid-feedback">Name is required</div>
+      <div class="Login-page">
+        <div class="form ">
+          <form novalidate>
+            <div>
+              <label for="name">Name</label>
+              <input type="text" autofocus required id="name" placeholder="Name" />
+              <div class="invalid-feedback">Name is required</div>
+            </div>
+            <div>
+              <label for="email">E-Mail</label>
+              <input type="email" required id="email" placeholder="Email" />
+              <div class="invalid-feedback">>Email is required and must be valid</div>
+            </div>
+            <div>
+              <label for="password">Password</label>
+              <input type="password" required minlength="10" id="password" placeholder="Password" />
+              <div class="invalid-feedback">Passwort ist erforderlich und muss mind. 10 Zeichen lang sein</div>
+            </div>
+            <div>
+              <label for="password-check">Enter password again</label>
+              <input type="password" required minlength="10" id="password-check" placeholder="Password again" />
+              <div class="invalid-feedback">
+                Re-entering the password is required and must match the first password entered
+              </div>
+            </div>
+            <button type="button" @click="${this.submit}">Create account</button>
+            <p class="message">
+              Already registered?
+              <a @click="${this.signIn}" href="/users/sign-up">Sign-In</a>
+            </p>
+          </form>
         </div>
-        <div>
-          <label for="email">E-Mail</label>
-          <input type="email" required id="email" />
-          <div class="invalid-feedback">>Email is required and must be valid</div>
-        </div>
-        <div>
-          <label for="password">Password</label>
-          <input type="password" required minlength="10" id="password" />
-          <div class="invalid-feedback">Passwort ist erforderlich und muss mind. 10 Zeichen lang sein</div>
-        </div>
-        <div>
-          <label for="password-check">Enter password again</label>
-          <input type="password" required minlength="10" id="password-check" />
-          <div class="invalid-feedback">
-            Re-entering the password is required and must match the first password entered
-          </div>
-        </div>
-        <button type="button" @click="${this.submit}">Create account</button>
-      </form>
+      </div>
     `;
   }
 
@@ -82,5 +89,9 @@ class SignUpComponent extends PageMixin(LitElement) {
       this.passwordCheckElement.setCustomValidity('');
     }
     return this.form.checkValidity();
+  }
+
+  async signIn() {
+    window.location.href = 'users/sign-in';
   }
 }

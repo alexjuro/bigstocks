@@ -4,14 +4,14 @@ import { LitElement, html } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import { PageMixin } from '../page.mixin.js';
-
 import sharedStyle from '../shared.css?inline';
-import { router } from '../../router/router.js';
+import style from './style.css?inline';
+
 // ToDo: Add ComponentStyle
 @customElement('sign-in')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class SignInComponent extends PageMixin(LitElement) {
-  static styles = sharedStyle;
+  static styles = [style, sharedStyle];
 
   @query('form') private form!: HTMLFormElement;
 
@@ -22,21 +22,27 @@ class SignInComponent extends PageMixin(LitElement) {
   render() {
     return html`
       ${this.renderNotification()}
-      <h1>Sign-In</h1>
-      <form novalidate>
-        <div>
-          <label for="email">E-Mail</label>
-          <input type="email" autofocus required id="email" />
-          <div class="invalid-feedback">Email is required and must be valid</div>
+      <div class="Login-Page">
+        <div class="form">
+          <form novalidate class="login-form">
+            <div>
+              <label for="email">E-Mail</label>
+              <input type="email" autofocus required id="email" placeholder="Email" />
+              <div class="invalid-feedback">Email is required and must be valid</div>
+            </div>
+            <div>
+              <label for="password">Password</label>
+              <input type="password" required id="password" placeholder="Password" />
+              <div class="invalid-feedback">Password is required</div>
+            </div>
+            <button type="button" @click="${this.submit}">Sign-In</button>
+            <p class="message">
+              Not registered?
+              <a @click="${this.signUp}" href="/users/sign-up">Create an account</a>
+            </p>
+          </form>
         </div>
-        <div>
-          <label for="password">Password</label>
-          <input type="password" required id="password" />
-          <div class="invalid-feedback">Password is required</div>
-        </div>
-        <button type="button" @click="${this.submit}">Sign-In</button>
-        <button type="button" @click="${this.signUp}">Sign-Up</button>
-      </form>
+      </div>
     `;
   }
 
