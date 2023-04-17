@@ -14,17 +14,20 @@ export class PortfolioComponent extends PageMixin(LitElement) {
     static styles = [sharedStyle, componentStyle];
     @query('#doughnut') canvas!: HTMLCanvasElement;
     @property({ type: Array })
-    stocks: Stock[] = [
-        { symbol: 'AAPL', price: 255 },
-        { symbol: 'GOOGL', price: 301 },
-        { symbol: 'TSLA', price: 200 },
-        { symbol: 'MSFT', price: 500 },
-        { symbol: 'AMZN', price: 540 }];
+    private stocks: Stock[] = [
+        { symbol: 'AAPL', price: 200 },
+        { symbol: 'GOOGL', price: 300 },
+        { symbol: 'TSLA', price: 40 },
+        { symbol: 'MSFT', price: 100 },
+        { symbol: 'AMZN', price: 90 }];
     @property({ type: Object })
     private StockService = new StockService();
     @property({ type: Object })
     private Chart = {};
 
+    getStocks(){
+        return this.stocks;
+    }
     getLabels() {
         const labels = this.stocks.map(stock => stock.symbol);
         return labels;
@@ -34,20 +37,33 @@ export class PortfolioComponent extends PageMixin(LitElement) {
         const prices = this.stocks.map(stock => stock.price);
         return prices;
     }
+    setPrice(symbol : String, price: number){
+        for (const a of this.stocks)
+        {
+            if (a.symbol == symbol)
+            {
+                a.price = price
+            }
+            this.updateChart();
+        }
+    }
+
+    sendSubscriptions() {
+        for (const a of this.stocks) {
+            this.StockService.subscribe(a.symbol);
+        };
+    }
 
     firstUpdated() {
         this.createChart();
     }
-
-    connectedCallback() {
+    
+    async connectedCallback() {
         super.connectedCallback();
-        this.StockService.connectSocket();
-        for (const a of this.stocks) {
-            this.StockService.subscribe(a.symbol);
-        }
+        await this.StockService.connectSocket()
+        this.sendSubscriptions();
         this.StockService.addObserver(this);
     }
-  
 
     disconnectedCallback() {
         super.disconnectedCallback();
@@ -57,15 +73,16 @@ export class PortfolioComponent extends PageMixin(LitElement) {
     createChart() {
         this.Chart = new Chart(this.canvas,
             {
-                type: "pie",
+                type: "doughnut",
                 data: {
                     labels: this.getLabels(),
                     datasets: [{
                         data: this.getPrices(),
-                        
+                        // backgroundColor: ["#FFA07A", "#FA8072", "#E9967A", "#F08080", "#CD5C5C"],
                     }]
                 },
                 options: {
+                    
                     animation: {
                         onComplete: function () {
                             console.log('Line Chart Rendered Completely!');
@@ -75,7 +92,19 @@ export class PortfolioComponent extends PageMixin(LitElement) {
             }
         )
     }
+ 
+    updateChart()
+    {
+        if (this.Chart instanceof Chart)
+        {
+            this.Chart.data.labels = this.getLabels();
+            this.Chart.data.datasets[0].data = this.getPrices();
+            this.Chart.update();
+        }
+    }
 
+
+    
 
     render() {
         return html`
@@ -94,55 +123,3 @@ export class PortfolioComponent extends PageMixin(LitElement) {
 
 
 }
-/*
-  async connectSocket() {
-    const apiKey = 'cgsjqchr01qkrsgj9tk0cgsjqchr01qkrsgj9tkg';
-    const url = `wss://ws.finnhub.io?token=${apiKey}`;
-
-    try {
-      this.socket = new WebSocket(url);
-
-    this.addUsersStocks();
-
-        this.updateUsersStocks();
-
-    } catch (error) {
-      console.error('WebSocket connection error', error);
-    }
-  }
-  
-
-    async addUsersStocks() {
-        this.socket?.addEventListener('open', (event) => {
-        
-        this.stocks.forEach(stock => {
-          this.socket?.send(JSON.stringify({ type: 'subscribe', symbol: stock.symbol }));
-        });
-      });
-    }
-
-    async updateUsersStocks() {
-        this.socket?.addEventListener('message', (event) => {
-        const data = JSON.parse(event.data);
-
-        if (data.type === 'trade' && data.data && data.data[0]) {
-          const an = data.data[0];
-          const stockIndex = this.stocks.findIndex(stock => stock.symbol === an.s);
-
-          if (stockIndex >= 0) {
-            this.stocks[stockIndex].price = an.p;
-            this.requestUpdate();
-          }
-        }
-      });
-    }
-
-  disconnectSocket() {
-    if (this.socket) {
-      this.socket.close();
-      this.socket = null;
-      console.log('WebSocket connection closed');
-    }
-  }
-    
-    */

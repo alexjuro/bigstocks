@@ -1,4 +1,4 @@
-/* Autor: TODO */
+/* Autor: Alexander Schellenberg */
 
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';

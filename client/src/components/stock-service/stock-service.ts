@@ -4,6 +4,7 @@ import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { PageMixin } from '../page.mixin';
 import { property } from "lit-element";
+import { PortfolioComponent } from '../portfolio/portfolio';
 
 export type Stock = {
   symbol: string;
@@ -13,36 +14,46 @@ export type Stock = {
 
 const apiKey = 'cgsjqchr01qkrsgj9tk0cgsjqchr01qkrsgj9tkg';
 
-export class StockService{
+export class StockService {
     private socket: WebSocket | null = null;
-    private stocks: Map<string, Stock> = new Map();
     private subscriptions: Set<string> = new Set();
     private observers: Set<LitElement> = new Set();
 
     
-    public async connectSocket() {
-        this.socket = await new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`);
-        this.socket.onopen = () => {
-            console.log('WebSocket connection established.');
-        };
-        this.socket.onerror = (error) => {
-            console.error(`WebSocket error: ${error}`);
+    public async connectSocket(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`);
+            this.socket.onopen = () => {
+                console.log('WebSocket connection established.');
+                resolve();
+            }
+            this.socket.onerror = (error) => {
+                console.error(`WebSocket error: ${error}`);
+                reject();
             };
 
-        this.socket.onclose = () => {
-            console.log('WebSocket connection closed.');
+            this.socket.onclose = () => {
+                console.log('WebSocket connection closed.');
+                reject();
             };
-        this.socket.onmessage = (event) => {
-            const message = JSON.parse(event.data);
-            if (message.type === 'trade' && message.data) {
-                const { s: symbol, p: price } = message.data[0];
-                if (this.subscriptions.has(symbol)) {
-                    this.stocks.set(symbol, { symbol, price });
-                    this.notifyObservers();
+    
+            this.socket.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                console.log(message);
+                if (message.type === 'trade' && message.data) {
+                    const { s: symbol, p: price } = message.data[0];
+                    if (this.subscriptions.has(symbol)) {
+                        this.notifyObservers(symbol, price);
+                    }
                 }
-            }
-        };
+            };
+        });
     }
+    public getSubscriptions()
+    {
+        return this.subscriptions;
+    }
+
     public closeSocket() {
         this.socket?.close;
     }
@@ -56,10 +67,7 @@ export class StockService{
     this.subscriptions.delete(symbol);
     this.sendRequest(symbol, 'unsubscribe');
   }
-
-  public getStock(symbol: string): Stock | undefined {
-    return this.stocks.get(symbol);
-  }
+    
 
   public addObserver(observer: LitElement): void {
     this.observers.add(observer);
@@ -70,42 +78,21 @@ export class StockService{
   }
 
   private sendRequest(symbol: string, action = 'subscribe'): void {
-    const message = JSON.stringify({ type: action, symbol });
-    this.socket?.send(message);
+      const message = JSON.stringify({ type: action, symbol: symbol });
+      this.socket?.send(message);
+      console.log(this.socket + " sendRequest: " + action + " " + symbol);
   }
 
-  private notifyObservers(): void {
-    for (const observer of this.observers) {
-      observer.requestUpdate();
+  private notifyObservers(symbol : String, price: number): void {
+      for (const observer of this.observers) {
+        if (observer instanceof PortfolioComponent)
+        {
+            observer.setPrice(symbol, price);
+        }
+        observer.requestUpdate();
+        
     }
   }
 
 
 }
-
-/*
-    async addUsersStocks() {
-        this.socket?.addEventListener('open', (event) => {
-        
-        this.stocks.forEach(stock => {
-          this.socket?.send(JSON.stringify({ type: 'subscribe', symbol: stock.symbol }));
-        });
-      });
-    }
-
-    async updateUsersStocks() {
-        this.socket?.addEventListener('message', (event) => {
-        const data = JSON.parse(event.data);
-
-        if (data.type === 'trade' && data.data && data.data[0]) {
-          const an = data.data[0];
-          const stockIndex = this.stocks.findIndex(stock => stock.symbol === an.s);
-
-          if (stockIndex >= 0) {
-            this.stocks[stockIndex].price = an.p;
-            this.requestUpdate();
-          }
-        }
-      });
-    }
-    */
