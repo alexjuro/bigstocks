@@ -2,13 +2,15 @@
 
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { PageMixin } from '../page.mixin';
+import { PageMixin } from './components/page.mixin';
 import { property } from "lit-element";
-import { PortfolioComponent } from '../portfolio/portfolio';
+import { PortfolioComponent } from './components/portfolio/portfolio';
 
 export type Stock = {
+    name: string;
   symbol: string;
-  price: number;
+    price: number;
+    shares: number;
   
 };
 
@@ -87,7 +89,7 @@ export class StockService {
       for (const observer of this.observers) {
         if (observer instanceof PortfolioComponent)
         {
-            observer.setPrice(symbol, price);
+            observer.setStockPrice(symbol, price);
         }
         observer.requestUpdate();
         

@@ -6,42 +6,88 @@
 
 
 h1 {
-  color: #B22222;
+  size: 3rem;
+  color: #502563;
 }
 
 .portfolio-page {
-  background-color:#ea9d9d;
+  background-color: #f9e6f5;
+  opacity: 83%;
   position: relative;
   z-index: 1;
-  max-width: 420px;
+  max-width: 600px;
   margin: 0 auto 100px;
+  margin-top: 2vh;
   padding: 45px;
   text-align: center;
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+  box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
   border-radius: 1em;
-  border: 1px solid #000000;
+  border: 2px solid #00000095;
 }
 
 .stock{
-font-size: 14px;
-  background-color: #f2f2f2;
-  color: #000000;
+  font-size: 1.5rem;
+  background-color: #ffffff;
+  color: #373737;
   width: 100%;
-  margin: 0 0 15px;
+  margin: 30px 0 30px;
   padding: 4px;
   box-sizing: border-box;
   border-radius: 1em;
   border: 1px solid #000000;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 
   0 5px 5px 0 rgba(0, 0, 0, 0.24);
-  box-shadow: inset 0 0 0 0 #f0f0f2;
-  transition: .4s ease-in-out, .6s ease-in-out;
+  box-shadow: inset 0 0 0 0 #fbfbfa;
+  transition: .2s ease-in-out, .3s ease-in-out;
 
 }
 
 .stock:hover{
-    box-shadow: inset 330px 0 0 0 #dcdddc;
+    box-shadow: inset 600px 0 0 0 #ffedda;
 }
+
+#allo{
+  font-size:2.5rem;
+}
+
+#upp{
+  font-size:4rem;
+  color: #15011e;
+}
+
+.blinkGreen {
+    animation: blinkGreen 1s linear;
+}
+
+@keyframes blinkGreen {
+    0% {
+        background-color: lightgreen;
+    }
+    50% {
+        background-color: transparent;
+    }
+    100% {
+        background-color: lightgreen;
+    }
+}
+
+.blinkRed {
+    animation: blinkRed 1s linear;
+}
+
+@keyframes blinkRed {
+    0% {
+        background-color: lightcoral;
+    }
+    50% {
+        background-color: transparent;
+    }
+    100% {
+        background-color: lightcoral;
+    }
+}
+
+    
  /*
 .stock:hover p{
     font-size: 15px;
