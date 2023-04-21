@@ -15,7 +15,7 @@ class AuthService {
         res.locals.user = jwt.verify(token, SECRET);
         next();
       } catch {
-        res.status(401).json({ message: 'Bitte melden Sie sich an!' });
+        res.status(401).json({ message: 'Please log in!' });
       }
     }
   };
