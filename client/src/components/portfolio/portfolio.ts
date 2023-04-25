@@ -6,21 +6,24 @@ import { LitElement, html } from 'lit';
 import { property, query } from "lit-element";
 import sharedStyle from '../shared.css?inline';
 import componentStyle from './portfolio.css?inline';
-import { Stock, StockService } from '../../stock-service.js';
+import { StockService } from '../../stock-service.js';
 import Chart from 'chart.js/auto';
+import { StockComponent } from '../../interfaces/stockcomponent-interface.js';
+import { stocks, UserStock } from '../../interfaces/stock-interface.js';
 
 
 @customElement('app-portfolio')
-export class PortfolioComponent extends PageMixin(LitElement) {
+export class PortfolioComponent extends PageMixin(LitElement) implements StockComponent{
     static styles = [sharedStyle, componentStyle];
     @query('#doughnut') doughnut!: HTMLCanvasElement;
     @property({ type: Array })
-    private stocks: Stock[] = [
-        { name: 'Apple', symbol: 'AAPL', price: 0, shares:2 },
-        { name: 'Alphabet', symbol: 'GOOGL', price: 0, shares:3 },
-        { name: 'Tesla',symbol: 'TSLA', price: 0, shares:1 },
-        { name: 'Microsoft',symbol: 'MSFT', price: 0, shares:2 },
-        { name: 'Amazon',symbol: 'AMZN', price: 0, shares:7 }];
+    private stocks: UserStock[] = [
+        { name: stocks[0].name, symbol: stocks[0].symbol, price: stocks[0].price, image: stocks[0].image, shares:2},
+        { name: stocks[1].name, symbol: stocks[1].symbol, price: stocks[1].price, image: stocks[1].image, shares:1},
+        { name: stocks[2].name, symbol: stocks[2].symbol, price: stocks[2].price, image: stocks[2].image, shares:8},
+        { name: stocks[3].name, symbol: stocks[3].symbol, price: stocks[3].price, image: stocks[3].image, shares:3},
+        { name: stocks[4].name, symbol: stocks[4].symbol, price: stocks[4].price, image: stocks[4].image, shares: 5}
+    ];
     @property({ type: Object })
     private StockService = new StockService();
     @property({ type: Object })
@@ -44,7 +47,7 @@ export class PortfolioComponent extends PageMixin(LitElement) {
         return prices;
     }
 
-    setStockPrice(symbol: String, price: number) {
+    updateStockPrice(symbol: String, price: number) {
         let s = "blinkRed";
         let change = false;
         for (const a of this.stocks)
@@ -64,7 +67,7 @@ export class PortfolioComponent extends PageMixin(LitElement) {
             this.updateDoughnut();
             if (change)
             {
-               const element = this.shadowRoot?.getElementById(a.symbol);
+               const element = this.shadowRoot?.getElementById(a.name);
                 if (element) {
                     element.classList.add(s);
                     setTimeout(() => {
@@ -122,17 +125,20 @@ export class PortfolioComponent extends PageMixin(LitElement) {
                 data: {
                     labels: this.getStockNames(),
                     datasets: [{
-                        data: this.getCumulatedPrices(),
-                        backgroundColor: ["#581f4d", "#77325f", "#923d5b", "#c3415b", "#dd6868"],
+                        data: this.getCumulatedPrices()
+                        //backgroundColor: ["#581f4d", "#77325f", "#923d5b", "#c3415b", "#dd6868"],
                     }]
                 },
                 options: {
                     plugins: {
+                        subtitle: {
+                            display: true,
+                            text: "Your " + this.stocks.length + " stocks!"
+                        },
                         legend: {
                             labels: {
-                                // This more specific font property overrides the global property
                                 font: {
-                                    size: 20
+                                    size: 8
                                 }
                             }
                         }
@@ -142,7 +148,7 @@ export class PortfolioComponent extends PageMixin(LitElement) {
                             console.log('Line Chart Rendered Completely!');
                         }
                     },
-                }
+                },
             }
         )
     }
@@ -162,20 +168,29 @@ export class PortfolioComponent extends PageMixin(LitElement) {
 
     render() {
         return html`
-      <div class="portfolio-page">
-        <h1 id=upp> My Portfolio </h1>
-        ${this.stocks.map(stock => html`
-            <div class="stock" id= ${stock.symbol}>
-            <h1> ${stock.name}</h1>
-            <p>Price: ${stock.price ? stock.price.toFixed(2) +'$' : 'N/A'} </p>
-            <p>Shares: ${stock.shares} </p>
-            </div>
-        `)}
-        <div>
-            <h1 id=allo> portfolio-allocation </h1>
+    <div class="container">
+        <div class="portfolio-page flex-container">
+            <h1 id=upp> My Portfolio </h1>
+            ${this.stocks.map(stock => html`
+                <div class="stock" id= ${stock.symbol}>
+                    <span id=${stock.name} class="dot"></span>
+                    <img src="${stock.image}" alt="${stock.name} Logo">
+                    <h1> ${stock.name}</h1>
+                    <p>Price: ${stock.price ? stock.price +'$' : 'N/A'} </p>
+                    <p>Shares: ${stock.shares} </p>
+                </div>
+            `)}
+        </div>
+    
+        <div class="allo flex-container">
+            <h1 id=upp> Portfolio-Allocation </h1>
             <canvas id="doughnut" width="268" height="268"</canvas>
         </div>
-      </div>
+        <div class=" flex-container">
+            <h1 id=upp> Portfolio-Graph </h1>
+        </div>
+    </div>
+    
     `;
     }
 
