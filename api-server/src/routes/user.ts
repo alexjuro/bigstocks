@@ -9,23 +9,19 @@ const router = express.Router();
 
 router.get('/profile', authService.authenticationMiddleware, async (req, res) => {
   const dao: GenericDAO<User> = req.app.locals.userDAO;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { password, ...user } = (await dao.findOne(req.app.locals.user))!;
-  res.status(200).json(user);
+
+  const { name, email } = (await dao.findOne(req.app.locals.user))!;
+  const user = { name, email };
+
+  email ? res.status(200).json(user) : res.status(404).json({ status: 'unable to fetch user information' });
 });
 
 router.post('/profile', authService.authenticationMiddleware, async (req, res) => {
   const dao: GenericDAO<User> = req.app.locals.userDAO;
-  const userData = req.body.userData;
-  (await dao.findAll(userData))
-    ? dao
-        .update(userData)
-        .then(() => res.status(200).json({ status: 'ok' }))
-        .catch(() => res.status(500).json({ status: 'error' }))
-    : dao
-        .create(userData)
-        .then(() => res.status(201).json({ status: 'ok' }))
-        .catch(() => res.status(500).json({ status: 'error' }));
+  dao
+    .update(req.body)
+    .then(() => res.status(200).json({ status: 'ok' }))
+    .catch(() => res.status(500).json({ status: 'error' }));
 });
 
 export default router;
