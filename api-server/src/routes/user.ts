@@ -7,14 +7,14 @@ import { authService } from '../services/auth.service.js';
 
 const router = express.Router();
 
-router.get('/', authService.authenticationMiddleware, async (req, res) => {
+router.get('/profile', authService.authenticationMiddleware, async (req, res) => {
   const dao: GenericDAO<User> = req.app.locals.userDAO;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password, ...user } = (await dao.findOne(req.app.locals.user))!;
   res.status(200).json(user);
 });
 
-router.put('/', authService.authenticationMiddleware, async (req, res) => {
+router.post('/profile', authService.authenticationMiddleware, async (req, res) => {
   const dao: GenericDAO<User> = req.app.locals.userDAO;
   const userData = req.body.userData;
   (await dao.findAll(userData))
