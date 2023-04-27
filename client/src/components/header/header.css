@@ -19,7 +19,6 @@ h1{
     flex-direction: row;
     align-items: center;
     height: 7vh;
-    width: 100%;
     position: relative;
 }
 
@@ -27,12 +26,15 @@ h1{
     justify-content: center;
     background-color: #121212;
     z-index: 0;
+    width: 100%;
 }
 
 #headcontainer{
-    justify-content: space-around;
+    justify-content: space-between;
     z-index: 1;
     top: -7vh;
+    width: 97%;
+    left: 1.5%;
 }
 
 a{
