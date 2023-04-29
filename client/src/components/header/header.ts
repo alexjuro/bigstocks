@@ -11,15 +11,25 @@ class AppHeaderComponent extends LitElement {
     static styles = [componentStyle, sharedStyle];
   render() {
     return html`
-    <div id="bigcontainer">
-      <div id="headcontainerbackground" class="flexcontainer">
-          hello dies ist im hintergrund
-      </div>
-      <div id="headcontainer" class="flexcontainer">
-          <div>1</div>
-          <div>2</div>
-          <div>3</div>
-      </div>
-    </div>`;
+      <div id="bigcontainer">
+        <div id="headcontainerbackground" class="flexcontainer">
+          <img src="../Mediamodifier-Design.svg" alt="" height="100%" class="logomask">
+        </div>
+        <div id="headcontainer" class="flexcontainer">
+          <div>
+            <a href="">
+              <img src="../list-ol.svg" alt="" class="iconmask">
+            </a>
+          </div>
+          <div>
+            <a href="#top" id="logotext">bigstocks</a>
+          </div>
+          <div>
+            <a href="">
+              <img src="../person-fill.svg" alt="" class="iconmask">
+            </a>
+          </div>
+        </div>
+      </div>`;
   }
 }

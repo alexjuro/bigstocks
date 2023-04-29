@@ -4,13 +4,15 @@
 *{
     padding: 0px;
     margin: 0px;
+    --conatinerheight: 6vh;
+    --textheight: 3vh;
 }
 
 h1{
     color: aquamarine;
 }
 #bigcontainer{
-    height: 7vh;
+    height: var(--conatinerheight);
     overflow: hidden;
 }
 
@@ -18,7 +20,7 @@ h1{
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 7vh;
+    height: var(--conatinerheight);
     position: relative;
 }
 
@@ -32,7 +34,7 @@ h1{
 #headcontainer{
     justify-content: space-between;
     z-index: 1;
-    top: -7vh;
+    top: -6vh;
     width: 97%;
     left: 1.5%;
 }
@@ -41,7 +43,7 @@ a{
     text-decoration: none;
     font-family: 'Roboto', sans-serif;
     font-weight: 700;
-    font-size: 4vh;
+    font-size: var(--textheight);
     color: lightgoldenrodyellow;
 }
 
@@ -51,4 +53,11 @@ a{
 
 .logomask{
     filter: brightness(90%);
+}
+
+.iconmask{
+    filter: invert(100%);
+    width: var(--textheight);
+    height: var(--textheight);
+    padding-top: 0.5vh;
 }
