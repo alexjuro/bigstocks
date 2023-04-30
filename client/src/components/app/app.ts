@@ -2,7 +2,7 @@
 
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import sharedStyle from '../shared.css?inline'
+import sharedStyle from '../shared.css?inline';
 
 @customElement('app-root')
 class AppComponent extends LitElement {
