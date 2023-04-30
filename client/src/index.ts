@@ -2,4 +2,5 @@
 
 import './components/app/app.ts';
 import './components/header/header.ts';
+import './components/leaderboard/leaderboard.ts'
 
