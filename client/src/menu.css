@@ -1,0 +1,34 @@
+*{
+    padding: 0px;
+    margin: 0px;
+}
+
+#maincontainer{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 94vh;
+    background-color: aquamarine;
+}
+
+.spacer {
+    height: 100%;
+    width: 7%;
+    background-color: cadetblue;
+}
+
+#main{
+    height: 100%;
+    width: 108rem;
+    flex-shrink: 0;
+}
+
+@media (max-width: 108rem){
+    .spacer{
+        display: none;
+    }
+
+    #main{
+        flex-shrink: 1;
+    }
+}

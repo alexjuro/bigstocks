@@ -4,6 +4,7 @@ import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import sharedStyle from '../shared.css?inline';
 import componentStyle from './header.css?inline';
+//import backgroundsvg from './backgroundlogo.svg';
 
 
 @customElement('app-header')
