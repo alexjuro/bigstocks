@@ -7,7 +7,12 @@
   --app-background: #121212;
   --app-error-color: #cf6679;
 }
+
+*{
+  padding: 0px;
+  margin: 0px;
+}
+
 body {
-  font-family: 'Open Sans', sans-serif;
-  margin: 0;
+  background-image: url(./components/leaderboard2/-2___1_better.jpg);
 }
