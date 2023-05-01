@@ -5,6 +5,10 @@
     margin: 0px;
 }
 
+body{
+    background-image: url(./-2___1_better.jpg);
+}
+
 #maincontainer{
     display: flex;
     flex-direction: row;
@@ -20,7 +24,6 @@
 #main{
     height: 93vh;
     width: 100rem;
-    background-color: lightblue;
     flex-shrink: 0;
 }
 
@@ -32,7 +35,6 @@
 .spacer{
     width: 100%;
     height: 8vh;
-    background-color: crimson;
 }
 
 #topthree{
@@ -54,20 +56,36 @@
 
 #spaceone{
     grid-area: sone;
-    background-color: aquamarine;
-}
-#spacetwo{
-    grid-area: stwo;
-    background-color: aquamarine;
-}
-#spacethree{
-    grid-area: sthree;
-    background-color: aquamarine;
 }
 
-#one{grid-area: one;}
-#two{grid-area: two;}
-#three{grid-area: three;}
+#spacetwo{
+    grid-area: stwo;
+}
+
+#spacethree{
+    grid-area: sthree;
+}
+
+#one{
+    grid-area: one;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    z-index: 3;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+#two{
+    grid-area: two;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 3px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+}
+
+#three{
+    grid-area: three;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 3px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;}
 
 .placement{
     background-color: #424242;
@@ -110,7 +128,7 @@
         top: 5px;
     }
     50%{
-        top: -10px;
+        top: -7px;
     }
     100%{
         top: 5px;
@@ -121,7 +139,7 @@
     position: relative;
     top: 5px;
     animation-name: levitate ;
-    animation-duration: 5s;
+    animation-duration: 4s;
     animation-iteration-count: infinite;
     animation-timing-function: ease-in-out;
 }
@@ -137,13 +155,32 @@
     flex-direction: row;
 
     background-color: aquamarine;
+
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
 }
 
 .boardhalf{
     width: 50%;
     height: 100%;
+    list-style-position: inside;
 }
 
-#names{
-    background-color: antiquewhite;
+#scores ol{
+    list-style: none;
+}
+
+a{
+    text-decoration: none;
+    color: white;
+    font-size: 3vh;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
+#scores ol li{
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 3vh;
+    color: white;
 }
