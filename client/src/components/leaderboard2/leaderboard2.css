@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
+
+*{
+    padding: 0px;
+    margin: 0px;
+}
+
+#maincontainer{
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+}
+
+#left{
+    height: 93vh;
+    width: 100%;
+}
+
+#main{
+    height: 93vh;
+    width: 100rem;
+    background-color: lightblue;
+    flex-shrink: 0;
+}
+
+#right{
+    height: 93vh;
+    width: 100%;
+}
+
+.spacer{
+    width: 100%;
+    height: 8vh;
+    background-color: crimson;
+}
+
+#topthree{
+    width: 50%;
+    height: 30vh;
+
+    position: relative;
+    left: 25%;
+
+    display: grid;
+    grid-template-columns:  1fr 1fr 1fr;
+    grid-template-rows:     50% 1fr 1fr 1fr;
+    grid-template-areas: 
+    "sthree     sone    stwo"
+    "sthree     one     stwo"
+    "sthree     one     two"
+    "three      one     two";
+}
+
+#spaceone{
+    grid-area: sone;
+    background-color: aquamarine;
+}
+#spacetwo{
+    grid-area: stwo;
+    background-color: aquamarine;
+}
+#spacethree{
+    grid-area: sthree;
+    background-color: aquamarine;
+}
+
+#one{grid-area: one;}
+#two{grid-area: two;}
+#three{grid-area: three;}
+
+.placement{
+    background-color: #424242;
+    display: flex;
+    justify-content: center;
+    color: white;
+    font-size: 2vh;
+    padding: 10px 0px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
+.placementnames{
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+}
+
+.placementnames img{
+    height: 7vh;
+    margin-bottom: 20px;
+}
+
+.placementnames a{
+    display: flex;
+    justify-content: center;
+    padding-bottom: 5px;
+}
+
+#throphythree{
+    rotate: -15deg;
+}
+
+#throphytwo{
+    rotate: 15deg;
+}
+
+@keyframes levitate {
+    0%{
+        top: 5px;
+    }
+    50%{
+        top: -10px;
+    }
+    100%{
+        top: 5px;
+    }
+}
+
+#throphyone{
+    position: relative;
+    top: 5px;
+    animation-name: levitate ;
+    animation-duration: 5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+#board{
+    width: 60%;
+    height: 40vh;
+
+    position: relative;
+    left: 20%;
+
+    display: flex;
+    flex-direction: row;
+
+    background-color: aquamarine;
+}
+
+.boardhalf{
+    width: 50%;
+    height: 100%;
+}
+
+#names{
+    background-color: antiquewhite;
+}
