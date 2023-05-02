@@ -10,8 +10,9 @@ const router = express.Router();
 router.get('/profile', authService.authenticationMiddleware, async (req, res) => {
   const dao: GenericDAO<User> = req.app.locals.userDAO;
 
-  const { name, email } = (await dao.findOne(req.app.locals.user))!;
-  const user = { name, email };
+  // WARN: security concern?
+  const { name, email, password } = (await dao.findOne(req.app.locals.user))!;
+  const user = { name, email, password };
 
   email ? res.status(200).json(user) : res.status(404).json({ status: 'unable to fetch user information' });
 });
