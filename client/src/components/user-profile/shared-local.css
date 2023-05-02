@@ -1,0 +1,25 @@
+input {
+  display: inline-block;
+  width: 300px;
+  border: 1px solid #aaa;
+  border-radius: 2px;
+  padding: 4px 6px;
+}
+
+label {
+  color: 777;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+span {
+  position: relative;
+  display: inline;
+}
+
+span::before {
+  position: absolute;
+  right: 10px;
+  top: -4px;
+  color: var(--app-error-color);
+}

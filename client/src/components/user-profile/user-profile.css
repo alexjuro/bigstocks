@@ -3,49 +3,11 @@
   margin: 1rem;
 }
 
-button {
-  margin-top: 0.6rem;
-  border: 1px solid #aaa;
-  border-radius: 2px;
-}
-
 hr {
   border: none;
   border-bottom: 2px solid #aaa;
   border-radius: 2px;
   width: 100%;
-}
-
-input {
-  display: inline-block;
-  width: 300px;
-  border: 1px solid #aaa;
-  border-radius: 2px;
-  padding: 4px 6px;
-}
-
-label {
-  color: 777;
-  display: block;
-  margin-bottom: 0.2rem;
-}
-
-span {
-  position: relative;
-  display: inline;
-}
-
-span::before {
-  position: absolute;
-  right: 10px;
-  top: -4px;
-  color: var(--app-error-color);
-}
-
-#annotation {
-  font-size: 0.8em;
-  margin-top: 4px;
-  color: #777;
 }
 
 .divider {
@@ -58,10 +20,18 @@ span::before {
   border: 1px solid var(--app-info-color);
 }
 
-.was-validated input:invalid + span::before {
+.was-validated input:invalid ~ span::before {
   content: '⨯';
 }
-.was-validated input:valid + span::before {
+
+.was-validated input:valid ~ span::before {
   color: var(--app-info-color);
   content: '✓';
+}
+
+.was-validated input:invalid ~ .invalid-feedback {
+  color: var(--app-error-color);
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  display: block;
 }
