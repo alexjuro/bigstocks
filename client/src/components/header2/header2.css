@@ -24,7 +24,7 @@
     position: relative;
     height: 6vh;
     top: 1vh;
-    left: -12px;
+    filter: blur(0.5px) opacity(70%) brightness(90%);
 }
 
 #layertwo{
