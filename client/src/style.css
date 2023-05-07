@@ -1,18 +1,58 @@
-/* Autor: Prof. Dr. Norman Lahme-Hütig (FH Münster) */
-
-:root {
-  --app-primary: #BB86FC;
-  --app-primary-variant: #3700B3;
-  --app-secondary: #03DAC6;
-  --app-background: #121212;
-  --app-error-color: #cf6679;
-}
-
+/* Autor: Alexander Lensjak */
 *{
   padding: 0px;
   margin: 0px;
+  box-sizing: border-box;
 }
 
-body {
-  background-image: url(./components/leaderboard2/-2___1_better.jpg);
+body{
+  background-color: #121212;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
+
+#maincontainer{
+  display: flex;
+  flex-direction: row;
+  width: 400%;
+  height: 93vh;
+
+  position: relative;
+  right: 100%;
+  transition: right 0.4s ease-in-out;
+}
+
+.page{
+  width: 200%;
+  height: 100%;
+}
+
+#news{
+  background-color: aquamarine;
+}
+
+#leaderboard{
+  background-color: lightblue;
+}
+
+#portfolio{
+  background-color: lightcyan;
+}
+
+#profile{
+  background-color: lightskyblue;
+}
+
+#left{
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+}
+
+#right{
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+
