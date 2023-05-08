@@ -153,4 +153,4 @@ export const stocks: Stock[] = [
     price: 0,
     dailyPercentage: 0
   }
-]
+];

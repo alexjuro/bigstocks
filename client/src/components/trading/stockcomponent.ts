@@ -4,7 +4,7 @@ import { LitElement, html } from 'lit';
 import { StockService } from '../../stock-service.js';
 import { stocks, UserStock } from '../../interfaces/stock-interface.js';
 
-export abstract class StockComponent extends PageMixin(LitElement){
+export abstract class StockComponent extends PageMixin(LitElement) {
   protected userStocks: UserStock[] = [];
   protected stockService: StockService | null = null;
 
@@ -13,77 +13,73 @@ export abstract class StockComponent extends PageMixin(LitElement){
   }
 
   getStockSymbols(): string[] {
-    return this.userStocks.map((stock) => stock.symbol);
+    return this.userStocks.map(stock => stock.symbol);
   }
 
   getStockNames(): string[] {
-    return this.userStocks.map((stock) => stock.name);
+    return this.userStocks.map(stock => stock.name);
   }
 
   getStockPrices(): number[] {
-    return this.userStocks.map((stock) => stock.price);
+    return this.userStocks.map(stock => stock.price);
   }
 
   getStockDailyPercentage(): number[] {
-    return this.userStocks.map((stock) => stock.dailyPercentage);
+    return this.userStocks.map(stock => stock.dailyPercentage);
   }
 
-  sendSubscriptions(): void{
+  sendSubscriptions(): void {
     for (const stock of this.userStocks) {
       this.stockService!.subscribe(stock.symbol);
     }
   }
 
-    updateStockPrice(symbol: string, price: number): void {
-    let cssClass = "blinkRed";
+  updateStockPrice(symbol: string, price: number): void {
+    let cssClass = 'blinkRed';
     for (const stock of this.userStocks) {
       if (stock.symbol === symbol) {
         if (stock.price === price) {
           break;
         }
         if (stock.price < price) {
-          cssClass = "blinkGreen";
+          cssClass = 'blinkGreen';
         }
         stock.price = price;
 
-          if (this.shadowRoot) {
-              const element = this.shadowRoot.getElementById("dot" + stock.symbol);
-          
-              if (element) {
-                  element.classList.add(cssClass);
-                  setTimeout(() => {
-                      element.classList.remove(cssClass);
-                  }, 1000);
-              }
+        if (this.shadowRoot) {
+          const element = this.shadowRoot.getElementById('dot' + stock.symbol);
+
+          if (element) {
+            element.classList.add(cssClass);
+            setTimeout(() => {
+              element.classList.remove(cssClass);
+            }, 1000);
           }
+        }
         break;
       }
     }
   }
 
-    updateStockDailyPercentage(symbol: string, percentage: number): void {
-        
-        const stock = this.userStocks.find((s) => s.symbol === symbol);
-        if (!stock) return;
+  updateStockDailyPercentage(symbol: string, percentage: number): void {
+    const stock = this.userStocks.find(s => s.symbol === symbol);
+    if (!stock) return;
 
-        if (this.shadowRoot) {
-            const element = this.shadowRoot.getElementById(`perc${stock.symbol}`);
-            if (!element) {
-                console.log("FAIL");
-                return;
-            }
+    if (this.shadowRoot) {
+      const element = this.shadowRoot.getElementById(`perc${stock.symbol}`);
+      if (!element) {
+        console.log('FAIL');
+        return;
+      }
 
-            element.classList.remove("setTextGreen", "setTextRed");
-            const cssClass = percentage >= 0 ? "setTextGreen" : "setTextRed";
-            element.classList.add(cssClass);
-            stock.dailyPercentage = percentage;
-        }
+      element.classList.remove('setTextGreen', 'setTextRed');
+      const cssClass = percentage >= 0 ? 'setTextGreen' : 'setTextRed';
+      element.classList.add(cssClass);
+      stock.dailyPercentage = percentage;
     }
+  }
 
   getStockShares(): number[] {
-    return this.userStocks.map((stock) => stock.shares);
+    return this.userStocks.map(stock => stock.shares);
   }
-    
-
-
 }
