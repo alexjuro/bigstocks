@@ -14,59 +14,6 @@
   </head>
 
   <body>
-    <app-header></app-header>
-
-    <div id="maincontainer">
-      <div id="news" class="page">news</div>
-      <div id="leaderboard" class="page">leaderboard</div>
-      <div id="portfolio" class="page">portfolio</div>
-      <div id="profile" class="page">profile</div>
-    </div>
-
-    <button id="left" onclick="left()">left</button>
-    <button id="right" onclick="right()">right</button>
+    <app-root></app-root>
   </body>
-
-<script>
-  const maincontainer = document.getElementById('maincontainer')
-
-var pos = 100;
-
-function left(){
-    if(pos == 0){
-        maincontainer.style.right = pos + "%";
-    }
-    else{
-        pos = pos - 100;
-        maincontainer.style.right = pos + "%";
-    }
-}
-
-function right(){
-    if(pos == 300){
-        maincontainer.style.right = pos + "%";
-    }
-    else{
-        pos = pos + 100;
-        maincontainer.style.right = pos + "%";
-    }
-}
-
-function news(){
-    maincontainer.style.right = "0%";
-}
-
-function leaderboard(){
-    maincontainer.style.right = "100%";
-}
-
-function portfolio(){
-    maincontainer.style.right = "200%";
-}
-
-function profile(){
-    maincontainer.style.right = "300%";
-}
-</script>
-
 </html>
