@@ -2,9 +2,6 @@
 
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { httpClient } from '../../http-client';
-import { router } from '../../router/router';
-import sharedStyle from '../shared.css?inline';
 import componentStyle from './app.css?inline';
 
 @customElement('app-root')
@@ -14,63 +11,85 @@ class AppComponent extends LitElement {
   static styles = componentStyle;
 
   pos = 100;
-  page = 1;
-  pages = ['news', 'leaderboard', 'protfolio', 'profile'];
 
   constructor() {
     super();
-    const port = 3000;
-    httpClient.init({ baseURL: `${location.protocol}//${location.hostname}:${port}/api/` });
+    this._left = this._left.bind(this);
+    this._right = this._right.bind(this);
+    this._onPopState = this._onPopState.bind(this);
   }
 
-  /*
-    function left() {
-      if (pos == 0) {
-        maincontainer!.style.right = pos + '%';
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener('popstate', this._onPopState);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('popstate', this._onPopState);
+  }
+
+  private _left() {
+    if (this.pos != 0) {
+      this.pos = this.pos - 100;
+      this._move(this.pos);
+
+      if (this.pos == 0) {
+        window.history.pushState({ showing: 'news' }, '', '/news');
+      }
+      if (this.pos == 100) {
+        window.history.pushState({ showing: 'leaderboard' }, '', '/leaderboard');
+      }
+      if (this.pos == 200) {
+        window.history.pushState({ showing: 'portfolio' }, '', '/portfolio');
+      }
+    }
+  }
+
+  private _right() {
+    if (this.pos != 300) {
+      this.pos = this.pos + 100;
+      this._move(this.pos);
+
+      if (this.pos == 100) {
+        window.history.pushState({ showing: 'leaderboard' }, '', '/leaderboard');
+      }
+      if (this.pos == 200) {
+        window.history.pushState({ showing: 'portfolio' }, '', '/portfolio');
+      }
+      if (this.pos == 300) {
+        window.history.pushState({ showing: 'profile' }, '', '/profile');
+      }
+    }
+  }
+
+  private _onPopState(event: PopStateEvent) {
+    if (event.state) {
+      if (event.state.showing === 'news') {
+        this.pos = 0;
+        this._move(this.pos);
+      } else if (event.state.showing === 'leaderboard') {
+        this.pos = 100;
+        this._move(this.pos);
+      } else if (event.state.showing === 'portfolio' || window.location.pathname.endsWith('/portfolio')) {
+        this.pos = 200;
+        this._move(this.pos);
+      } else if (event.state.showing === 'profile') {
+        this.pos = 300;
+        this._move(this.pos);
       } else {
-        pos = pos - 100;
-        maincontainer!.style.right = pos + '%';
+        this.pos = 100;
+        this._move(this.pos);
       }
+    } else {
+      this.pos = 100;
+      this._move(this.pos);
     }
+  }
 
-    function right() {
-      if (pos == 300) {
-        maincontainer!.style.right = pos + '%';
-      } else {
-        pos = pos + 100;
-        maincontainer!.style.right = pos + '%';
-      }
-    }
-
-    function news() {
-      maincontainer!.style.right = '0%';
-    }
-
-    function leaderboard() {
-      maincontainer!.style.right = '100%';
-    }
-
-    function portfolio() {
-      maincontainer!.style.right = '200%';
-    }
-
-    function profile() {
-      maincontainer!.style.right = '300%';
-    }*/
-
-  //vielleicht irgendwie die url catchen und dann anhand daran und this.page anzeigen was angezeigt wird
-
-  renderSelect() {
-    return router.select(
-      {
-        'users/sign-in': () => html`<app-header></app-header>`,
-        'users/sign-up': () => html`<sign-up></sing-up>`,
-        'stonks': () => html`<app-stonks></app-stonks>`
-      },
-      () => {
-        return html`<app-stonks></app-stonks>`;
-      }
-    );
+  private _move(pos: number) {
+    const maincontainer = this.shadowRoot!.getElementById('maincontainer');
+    maincontainer!.style.right = this.pos + '%';
   }
 
   render() {
@@ -88,31 +107,5 @@ class AppComponent extends LitElement {
 
       <button id="left" @click="${this._left}">left</button>
       <button id="right" @click="${this._right}">right</button>`;
-  }
-
-  _left() {
-    const maincontainer = this.shadowRoot!.getElementById('maincontainer');
-
-    if (this.pos == 0) {
-      maincontainer!.style.right = this.pos + '%';
-    } else {
-      this.pos = this.pos - 100;
-      this.page--;
-      maincontainer!.style.right = this.pos + '%';
-      window.history.pushState('obj', 'newtitle', this.pages[this.page]);
-    }
-  }
-
-  _right() {
-    const maincontainer = this.shadowRoot!.getElementById('maincontainer');
-
-    if (this.pos == 300) {
-      maincontainer!.style.right = this.pos + '%';
-    } else {
-      this.pos = this.pos + 100;
-      this.page++;
-      maincontainer!.style.right = this.pos + '%';
-      window.history.pushState('obj', 'newtitle', this.pages[this.page]);
-    }
   }
 }
