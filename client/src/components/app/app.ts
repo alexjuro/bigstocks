@@ -1,5 +1,4 @@
 /* Autor: Alexander Lesnjak */
-
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import componentStyle from './app.css?inline';
@@ -22,6 +21,11 @@ class AppComponent extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('popstate', this._onPopState);
+    const currentPath = window.location.pathname;
+    if (currentPath === '/portfolio') {
+      this.pos = 200;
+      this._move(this.pos);
+    }
   }
 
   disconnectedCallback() {
@@ -32,55 +36,44 @@ class AppComponent extends LitElement {
   private _left() {
     if (this.pos != 0) {
       this.pos = this.pos - 100;
-      this._move(this.pos);
-
-      if (this.pos == 0) {
-        window.history.pushState({ showing: 'news' }, '', '/news');
-      }
-      if (this.pos == 100) {
-        window.history.pushState({ showing: 'leaderboard' }, '', '/leaderboard');
-      }
-      if (this.pos == 200) {
-        window.history.pushState({ showing: 'portfolio' }, '', '/portfolio');
-      }
+      this._jumpTo(this.pos);
     }
   }
 
   private _right() {
     if (this.pos != 300) {
       this.pos = this.pos + 100;
-      this._move(this.pos);
-
-      if (this.pos == 100) {
-        window.history.pushState({ showing: 'leaderboard' }, '', '/leaderboard');
-      }
-      if (this.pos == 200) {
-        window.history.pushState({ showing: 'portfolio' }, '', '/portfolio');
-      }
-      if (this.pos == 300) {
-        window.history.pushState({ showing: 'profile' }, '', '/profile');
-      }
+      this._jumpTo(this.pos);
     }
+  }
+
+  private _jumpTo(pos: number) {
+    if (this.pos == 0) {
+      window.history.pushState({ showing: 'news' }, '', '/news');
+    } else if (this.pos == 100) {
+      window.history.pushState({ showing: 'leaderboard' }, '', '/leaderboard');
+    } else if (this.pos == 200) {
+      window.history.pushState({ showing: 'portfolio' }, '', '/portfolio');
+    } else if (this.pos == 300) {
+      window.history.pushState({ showing: 'profile' }, '', '/profile');
+    }
+    this._move(this.pos);
   }
 
   private _onPopState(event: PopStateEvent) {
     if (event.state) {
       if (event.state.showing === 'news') {
         this.pos = 0;
-        this._move(this.pos);
       } else if (event.state.showing === 'leaderboard') {
         this.pos = 100;
-        this._move(this.pos);
-      } else if (event.state.showing === 'portfolio' || window.location.pathname.endsWith('/portfolio')) {
+      } else if (event.state.showing === 'portfolio') {
         this.pos = 200;
-        this._move(this.pos);
       } else if (event.state.showing === 'profile') {
         this.pos = 300;
-        this._move(this.pos);
       } else {
         this.pos = 100;
-        this._move(this.pos);
       }
+      this._move(this.pos);
     } else {
       this.pos = 100;
       this._move(this.pos);
