@@ -21,11 +21,6 @@ class AppComponent extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('popstate', this._onPopState);
-    const currentPath = window.location.pathname;
-    if (currentPath === '/portfolio') {
-      this.pos = 200;
-      this._move(this.pos);
-    }
   }
 
   disconnectedCallback() {
@@ -60,6 +55,11 @@ class AppComponent extends LitElement {
     this._move(this.pos);
   }
 
+  private _move(pos: number) {
+    const maincontainer = this.shadowRoot!.getElementById('maincontainer');
+    maincontainer!.style.right = this.pos + '%';
+  }
+
   private _onPopState(event: PopStateEvent) {
     if (event.state) {
       if (event.state.showing === 'news') {
@@ -78,11 +78,6 @@ class AppComponent extends LitElement {
       this.pos = 100;
       this._move(this.pos);
     }
-  }
-
-  private _move(pos: number) {
-    const maincontainer = this.shadowRoot!.getElementById('maincontainer');
-    maincontainer!.style.right = this.pos + '%';
   }
 
   render() {
