@@ -3,6 +3,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { httpClient } from '../../http-client';
+import { router } from '../../router/router';
 import sharedStyle from '../shared.css?inline';
 import componentStyle from './app.css?inline';
 
@@ -59,12 +60,28 @@ class AppComponent extends LitElement {
 
   //vielleicht irgendwie die url catchen und dann anhand daran und this.page anzeigen was angezeigt wird
 
+  renderSelect() {
+    return router.select(
+      {
+        'users/sign-in': () => html`<app-header></app-header>`,
+        'users/sign-up': () => html`<sign-up></sing-up>`,
+        'stonks': () => html`<app-stonks></app-stonks>`
+      },
+      () => {
+        return html`<app-stonks></app-stonks>`;
+      }
+    );
+  }
+
   render() {
     return html` <app-header></app-header>
 
       <div id="maincontainer">
         <div id="news" class="page">news</div>
-        <div id="leaderboard" class="page">leaderboard</div>
+        <div id="leaderboard" class="page">
+          leaderboard
+          <app-leaderboard></app-leaderboard>
+        </div>
         <div id="portfolio" class="page">portfolio</div>
         <div id="profile" class="page">profile</div>
       </div>
