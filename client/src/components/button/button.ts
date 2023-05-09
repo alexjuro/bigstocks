@@ -28,6 +28,9 @@ export class MeinElement extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('popstate', this._onPopState);
+    if (window.location.pathname === '/bgcolorchangedred') {
+      document.body.style.backgroundColor = 'red';
+    }
   }
 
   disconnectedCallback() {

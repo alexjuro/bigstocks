@@ -21,6 +21,27 @@ class AppComponent extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('popstate', this._onPopState);
+    if (window.location.pathname === '/news') {
+      setTimeout(() => {
+        const maincontainer = this.shadowRoot!.getElementById('maincontainer');
+        maincontainer!.style.right = '0%';
+      }, 0);
+    } else if (window.location.pathname === '/leaderboard') {
+      setTimeout(() => {
+        const maincontainer = this.shadowRoot!.getElementById('maincontainer');
+        maincontainer!.style.right = '100%';
+      }, 0);
+    } else if (window.location.pathname === '/portfolio') {
+      setTimeout(() => {
+        const maincontainer = this.shadowRoot!.getElementById('maincontainer');
+        maincontainer!.style.right = '200%';
+      }, 0);
+    } else if (window.location.pathname === '/profile') {
+      setTimeout(() => {
+        const maincontainer = this.shadowRoot!.getElementById('maincontainer');
+        maincontainer!.style.right = '300%';
+      }, 0);
+    }
   }
 
   disconnectedCallback() {
