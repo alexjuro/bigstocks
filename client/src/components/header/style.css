@@ -1,35 +1,39 @@
-*{
-    padding: 0px;
-    margin: 0px;
-    box-sizing: border-box;
+* {
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
 }
 
-#headercontainer{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    
-    width: 100%;
-    height: 7vh;
+#headercontainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 
-    background-color: lightpink;
+  width: 100%;
+  height: 7vh;
+
+  position: relative;
+  z-index: 3;
+
+  background-color: lightblue;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
 }
 
 #logo {
-    width: 20%;
-    padding-left: 10px;
-    cursor: pointer;
+  width: 20%;
+  padding-left: 10px;
+  cursor: pointer;
 }
 
-#nav{
-    width: 80%;
-    display: flex;
-    flex-direction: row;
-    justify-content: end;
+#nav {
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
 }
 
-.navelem{
-    background-color: aquamarine;
-    margin: 0px 10px;
-    cursor: pointer;
+.navelem {
+  background-color: aquamarine;
+  margin: 0px 10px;
+  cursor: pointer;
 }
