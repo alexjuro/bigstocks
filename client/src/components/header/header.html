@@ -1,20 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./header.css" />
     <title>Document</title>
-</head>
-<body>
+  </head>
+  <body>
     <div id="headercontainer">
-        <div id="logo" onclick="leaderboard()">bigstocks</div>
-        <div id="nav">
-            <div class="navelem" onclick="news()">news</div>
-            <div class="navelem" onclick="portfolio()">portfolio</div>
-            <div class="navelem" onclick="profile()">profile</div>
-        </div>
+      <div id="logo">bigstocks</div>
+      <div id="pagetitle">pagename</div>
+      <div id="nav">
+        <div class="navelem"><a href="/news">news</a></div>
+        <div class="navelem"><a href="/portfolio">portfolio</a></div>
+        <div class="navelem"><a href="/profile">profile</a></div>
+        <button id="hamburger" onclick="toggleNav()">
+          <img src="./list.svg" alt="" height="20px" width="20px" />
+        </button>
+      </div>
     </div>
-</body>
+
+    <nav id="navMobile">
+      <div class="mobileelem"><a href="/news">news</a></div>
+      <div class="mobileelem"><a href="/portfolio">portfolio</a></div>
+      <div class="mobileelem"><a href="/profile">profile</a></div>
+    </nav>
+  </body>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const navMobile = document.getElementById('navMobile');
+
+    let isNavMobileOpen = false;
+
+    function toggleNav() {
+      if (isNavMobileOpen) {
+        navMobile.style.display = 'none';
+        isNavMobileOpen = false;
+      } else {
+        navMobile.style.display = 'flex';
+        isNavMobileOpen = true;
+      }
+    }
+
+    function hideNavMobile() {
+      if (window.innerWidth > 900) {
+        navMobile.style.display = 'none';
+        isNavMobileOpen = false;
+      }
+    }
+
+    window.addEventListener('resize', hideNavMobile);
+  </script>
 </html>
