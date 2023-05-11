@@ -1,0 +1,127 @@
+.market-news {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-gap: 50px;
+  margin: 50px auto;
+  max-width: 1200px;
+}
+
+.article {
+  display: flex;
+  flex-direction: column;
+  height: 350px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #9370db;
+  color: ghostwhite;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.article:hover {
+  height: auto;
+  transform: scale(1);
+}
+
+.article-headline {
+  margin: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  transition: all 0.4s ease-in-out;
+  position: absolute;
+  top: calc(50% + 20px);
+  left: 20px;
+  right: 20px;
+  z-index: 1;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  transform: translateY(50%);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.article:hover .article-headline {
+  margin: 10px 20px 0;
+  font-size: 20px;
+  top: 20px;
+  transform: translateY(0);
+}
+
+.article-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 0 0 10px 10px;
+  transform: translateY(100%);
+  transition: all 0.25s ease-in-out;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100%);
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  padding: 20px;
+}
+
+.article:hover .article-content {
+  transform: translateY(0);
+  transition-delay: 0.1s;
+}
+
+.article h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.article p {
+  margin: 0;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.article-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 10px 10px 0 0;
+  outline: none;
+  transition: all 0.4s ease-in-out;
+  filter: blur(0px);
+}
+
+.article:hover .article-image {
+  height: 250px;
+  filter: blur(3px);
+}
+
+.article-content a {
+  color: #f0f;
+  text-decoration: underline;
+  font-size: 16px;
+}
+
+.article-content a:hover {
+  color: #006400;
+  text-decoration-color: #006400;
+  cursor: pointer;
+}
+
+.article-content p.article-summary {
+  margin-bottom: 20px;
+}
+
+.article:hover p.article-summary {
+  margin-bottom: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  .market-news {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-gap: 20px;
+  }
+}

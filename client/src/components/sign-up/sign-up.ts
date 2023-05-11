@@ -29,6 +29,7 @@ class SignUpComponent extends PageMixin(LitElement) {
       ${this.renderNotification()}
       <div class="Login-page">
         <div class="form ">
+          <h1>Sign-Up</h1>
           <form novalidate>
             <div>
               <label for="name">Name</label>
@@ -54,10 +55,10 @@ class SignUpComponent extends PageMixin(LitElement) {
             </div>
             <button type="button" @click="${this.submit}">Create account</button>
             <p class="message">
-              Already registered?
-              <a @click="${this.signIn}" href="/users/sign-up">Sign-In</a>
-            </p>
+              Already registered? <button @click="${this.signIn}">Sign-In</button>
           </form>
+            </p>
+           
         </div>
       </div>
     `;
@@ -72,8 +73,8 @@ class SignUpComponent extends PageMixin(LitElement) {
         passwordCheck: this.passwordCheckElement.value
       };
       try {
-        await httpClient.post('users', accountData);
-        router.navigate('/tasks');
+        await httpClient.post('users/sign-up', accountData);
+        router.navigate('/main');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
       }
@@ -84,7 +85,7 @@ class SignUpComponent extends PageMixin(LitElement) {
 
   isFormValid() {
     if (this.passwordElement.value !== this.passwordCheckElement.value) {
-      this.passwordCheckElement.setCustomValidity('Passwörter müssen gleich sein');
+      this.passwordCheckElement.setCustomValidity('Please ensure that your passwords are identical');
     } else {
       this.passwordCheckElement.setCustomValidity('');
     }
@@ -92,6 +93,7 @@ class SignUpComponent extends PageMixin(LitElement) {
   }
 
   async signIn() {
-    window.location.href = 'users/sign-in';
+    // window.location.href = 'users/sign-in';
+    router.navigate('users/sign-in');
   }
 }

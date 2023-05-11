@@ -9,6 +9,7 @@ import { InMemoryGenericDAO } from './models/in-memory-generic.dao.js';
 // TODO: Models importieren
 
 import config from '../config.json' assert { type: 'json' };
+import { User } from './models/user.js';
 const { MongoClient } = mongodb;
 const { Client } = pg;
 
@@ -30,7 +31,9 @@ async function startInMemoryDB(app: Express) {
 
 async function startMongoDB(app: Express) {
   const client = await connectToMongoDB();
-  const db = client.db('myapp');
+  const db = client.db('bigstocks');
+  app.locals.userDAO = new MongoGenericDAO<User>(db, 'users');
+
   // TODO: DAOs erzeugen
   return async () => await client.close();
 }

@@ -38,6 +38,7 @@
     "vite": "^4.1.4"
   },
   "dependencies": {
+    "finnhub": "^1.2.17",
     "lit": "^2.6.1"
   }
 }

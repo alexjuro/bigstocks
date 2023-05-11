@@ -4,10 +4,11 @@ import { LitElement, html } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import { PageMixin } from '../page.mixin.js';
+import { router } from '../../router/router.js';
+
 import sharedStyle from '../shared.css?inline';
 import style from './style.css?inline';
 
-// ToDo: Add ComponentStyle
 @customElement('sign-in')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class SignInComponent extends PageMixin(LitElement) {
@@ -24,6 +25,7 @@ class SignInComponent extends PageMixin(LitElement) {
       ${this.renderNotification()}
       <div class="Login-Page">
         <div class="form">
+          <h1>Log-In</h1>
           <form novalidate class="login-form">
             <div>
               <label for="email">E-Mail</label>
@@ -38,7 +40,7 @@ class SignInComponent extends PageMixin(LitElement) {
             <button type="button" @click="${this.submit}">Sign-In</button>
             <p class="message">
               Not registered?
-              <a @click="${this.signUp}" href="/users/sign-up">Create an account</a>
+              <button @click="${this.signUp}">Create an account</button>
             </p>
           </form>
         </div>
@@ -54,7 +56,7 @@ class SignInComponent extends PageMixin(LitElement) {
       };
       try {
         await httpClient.post('/users/sign-in', authData);
-        //router.navigate('/tasks'); --> Add our Website
+        router.navigate('/news');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
       }
@@ -68,6 +70,6 @@ class SignInComponent extends PageMixin(LitElement) {
   }
 
   async signUp() {
-    window.location.href = 'users/sign-up';
+    router.navigate('users/sign-up');
   }
 }
