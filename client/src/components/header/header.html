@@ -4,62 +4,67 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./header.css" />
+    <link rel="stylesheet" href="header.css" />
     <title>Document</title>
   </head>
   <body>
-    <div id="headercontainer">
-      <div id="logo">bigstocks</div>
-      <div id="pagetitle">pagename</div>
-      <div id="nav">
-        <div class="navelem"><a href="/news">news</a></div>
-        <div class="navelem"><a href="/portfolio">portfolio</a></div>
-        <div class="navelem"><a href="/profile">profile</a></div>
-        <button id="hamburger" onclick="toggleNav()">
-          <img src="./list.svg" alt="" height="20px" width="20px" />
-        </button>
-      </div>
-    </div>
-
-    <div id="navMobile">
-      <div class="mobileelem"><a href="/news">news</a></div>
-      <div class="mobileelem"><a href="/portfolio">portfolio</a></div>
-      <div class="mobileelem"><a href="/profile">profile</a></div>
-    </div>
-
     <div id="background">
-      <div id="mobilekreis"></div>
+      <div id="circle"></div>
+    </div>
+    <div id="background2">
+      <nav id="mnav">
+        <ul>
+          <li><a href="">news</a></li>
+          <li><a href="">portfolio</a></li>
+          <li><a href="">profile</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div id="flexheader">
+      <div id="left" class="headelem"><a href="">bigstocks</a></div>
+      <div id="mid" class="headelem"><a href="">pagename</a></div>
+      <div id="right" class="headelem">
+        <nav id="dnav">
+          <a href="">news</a>
+          <a href="">portfolio</a>
+          <a href="">profile</a>
+        </nav>
+        <button id="btn" onclick="toggle()"><img src="../../../public/list.svg" alt="" height="27px" /></button>
+      </div>
     </div>
   </body>
 
   <script>
-    const hamburger = document.getElementById('hamburger');
-    const navMobile = document.getElementById('navMobile');
-    const kreis = document.getElementById('mobilekreis');
+    const circle = document.getElementById('circle');
+    const mnav = document.getElementById('mnav');
 
-    let isNavMobileOpen = false;
+    let visable = false;
 
-    function toggleNav() {
-      if (isNavMobileOpen) {
-        navMobile.style.display = 'none';
-        isNavMobileOpen = false;
-        kreis.style.width = '0vw';
-        kreis.style.height = '0vh';
+    function toggle() {
+      if (visable) {
+        circle.style.width = '0px';
+        circle.style.height = '0px';
+        mnav.style.display = 'none';
+        visable = false;
       } else {
-        navMobile.style.display = 'flex';
-        isNavMobileOpen = true;
-        kreis.style.width = '70vw';
-        kreis.style.height = '40vh';
+        circle.style.width = '220px';
+        circle.style.height = '220px';
+        setTimeout(function () {
+          mnav.style.display = 'block';
+        }, 280);
+        visable = true;
       }
     }
 
-    function hideNavMobile() {
-      if (window.innerWidth > 900) {
-        navMobile.style.display = 'none';
-        isNavMobileOpen = false;
+    function autoResize() {
+      if (window.innerWidth >= 810) {
+        circle.style.width = '0px';
+        circle.style.height = '0px';
+        mnav.style.display = 'none';
+        visable = false;
       }
     }
 
-    window.addEventListener('resize', hideNavMobile);
+    window.addEventListener('resize', autoResize);
   </script>
 </html>
