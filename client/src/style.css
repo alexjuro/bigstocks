@@ -4,7 +4,7 @@
 :root {
   --background: ghostwhite;
   --primary: #9370db;
-  --primaryVariation: #9480d8;
+  --primaryVariation: rgb(148, 128, 216);
   --secondary: #6a5acd;
 }
 
