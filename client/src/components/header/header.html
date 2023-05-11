@@ -21,16 +21,21 @@
       </div>
     </div>
 
-    <nav id="navMobile">
+    <div id="navMobile">
       <div class="mobileelem"><a href="/news">news</a></div>
       <div class="mobileelem"><a href="/portfolio">portfolio</a></div>
       <div class="mobileelem"><a href="/profile">profile</a></div>
-    </nav>
+    </div>
+
+    <div id="background">
+      <div id="mobilekreis"></div>
+    </div>
   </body>
 
   <script>
     const hamburger = document.getElementById('hamburger');
     const navMobile = document.getElementById('navMobile');
+    const kreis = document.getElementById('mobilekreis');
 
     let isNavMobileOpen = false;
 
@@ -38,9 +43,13 @@
       if (isNavMobileOpen) {
         navMobile.style.display = 'none';
         isNavMobileOpen = false;
+        kreis.style.width = '0vw';
+        kreis.style.height = '0vh';
       } else {
         navMobile.style.display = 'flex';
         isNavMobileOpen = true;
+        kreis.style.width = '70vw';
+        kreis.style.height = '40vh';
       }
     }
 
