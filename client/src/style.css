@@ -1,6 +1,13 @@
 /* Autor: Alexander Lensjak */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
+:root {
+  --background: ghostwhite;
+  --primary: #9370db;
+  --primaryVariation: #9480d8;
+  --secondary: #6a5acd;
+}
+
 * {
   padding: 0px;
   margin: 0px;

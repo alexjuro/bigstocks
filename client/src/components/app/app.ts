@@ -6,6 +6,7 @@ import { router } from '../../router/router';
 @customElement('app-root')
 class AppComponent extends LitElement {
   render() {
-    return html` <app-header></app-header>`;
+    return html` <app-header2></app-header2>
+      <app-leaderboard></app-leaderboard>`;
   }
 }

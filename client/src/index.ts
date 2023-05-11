@@ -3,4 +3,5 @@
 import './components/app/app.ts';
 import './components/main/main.ts';
 import './components/header/header.ts';
+import './components/headernew/header.ts';
 import './components/leaderboard/leaderboard.ts';
