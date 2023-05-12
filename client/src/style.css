@@ -6,6 +6,8 @@
   --primary: #9370db;
   --primaryVariation: rgb(148, 128, 216);
   --secondary: #6a5acd;
+  --app-error-color: #c5344e;
+  --app-info-color: #14854e;
 }
 body {
   font-family: 'Open Sans', sans-serif;

@@ -13,12 +13,20 @@ class AppComponent extends LitElement {
     const port = 3000;
     httpClient.init({ baseURL: `${location.protocol}//${location.hostname}:${port}/api/` });
   }
+  firstUpdated() {
+    router.subscribe(() => this.requestUpdate());
+  }
   renderSelect() {
     return router.select(
       {
         'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
         'users/market': () => html`<app-market></app-market>`,
-        'leaderboard': () => html`<app-leaderboard></app-leaderboard>`
+        'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,
+        'users/sign-in': () => html`<sign-in></sing-in>`,
+        'users/sign-up': () => html`<sign-up></sing-up>`,
+        'users/sign-out': () => html`<sign-out></sign-out>`,
+        'stonks': () => html`<app-stonks></app-stonks>`,
+        'news': () => html`<finnhub-market-news></finnhub-market-news>`
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;
