@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "chart.js": "^4.2.1",
+    "font-awesome": "^4.7.0",
     "lit": "^2.6.1"
   }
 }

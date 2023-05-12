@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import startDB from './db.js';
 import { corsService } from './services/cors.service.js';
 import { pathToFileURL } from 'node:url';
-// TODO: Routen importieren
+import user from './routes/user.js';
 
 import config from '../config.json' assert { type: 'json' };
 
@@ -20,7 +20,7 @@ function configureApp(app: Express) {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(corsService.corsMiddleware);
-  // TODO: Routen einbinden
+  app.use('/api/users', user);
 }
 
 export async function start() {
