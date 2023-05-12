@@ -1,11 +1,15 @@
-/* Autor: Prof. Dr. Norman Lahme-Hütig (FH Münster) */
+/* Autor: Alexander Lensjak */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
 :root {
-  --app-primary-color: #034da1;
-  --app-error-color: #c5344e;
-  --app-info-color: #14854e;
+  --background: ghostwhite;
+  --primary: #9370db;
+  --primaryVariation: rgb(148, 128, 216);
+  --secondary: #6a5acd;
 }
-body {
-  font-family: 'Open Sans', sans-serif;
-  margin: 0;
+
+* {
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
 }

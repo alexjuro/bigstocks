@@ -1,11 +1,12 @@
-/* Autor: TODO */
-
+/* Autor: Alexander Lesnjak */
 import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
+import { router } from '../../router/router';
 
 @customElement('app-root')
 class AppComponent extends LitElement {
   render() {
-    return html`<h1>Hello World!</h1>`;
+    return html` <app-header2></app-header2>
+      <app-leaderboard></app-leaderboard>`;
   }
 }
