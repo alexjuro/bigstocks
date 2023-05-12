@@ -5,11 +5,7 @@ import sharedLocalStyle from './shared-local.css?inline';
 import componentStyle from './details.css?inline';
 import { httpClient } from '../../http-client';
 import { PageMixin } from '../page.mixin';
-
-type Data = {
-  name: string;
-  email: string;
-};
+import { UserData } from './types';
 
 // FIX: make invalid-feedback visible even with intermediate span
 @customElement('user-profile-details')
@@ -21,7 +17,7 @@ class ProfileMain extends PageMixin(LitElement) {
   @query('#name') name!: HTMLInputElement;
   @query('#email') email!: HTMLInputElement;
 
-  @property() data!: Data;
+  @property() data!: UserData;
 
   render() {
     return html`

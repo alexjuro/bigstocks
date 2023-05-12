@@ -3,13 +3,7 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { httpClient } from '../../http-client';
 import sharedStyle from '../shared.css?inline';
 import componentStyle from './avatar.css?inline';
-
-// FIX: also used in other components, export?
-type Data = {
-  name: string;
-  email: string;
-  avatar: string; // TODO: default avatar
-};
+import { UserData } from './types';
 
 @customElement('user-profile-avatar')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -18,7 +12,7 @@ class ProfileAvatar extends LitElement {
 
   @query('input') input!: HTMLInputElement;
 
-  @property() data!: Data;
+  @property() data!: UserData;
 
   render() {
     return html`

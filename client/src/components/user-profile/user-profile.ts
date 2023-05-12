@@ -4,12 +4,7 @@ import { until } from 'lit/directives/until.js';
 import sharedStyle from '../shared.css?inline';
 import componentStyle from './user-profile.css?inline';
 import { PageMixin } from '../page.mixin.js';
-
-type User = {
-  name: string;
-  email: string;
-  password: string;
-};
+import { UserData } from './types';
 
 @customElement('user-profile')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -37,7 +32,7 @@ class Profile extends PageMixin(LitElement) {
       ${until(
         this.userInfo
           .then(async res => {
-            const user: User = await res.json();
+            const user: UserData = await res.json();
 
             return html` ${this.renderNotification()}
               <h2>Profile</h2>
