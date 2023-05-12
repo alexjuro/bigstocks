@@ -1,9 +1,12 @@
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import componentStyle from './header.css?inline';
+import { PageMixin } from '../page.mixin';
+import { httpClient } from '../../http-client';
+import { router } from '../../router/router';
 
 @customElement('app-header')
-class AppHeader extends LitElement {
+class AppHeader extends PageMixin(LitElement) {
   static styles = componentStyle;
 
   private visable: boolean;
@@ -75,7 +78,9 @@ class AppHeader extends LitElement {
         </nav>
       </div>
       <div id="flexheader">
-        <div id="left" class="headelem"><a href="">bigstocks</a></div>
+        <div id="left" class="headelem">
+          <button type="button" @click="${this.getLeaderboard}">BigStocks</button>
+        </div>
         <div id="mid" class="headelem"><a href="">pagename</a></div>
         <div id="right" class="headelem">
           <nav id="dnav">
@@ -89,5 +94,13 @@ class AppHeader extends LitElement {
         </div>
       </div>
     `;
+  }
+
+  async getLeaderboard() {
+    try {
+      router.navigate('/leaderboard');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
   }
 }

@@ -10,7 +10,6 @@ import { router } from '../../router/router';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class MainComponent extends PageMixin(LitElement) {
   static style = sharedStyle;
-  @state() private result: any;
 
   async firstUpdated() {
     try {

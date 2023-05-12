@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 /* Autor: Alexander Schellenberg */
 
 import { customElement } from 'lit/decorators.js';
@@ -11,6 +12,8 @@ import { StockService } from '../../../stock-service.js';
 import Chart from 'chart.js/auto';
 import { StockComponent } from '../stockcomponent.js';
 import { stocks, UserStock } from '../../../interfaces/stock-interface.js';
+import { httpClient } from '../../../http-client';
+import { router } from '../../../router/router';
 
 @customElement('app-portfolio')
 export class PortfolioComponent extends StockComponent {
@@ -18,6 +21,24 @@ export class PortfolioComponent extends StockComponent {
     super();
   }
 
+  async firstUpdated() {
+    try {
+      this.startAsyncInit();
+      const newStatusJSON = await httpClient.get('/users/new' + location.search);
+      const newStatus = (await newStatusJSON.json()).new;
+      if (newStatus) {
+        this.showNotification('new user was created successfully', 'info');
+      }
+    } catch (e) {
+      if ((e as { statusCode: number }).statusCode === 401) {
+        router.navigate('/users/sign-in');
+      } else {
+        this.showNotification((e as Error).message, 'error');
+      }
+    } finally {
+      this.finishAsyncInit();
+    }
+  }
   static colorArray = [
     '#800080',
     '#663399',
