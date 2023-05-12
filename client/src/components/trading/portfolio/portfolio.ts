@@ -2,8 +2,7 @@
 /* Autor: Alexander Schellenberg */
 
 import { customElement } from 'lit/decorators.js';
-import { PageMixin } from '../../page.mixin';
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import { property, query } from 'lit-element';
 import sharedStyle from '../../shared.css?inline';
 import componentStyle from './portfolio.css?inline';
@@ -17,28 +16,6 @@ import { router } from '../../../router/router';
 
 @customElement('app-portfolio')
 export class PortfolioComponent extends StockComponent {
-  constructor() {
-    super();
-  }
-
-  async firstUpdated() {
-    try {
-      this.startAsyncInit();
-      const newStatusJSON = await httpClient.get('/users/new' + location.search);
-      const newStatus = (await newStatusJSON.json()).new;
-      if (newStatus) {
-        this.showNotification('new user was created successfully', 'info');
-      }
-    } catch (e) {
-      if ((e as { statusCode: number }).statusCode === 401) {
-        router.navigate('/users/sign-in');
-      } else {
-        this.showNotification((e as Error).message, 'error');
-      }
-    } finally {
-      this.finishAsyncInit();
-    }
-  }
   static colorArray = [
     '#800080',
     '#663399',
@@ -61,6 +38,7 @@ export class PortfolioComponent extends StockComponent {
     '#9400D3',
     '#FF00FF'
   ];
+
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
   @query('#doughnut') doughnut!: HTMLCanvasElement;
   @query('#graph') graph!: HTMLCanvasElement;
@@ -122,10 +100,33 @@ export class PortfolioComponent extends StockComponent {
   @property({ type: Object })
   private ChartGraph = {};
 
+  constructor() {
+    super();
+  }
+
+  async firstUpdated() {
+    try {
+      this.startAsyncInit();
+      const newStatusJSON = await httpClient.get('/users/new' + location.search);
+      const newStatus = (await newStatusJSON.json()).new;
+      if (newStatus) {
+        this.showNotification('new user was created successfully', 'info');
+      }
+    } catch (e) {
+      if ((e as { statusCode: number }).statusCode === 401) {
+        router.navigate('/users/sign-in');
+      } else {
+        this.showNotification((e as Error).message, 'error');
+      }
+    } finally {
+      this.finishAsyncInit();
+    }
+  }
+
   getCumulatedPrices() {
     const prices = this.getStockPrices();
     const shares = this.getStockShares();
-    let cum: Number[] = [];
+    const cum: number[] = [];
     for (let i = 0; i < this.userStocks.length; i++) {
       cum[i] = prices[i] * shares[i];
     }
@@ -170,6 +171,7 @@ export class PortfolioComponent extends StockComponent {
           tooltip: {
             callbacks: {
               label: (context: any) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const label = context.label;
                 const currentValue = context.raw.toFixed(2);
                 const total = context.chart._metasets[context.datasetIndex].total;
@@ -191,9 +193,6 @@ export class PortfolioComponent extends StockComponent {
               }
             }
           }
-        },
-        animation: {
-          onComplete: function () {}
         }
       }
     });
@@ -247,10 +246,10 @@ export class PortfolioComponent extends StockComponent {
             grace: '10%',
             grid: { display: false }
           }
-        },
+        } /*,
         animation: {
           onComplete: function () {}
-        }
+        }*/
       }
     });
   }

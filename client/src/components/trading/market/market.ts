@@ -12,15 +12,14 @@ import { stocks, Stock } from '../../../interfaces/stock-interface.js';
 
 @customElement('app-market')
 export class MarketComponent extends StockComponent {
-  constructor() {
-    super();
-  }
-
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
   @property({ type: Array })
   userStocks: Stock[] = stocks;
   @property({ type: Object })
   stockService = new StockService();
+  constructor() {
+    super();
+  }
 
   async connectedCallback() {
     super.connectedCallback();
