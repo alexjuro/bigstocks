@@ -8,6 +8,7 @@ import componentStyle from './avatar.css?inline';
 type Data = {
   name: string;
   email: string;
+  avatar: string; // TODO: default avatar
 };
 
 @customElement('user-profile-avatar')
@@ -22,40 +23,45 @@ class ProfileAvatar extends LitElement {
   render() {
     return html`
       <h3>Avatar</h3>
+      <p>Accepted image formats are PNG and JPEG. The image's size must not exceed 200KiB.</p>
       <form>
-        <img src="SOURCE" alt="Profile Picture" />
+        <img src="${this.data.avatar}" alt="Avatar" />
         <input type="file" accept="image/png,image/jpeg" />
         <form-control @req-submit=${this.submit}></form-control>
       </form>
-      <p>Accepted image formats are PNG and JPEG. Your image's size must not exceed 200KB.</p>
     `;
   }
 
   async submit() {
-    const [valid, file] = this.checkValidity();
-    if (!valid) {
-      // TODO: render error
-      console.log('error');
+    const file = this.checkValidity();
+    if (!file) {
+      this.dispatchEvent(new CustomEvent('submit-error', { bubbles: true, detail: new Error('Invalid file.') }));
       return;
     }
 
     try {
-      await httpClient.post('/users/profile', {
-        email: this.data.email,
-        avatar: file
-      });
+      await this.base64enc(file!).then(value => (this.data.avatar = value as string));
+      await httpClient.post('/users/profile', this.data);
     } catch (e) {
       this.dispatchEvent(new CustomEvent('submit-error', { bubbles: true, detail: e }));
     }
   }
 
-  checkValidity(): [boolean, File | null] {
+  checkValidity(): File | null {
     const files = this.input.files || new FileList();
     const valid =
       files.length === 1 && files[0].size <= 1024 * 200 && ['image/png', 'image/jpeg'].includes(files[0].type);
-    const file = valid ? files[0] : null;
-    return [valid, file];
+
+    return valid ? files[0] : null;
   }
 
-  // TODO: formatting, store+retrieve
+  async base64enc(file: File) {
+    const reader = new FileReader();
+
+    return new Promise((res, rej) => {
+      reader.onload = () => res(reader.result);
+      reader.onerror = () => rej(new Error('Failed to read image, please try again.'));
+      reader.readAsDataURL(file);
+    });
+  }
 }
