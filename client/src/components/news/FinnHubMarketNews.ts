@@ -67,8 +67,10 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
       if (!Array.isArray(data) || data.length === 0) {
         throw new Error('No news articles found.');
       }
-      this.articles = data as Article[];
+      //this.articles = data as Article[];
+      this.articles = data.sort((a, b) => b.datetime - a.datetime).slice(0, 12) as Article[];
     } catch (error) {
+      //Damit Error nicht vom Typ Unkown ist
       console.error(error);
       if (error instanceof Error) {
         this.error = error.message;
@@ -85,7 +87,7 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
     this.fetchArticles(); // Fetch initial data
     setInterval(() => {
       this.fetchArticles(); // Fetch new data every 3 minutes
-    }, 18000);
+    }, 180000);
   }
 
   // Hilfsfunktion zur Entfernung von doppelten Punkten am Anfang der Überschrift
@@ -104,13 +106,15 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
         ${this.articles.map(
           article => html`
             <div class="article">
-              <div class="article-image-container">
-                ${article.image
-                  ? html` <img src="${article.image}" alt="${article.headline}" class="article-image" /> `
-                  : ''}
+              ${article.image
+                ? html`
+                    <div class="article-image-container">
+                      <img src="${article.image}" alt="${article.headline}" class="article-image" />
+                    </div>
+                  `
+                : ''}
+              <div class="article-text-container">
                 <h2 class="article-headline">${this.cleanHeadline(article.headline)}</h2>
-              </div>
-              <div class="article-content">
                 <p class="article-summary">${article.summary}</p>
                 <a href="${article.url}" target="_blank" rel="noopener">Read more</a>
               </div>
