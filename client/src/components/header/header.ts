@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import componentStyle from './header.css?inline';
 
-@customElement('app-header2')
+@customElement('app-header')
 class AppHeader extends LitElement {
   static styles = componentStyle;
 
@@ -69,7 +69,7 @@ class AppHeader extends LitElement {
         <nav id="mnav">
           <ul>
             <li><a href="">news</a></li>
-            <li><a href="">portfolio</a></li>
+            <li><a href="">users/portfolio</a></li>
             <li><a href="">profile</a></li>
           </ul>
         </nav>

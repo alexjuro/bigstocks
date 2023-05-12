@@ -17,7 +17,8 @@ class AppComponent extends LitElement {
     return router.select(
       {
         'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
-        'users/market': () => html`<app-market></app-market>`
+        'users/market': () => html`<app-market></app-market>`,
+        'leaderboard': () => html`<app-leaderboard></app-leaderboard>`
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;
@@ -26,6 +27,7 @@ class AppComponent extends LitElement {
   }
 
   render() {
-    return html` <div class="main">${this.renderSelect()}</div> `;
+    return html`<app-header></app-header>
+      <div class="main">${this.renderSelect()}</div> `;
   }
 }
