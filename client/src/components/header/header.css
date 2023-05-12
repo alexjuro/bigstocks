@@ -97,7 +97,8 @@ nav ul {
 }
 
 #mnav {
-  display: none;
+  visibility: hidden;
+  transition: visibility 0.2s ease-in-out;
 }
 
 #btn {

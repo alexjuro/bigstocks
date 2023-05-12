@@ -18,15 +18,18 @@ class AppHeader extends LitElement {
     const mnav = this.shadowRoot!.getElementById('mnav');
 
     if (this.visable) {
-      circle!.style.width = '0px';
-      circle!.style.height = '0px';
-      mnav!.style.display = 'none';
-      this.visable = false;
+      mnav!.style.visibility = 'hidden';
+
+      setTimeout(() => {
+        circle!.style.width = '0px';
+        circle!.style.height = '0px';
+        this.visable = false;
+      }, 150);
     } else {
       circle!.style.width = '220px';
       circle!.style.height = '220px';
       setTimeout(() => {
-        mnav!.style.display = 'block';
+        mnav!.style.visibility = 'visible';
       }, 280);
       this.visable = true;
     }
@@ -37,10 +40,13 @@ class AppHeader extends LitElement {
     const mnav = this.shadowRoot!.getElementById('mnav');
 
     if (window.innerWidth >= 810) {
-      circle!.style.width = '0px';
-      circle!.style.height = '0px';
-      mnav!.style.display = 'none';
-      this.visable = false;
+      mnav!.style.visibility = 'hidden';
+
+      setTimeout(() => {
+        circle!.style.width = '0px';
+        circle!.style.height = '0px';
+        this.visable = false;
+      }, 150);
     }
   }
 
