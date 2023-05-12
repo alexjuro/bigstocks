@@ -8,7 +8,6 @@ import { router } from '../../router/router';
 @customElement('app-root')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class AppComponent extends LitElement {
-
   constructor() {
     super();
     const port = 3000;
@@ -18,6 +17,7 @@ class AppComponent extends LitElement {
     return router.select(
       {
         'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
+        'users/market': () => html`<app-market></app-market>`
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;
@@ -25,7 +25,7 @@ class AppComponent extends LitElement {
     );
   }
 
-render() {
+  render() {
     return html` <div class="main">${this.renderSelect()}</div> `;
   }
 }

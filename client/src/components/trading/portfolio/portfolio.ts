@@ -6,6 +6,7 @@ import { LitElement, html } from 'lit';
 import { property, query } from 'lit-element';
 import sharedStyle from '../../shared.css?inline';
 import componentStyle from './portfolio.css?inline';
+import sharedTradingStyle from '../shared-trading.css?inline';
 import { StockService } from '../../../stock-service.js';
 import Chart from 'chart.js/auto';
 import { StockComponent } from '../stockcomponent.js';
@@ -39,17 +40,18 @@ export class PortfolioComponent extends StockComponent {
     '#9400D3',
     '#FF00FF'
   ];
-  static styles = [sharedStyle, componentStyle];
+  static styles = [sharedStyle, componentStyle, sharedTradingStyle];
   @query('#doughnut') doughnut!: HTMLCanvasElement;
+  @query('#graph') graph!: HTMLCanvasElement;
   @property({ type: Array })
   userStocks = [
     {
-      name: stocks[7].name,
-      symbol: stocks[7].symbol,
-      price: stocks[7].price,
-      image: stocks[7].image,
+      name: stocks[0].name,
+      symbol: stocks[0].symbol,
+      price: stocks[0].price,
+      image: stocks[0].image,
       shares: 2,
-      dailyPercentage: stocks[7].dailyPercentage
+      dailyPercentage: stocks[0].dailyPercentage
     },
     {
       name: stocks[1].name,
@@ -97,7 +99,7 @@ export class PortfolioComponent extends StockComponent {
   @property({ type: Object })
   private ChartDoughnut = {};
   @property({ type: Object })
-  private ChartCandles = {};
+  private ChartGraph = {};
 
   getCumulatedPrices() {
     const prices = this.getStockPrices();
@@ -112,15 +114,21 @@ export class PortfolioComponent extends StockComponent {
   async connectedCallback() {
     super.connectedCallback();
     await this.stockService.connectSocket();
-    this.stockService.addObserver(this);
+    console.log('test');
+    this.stockService.setObserver(this);
     this.sendSubscriptions();
     this.stockService.updateStockPercentages();
     this.createDoughnut();
+    this.createGraph();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.stockService.closeSocket();
+  }
+
+  getStockShares(): number[] {
+    return this.userStocks.map(stock => stock.shares);
   }
 
   createDoughnut() {
@@ -136,6 +144,7 @@ export class PortfolioComponent extends StockComponent {
         ]
       },
       options: {
+        responsive: true,
         plugins: {
           tooltip: {
             callbacks: {
@@ -149,6 +158,7 @@ export class PortfolioComponent extends StockComponent {
               }
             }
           },
+
           subtitle: {
             display: true,
             text: 'You have ' + this.userStocks.length + ' stocks!'
@@ -156,7 +166,7 @@ export class PortfolioComponent extends StockComponent {
           legend: {
             labels: {
               font: {
-                size: 12
+                size: 16
               }
             }
           }
@@ -176,60 +186,32 @@ export class PortfolioComponent extends StockComponent {
     }
   }
 
-  handleStockClick(event: MouseEvent) {
-    const stockDiv = (event.target as HTMLElement).closest('.stock');
-
-    if (stockDiv) {
-      const element = stockDiv.parentElement?.querySelector('.candle-div');
-
-      if (element) {
-        element.remove();
-      } else {
-        const newEmptyDiv = document.createElement('div');
-        newEmptyDiv.classList.add('candle-div');
-        stockDiv.appendChild(newEmptyDiv);
-
-        const canvasElement = document.createElement('canvas');
-        canvasElement.width = 200; // Set the desired width
-        canvasElement.height = 300; // Set the desired height
-        newEmptyDiv.appendChild(canvasElement);
-        this.createStockCandles(canvasElement);
-
-        newEmptyDiv.addEventListener('click', () => {
-          newEmptyDiv.remove();
-        });
-      }
-    }
-  }
-
-  createStockCandles(element: HTMLCanvasElement) {
-    this.ChartCandles = new Chart(element, {
+  createGraph() {
+    this.ChartGraph = new Chart(this.graph, {
       type: 'line',
       data: {
-        labels: ['NOV', 'DEC', 'JAN', 'FEB', 'MAR', 'APR'],
+        labels: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
         datasets: [
           {
-            data: [10, 70, 30, 20, 30, 25],
-            backgroundColor: PortfolioComponent.colorArray[7],
-            borderColor: PortfolioComponent.colorArray[7],
-            borderWidth: 1,
-            tension: 0.6,
-            fill: false
+            data: [20, 30, 40, 35, 45, 70, 60, 65, 40, 30, 40, 35, 45, 45, 40, 55],
+            borderColor: '#9370DB',
+            backgroundColor: '#9370DB',
+            borderWidth: 3,
+            tension: 0.2,
+            fill: true,
+            pointBackgroundColor: '#411080',
+            pointBorderColor: '#6A5ACD'
           }
         ]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
         plugins: {
-          tooltip: {
-            callbacks: {
-              label: (context: any) => {
-                const currentValue = context.raw.toFixed(2);
-
-                return `${currentValue}$`;
-              }
-            }
+          subtitle: {
+            display: true,
+            text: '69% in the last week',
+            font: { weight: 'bold' },
+            position: 'top'
           },
           legend: {
             display: false
@@ -237,15 +219,16 @@ export class PortfolioComponent extends StockComponent {
         },
         scales: {
           y: {
-            beginAtZero: true,
             grace: '10%',
             grid: { display: false }
           },
           x: {
-            beginAtZero: true,
             grace: '10%',
             grid: { display: false }
           }
+        },
+        animation: {
+          onComplete: function () {}
         }
       }
     });
@@ -253,7 +236,18 @@ export class PortfolioComponent extends StockComponent {
 
   render() {
     return html`
+    
     <div class="container">
+        <div class="flex-container">
+            <div class= "graph">
+                <h1 id=upp> Portfolio-Graph </h1>
+                <canvas id="graph" "</canvas>
+            </div>
+            <div class="allo">
+                <h1 id=upp> Portfolio-Allocation </h1>
+                <canvas id="doughnut"</canvas>
+            </div>
+        </div>
         <div class="portfolio-page flex-container">
             <h1 id=upp> My Portfolio </h1>
             ${this.userStocks.map(
@@ -262,7 +256,7 @@ export class PortfolioComponent extends StockComponent {
                   <span id="dot${stock.symbol}" class="dot"></span>
                   <img src="${stock.image}" alt="${stock.name} Logo" />
                   <h2>${stock.name}</h2>
-                  <p id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
+                  <p class="prices" id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
                   <p class="percentages" id="perc${stock.symbol}">
                     ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
                   </p>
@@ -272,14 +266,7 @@ export class PortfolioComponent extends StockComponent {
             )}
         </div>
     
-        <div class="allo flex-container">
-            <h1 id=upp> Portfolio-Allocation </h1>
-            <canvas id="doughnut" width="400" height="400"</canvas>
-        </div>
-        <div class=" flex-container">
-            <h1 id=upp> Portfolio-Graph </h1>
-            <img src="https://media.ycharts.com/charts/ee62177c5e5720e04a3bf5c8298ca3e1.png" width="500" length="500" alt="Test">
-        </div>
+
     </div>
     
     `;

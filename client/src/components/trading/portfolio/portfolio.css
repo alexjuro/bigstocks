@@ -10,104 +10,32 @@ h1 {
 }
 
 .container {
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  justify-content: center;
 }
 
 .flex-container {
-  display: inline-flex;
   margin: 4vh;
-  flex-direction: column;
   background-color: white;
   padding: 10px;
   text-align: center;
-  box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+  box-shadow: 0 0 15px 0 rgba(173, 168, 168, 0.2), 0 5px 5px 0 rgba(186, 183, 183, 0.24);
   border-radius: 1em;
+  width: 50%;
+  height: 50%;
 }
-
-.portfolio-page {
-  width: 300px;
+.graph {
+  border-bottom: solid 1px gray;
 }
 
 .allo {
 }
 
-.stock {
-  position: relative;
-  font-size: 14px;
-  background-color: #ffffff;
-  color: #373737;
-  width: 100%;
-  margin: 10px 0 10px;
-  padding: 4px;
-  box-sizing: border-box;
-  border-radius: 1em;
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
-  box-shadow: inset 0 0 0 0 #fbfbfa;
-  transition: 0.2s ease-in-out, 0.3s ease-in-out;
-}
-
-.stock:hover {
-  box-shadow: inset 600px 0 0 0 #f5f0f0d4;
-}
-
-#upp {
-  font-size: 25px;
-  color: #373737;
-}
-
-.blinkGreen {
-  animation: blinkGreen 1s linear;
-}
-
-@keyframes blinkGreen {
-  0% {
-    background-color: lightgreen;
-  }
-  50% {
-    background-color: transparent;
-  }
-  100% {
-    background-color: lightgreen;
-  }
-}
-
-.blinkRed {
-  animation: blinkRed 1s linear;
-}
-
-@keyframes blinkRed {
-  0% {
-    background-color: lightcoral;
-  }
-  50% {
-    background-color: transparent;
-  }
-  100% {
-    background-color: lightcoral;
-  }
-}
-
-.dot {
-  position: absolute;
-  right: 2px;
-  top: 2px;
-  opacity: 100%;
-  height: 10px;
-  width: 10px;
-  border-radius: 50%;
-}
-.stock > img {
-  height: 30px;
-  width: 30px;
-  border-radius: 20%;
-  top: 10px;
-}
-
-.setTextRed {
-  color: red;
-}
-
-.setTextGreen {
-  color: green;
+.portfolio-page {
+  overflow: scroll;
+  max-height: 80vh;
 }
 
 .shares {
@@ -119,10 +47,11 @@ h1 {
   padding: 4px;
   background-color: #f6f6f6;
 }
+.prices {
+  font-size: 12px;
+}
 
-.percentages {
-  position: absolute;
-  right: 5px;
-  top: 4.5px;
-  font-size: 16px;
+#graph {
+  border-top-right-radius: 20%;
+  border-bottom-right-radius: 20%;
 }

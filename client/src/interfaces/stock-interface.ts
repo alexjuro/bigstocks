@@ -149,7 +149,7 @@ export const stocks: Stock[] = [
   {
     name: 'Intel',
     symbol: 'INTC',
-    image: 'https://logo.clearbit',
+    image: 'https://logo.clearbit.com/intel.com',
     price: 0,
     dailyPercentage: 0
   }

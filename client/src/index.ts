@@ -2,3 +2,4 @@
 
 import './components/app/app.js';
 import './components/trading/portfolio/portfolio.js';
+import './components/trading/market/market.js';
