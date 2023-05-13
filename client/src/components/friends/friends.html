@@ -17,11 +17,36 @@
         <button onClick="document.getElementById('addMethod').scrollIntoView();">Freund hinzufügen</button>
       </div>
       <div id="friendsContainer">
-        <div id="addMethod" class="containerelem"></div>
+        <div id="addMethod" class="containerelem">
+          <div id="textFreunde" class="textone">Freund hinzufuegen:</div>
+          <!--Das Fenster zum absenden-->
+          <div id="addwindow" class="window">
+            <input type="text" name="username" placeholder="Username" />
+            <button type="submit" onclick="displayFeedback()">Senden</button>
+          </div>
+
+          <!--Feedback ob das senden funktioniert hat oder nicht-->
+          <div id="feedback" class="clear"></div>
+
+          <div id="textFreunde">Freundschaftsanfragen:</div>
+          <div id="requestwindow" class="window">
+            <!--Beispiel fuer eine Anfrage-->
+            <div class="friendelem">
+              <div class="a">
+                <div class="frame"></div>
+              </div>
+              <div class="b">name</div>
+              <div class="c">
+                <button>accept</button>
+                <button>decline</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div id="friendsList" class="containerelem">
           <div id="textFreunde">Freunde:</div>
-          <div id="friendswindow">
+          <div id="friendswindow" class="window">
             <div class="friendelem">
               <div class="a">
                 <div class="frame"></div>
@@ -90,4 +115,32 @@
       </div>
     </div>
   </body>
+
+  <script>
+    var circle = false;
+    var divElement = document.getElementById('feedback');
+
+    function displayFeedback() {
+      divElement.classList.remove('yes');
+      divElement.classList.remove('no');
+
+      if (circle) {
+        divElement.classList.add('no');
+        divElement.innerHTML = 'Could not send Friend Request!';
+        setTimeout(function () {
+          divElement.classList.remove('no');
+          divElement.innerHTML = '';
+        }, 2000);
+        circle = false;
+      } else {
+        divElement.classList.add('yes');
+        divElement.innerHTML = 'great sucess';
+        setTimeout(function () {
+          divElement.classList.remove('yes');
+          divElement.innerHTML = '';
+        }, 2000);
+        circle = true;
+      }
+    }
+  </script>
 </html>
