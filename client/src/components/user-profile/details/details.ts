@@ -1,11 +1,11 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
-import sharedStyle from '../shared.css?inline';
-import sharedLocalStyle from './shared-local.css?inline';
+import sharedStyle from '../../shared.css?inline';
+import sharedLocalStyle from '../shared-local.css?inline';
 import componentStyle from './details.css?inline';
-import { httpClient } from '../../http-client';
-import { PageMixin } from '../page.mixin';
-import { UserData } from './types';
+import { httpClient } from '../../../http-client';
+import { PageMixin } from '../../page.mixin';
+import { UserData } from '../types';
 
 // FIX: make invalid-feedback visible even with intermediate span
 @customElement('user-profile-details')

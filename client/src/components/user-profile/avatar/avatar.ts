@@ -1,9 +1,9 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
-import { httpClient } from '../../http-client';
-import sharedStyle from '../shared.css?inline';
+import { httpClient } from '../../../http-client';
+import sharedStyle from '../../shared.css?inline';
 import componentStyle from './avatar.css?inline';
-import { UserData } from './types';
+import { UserData } from '../types';
 
 @customElement('user-profile-avatar')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

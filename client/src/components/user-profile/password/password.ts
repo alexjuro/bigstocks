@@ -1,9 +1,9 @@
 import { html, LitElement } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
-import sharedStyle from '../shared.css?inline';
-import sharedLocalStyle from './shared-local.css?inline';
-import { httpClient } from '../../http-client';
-import { PageMixin } from '../page.mixin';
+import sharedStyle from '../../shared.css?inline';
+import sharedLocalStyle from '../shared-local.css?inline';
+import { httpClient } from '../../../http-client';
+import { PageMixin } from '../../page.mixin';
 
 @customElement('user-profile-password')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
