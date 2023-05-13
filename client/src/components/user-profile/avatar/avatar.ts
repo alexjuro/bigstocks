@@ -11,16 +11,23 @@ class ProfileAvatar extends LitElement {
   static styles = [sharedStyle, componentStyle];
 
   @query('input') input!: HTMLInputElement;
+  @query('img') img!: HTMLImageElement;
 
   @property() data!: UserData;
+
+  private media_types = ['image/png', 'image/jpeg'];
+
+  firstUpdated() {
+    this.img.onerror = () => (this.img.src = 'PLACEHOLDER');
+  }
 
   render() {
     return html`
       <h3>Avatar</h3>
       <p>Accepted image formats are PNG and JPEG. The image's size must not exceed 200KiB.</p>
       <form>
-        <img src="${this.data.avatar}" alt="Avatar" />
-        <input type="file" accept="image/png,image/jpeg" />
+        <img src="${this.data.avatar || 'PLACEHOLDER'}" />
+        <input type="file" accept="${this.media_types.join(',')}" />
         <form-control @req-submit=${this.submit}></form-control>
       </form>
     `;
@@ -43,8 +50,7 @@ class ProfileAvatar extends LitElement {
 
   checkValidity(): File | null {
     const files = this.input.files || new FileList();
-    const valid =
-      files.length === 1 && files[0].size <= 1024 * 200 && ['image/png', 'image/jpeg'].includes(files[0].type);
+    const valid = files.length === 1 && files[0].size <= 1024 * 200 && this.media_types.includes(files[0].type);
 
     return valid ? files[0] : null;
   }
