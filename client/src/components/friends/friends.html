@@ -8,10 +8,44 @@
     <title>Document</title>
   </head>
   <body>
-    <app-header></app-header>
-
     <div id="background">
       <div id="kreis"></div>
+    </div>
+
+    <div id="main">
+      <div id="addFriend">
+        <button onClick="document.getElementById('addMethod').scrollIntoView();">Freund hinzufügen</button>
+      </div>
+      <div id="friendsContainer">
+        <div id="addMethod" class="containerelem"></div>
+
+        <div id="friendsList" class="containerelem">
+          <div id="textFreunde">Freunde:</div>
+          <div id="friendswindow">
+            <div class="friendelem">
+              <div class="a">
+                <div class="frame"></div>
+              </div>
+              <div class="b">name</div>
+              <div class="c">score</div>
+            </div>
+            <div class="friendelem">
+              <div class="a">
+                <div class="frame"></div>
+              </div>
+              <div class="b">name</div>
+              <div class="c">score</div>
+            </div>
+            <div class="friendelem">
+              <div class="a">
+                <div class="frame"></div>
+              </div>
+              <div class="b">name</div>
+              <div class="c">score</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 </html>

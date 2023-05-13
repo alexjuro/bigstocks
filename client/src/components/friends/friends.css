@@ -1,3 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+
+* {
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+#main {
+  height: calc(100vh - 70px);
+  position: relative;
+  z-index: 10;
+}
+
+#addFriend {
+  display: none;
+}
+
+#friendsContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+}
+
+.containerelem {
+  width: 50%;
+  height: 100%;
+}
+
+#addMethod {
+  background-color: lightcyan;
+}
+
+#friendsList {
+  background-color: lightsteelblue;
+  height: auto;
+}
+
+#textFreunde {
+  font-size: 30px;
+  margin-left: 7.5%;
+  margin-top: 2.5%;
+}
+
+#friendswindow {
+  max-height: 90%;
+  width: 90%;
+  margin: 5%;
+  margin-top: 2%;
+  overflow: scroll;
+  background-color: cadetblue;
+  border: none;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  padding: 2.5%;
+  padding-bottom: 0px;
+}
+
+.friendelem {
+  position: relative;
+  height: 90px;
+  width: 100%;
+  margin-bottom: 3.5%;
+  background-color: ghostwhite;
+  border-radius: 5px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    'a b'
+    'a c';
+}
+
+.a {
+  grid-area: a;
+  background-color: #ccc;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.frame {
+  height: 85%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  outline: 1px solid rgba(0, 0, 0, 0.5);
+  outline-offset: 3px;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.b {
+  grid-area: b;
+  background-color: #ddd;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+}
+
+.c {
+  grid-area: c;
+  background-color: #eee;
+  border-radius: 5px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
 #background {
   position: absolute;
   top: 0px;
@@ -9,11 +125,94 @@
 
 #kreis {
   background-color: lightblue;
-  width: 140vw;
-  height: 250vh;
+  width: 2000px;
+  height: 2000px;
   top: -110vh;
   left: 40vw;
   border-radius: 50%;
   position: relative;
   box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
+}
+
+@media (max-width: 1024px) {
+  #background {
+    height: 1000px;
+  }
+
+  #kreis {
+    left: -40vw;
+    top: -1200px;
+  }
+
+  #addFriend {
+    display: block;
+    display: flex;
+    height: 50px;
+    justify-content: left;
+    align-items: center;
+    background-color: aquamarine;
+  }
+
+  #addFriend button {
+    color: white;
+    background-color: lightpink;
+    border: 1px solid black;
+    font-size: 18px;
+    border-radius: 5px;
+    padding: 5px 15px;
+    margin-left: 20px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  }
+
+  #friendsContainer {
+    flex-direction: column-reverse;
+    height: auto;
+  }
+
+  .containerelem {
+    max-height: 700px;
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  .containerelem:nth-of-type(1) {
+    height: 900px;
+    width: 100%;
+  }
+
+  #textFreunde {
+    margin-left: 12.5%;
+    font-size: 25px;
+  }
+
+  #friendswindow {
+    width: 80%;
+    margin-left: 10%;
+  }
+
+  .friendelem {
+    height: 70px;
+    width: 100%;
+  }
+
+  .b {
+    padding-left: 5px;
+  }
+
+  .c {
+    padding-left: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  #kreis {
+    left: -140vw;
+    top: -1300px;
+  }
+
+  .friendelem {
+    grid-template-columns: 1fr 3fr;
+    height: 70px;
+    width: 100%;
+  }
 }
