@@ -136,7 +136,7 @@ html {
 
 @media (max-width: 1024px) {
   #background {
-    height: 1000px;
+    height: 800px;
   }
 
   #kreis {
@@ -170,14 +170,16 @@ html {
   }
 
   .containerelem {
-    max-height: 700px;
     width: 100%;
     flex-shrink: 0;
   }
 
-  .containerelem:nth-of-type(1) {
+  #friendsList {
+    max-height: 500px;
+  }
+
+  #addMethod {
     height: 900px;
-    width: 100%;
   }
 
   #textFreunde {
@@ -187,6 +189,7 @@ html {
 
   #friendswindow {
     width: 80%;
+    max-height: calc(500px * 0.9 - 100px);
     margin-left: 10%;
   }
 
