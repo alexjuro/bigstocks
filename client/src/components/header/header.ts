@@ -71,22 +71,22 @@ class AppHeader extends PageMixin(LitElement) {
       <div id="background2">
         <nav id="mnav">
           <ul>
-            <li><a href="">news</a></li>
-            <li><a href="">users/portfolio</a></li>
-            <li><a href="">profile</a></li>
+            <li><button type="button" @click="${this.getNews}">news</button></li>
+            <li><button type="button" @click="${this.getPortfolio}">portfolio</button></li>
+            <li><button type="button" @click="${this.getProfile}">profile</button></li>
           </ul>
         </nav>
       </div>
       <div id="flexheader">
         <div id="left" class="headelem">
-          <button type="button" @click="${this.getLeaderboard}">BigStocks</button>
+          <button type="button" @click="${this.getLeaderboard}">bigStocks</button>
         </div>
         <div id="mid" class="headelem"><a href="">pagename</a></div>
         <div id="right" class="headelem">
           <nav id="dnav">
-            <a href="">news</a>
-            <a href="">portfolio</a>
-            <a href="">profile</a>
+            <button type="button" @click="${this.getNews}">news</button>
+            <button type="button" @click="${this.getPortfolio}">portfolio</button>
+            <button type="button" @click="${this.getProfile}">profile</button>
           </nav>
           <button id="btn" @click="${this.toggle}">
             <img src="../../../public/list.svg" alt="" height="27px" />
@@ -99,6 +99,30 @@ class AppHeader extends PageMixin(LitElement) {
   async getLeaderboard() {
     try {
       router.navigate('/leaderboard');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+  }
+
+  async getNews() {
+    try {
+      router.navigate('/news');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+  }
+
+  async getPortfolio() {
+    try {
+      router.navigate('/users/portfolio');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+  }
+
+  async getProfile() {
+    try {
+      router.navigate('/users/profile');
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }

@@ -14,6 +14,20 @@ a {
   font-size: 23px;
 }
 
+button {
+  text-decoration: none;
+  color: white;
+  font-size: 23px;
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  scale: 1.02;
+}
+
 nav ul {
   list-style: none;
 }
@@ -70,7 +84,7 @@ nav ul {
   justify-content: flex-end;
 }
 
-#dnav a {
+#dnav button {
   margin-left: 20px;
 }
 
