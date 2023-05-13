@@ -36,7 +36,6 @@ html {
 }
 
 #addMethod {
-  background-color: lightcyan;
   display: flex;
   flex-direction: column;
 }
@@ -86,7 +85,7 @@ button {
   height: 5%;
   border-radius: 10px;
   margin-left: 5%;
-  margin-bottom: 30px;
+  margin-bottom: 70px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -108,7 +107,6 @@ button {
 }
 
 #friendsList {
-  background-color: lightsteelblue;
   height: auto;
 }
 
@@ -165,6 +163,12 @@ button {
   align-items: center;
   font-size: 24px;
   overflow-x: hidden;
+}
+
+.b button {
+  cursor: pointer;
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .c {
@@ -228,16 +232,16 @@ button {
     height: 50px;
     justify-content: left;
     align-items: center;
-    background-color: aquamarine;
   }
 
   #addFriend button {
     color: white;
+    height: 35px;
     background-color: lightpink;
     border: 1px solid black;
     font-size: 18px;
     border-radius: 5px;
-    padding: 5px 15px;
+    padding: 0px 15px;
     margin-left: 20px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   }
@@ -318,7 +322,7 @@ button {
 
 @media (max-width: 768px) {
   #kreis {
-    left: -140vw;
+    left: -70vw;
     top: -1300px;
   }
 
