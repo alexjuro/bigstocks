@@ -2,13 +2,13 @@
 import { PageMixin } from '../page.mixin';
 import { LitElement } from 'lit';
 import { StockService } from '../../stock-service.js';
-import { UserStock, Stock } from '../../interfaces/stock-interface.js';
+import { Stock } from '../../interfaces/stock-interface.js';
 import Chart from 'chart.js/auto';
 
 export abstract class StockComponent extends PageMixin(LitElement) {
   protected userStocks: Stock[] = [];
   protected stockService: StockService | null = null;
-  protected stockCandle: {} | null = null;
+  protected stockCandle: object | null = null;
 
   getStocks(): Stock[] {
     return this.userStocks;
@@ -84,10 +84,16 @@ export abstract class StockComponent extends PageMixin(LitElement) {
     const stockDiv = (event.target as HTMLElement).closest('.stock');
     console.log('EVENT!');
     if (stockDiv) {
+      console.log('test');
       const element = stockDiv.parentElement?.querySelector('.candle-div');
 
       if (element) {
         element.remove();
+
+        const infoDiv = stockDiv.querySelector('.info-div');
+        if (infoDiv) {
+          infoDiv.remove();
+        }
       } else {
         const newEmptyDiv = document.createElement('div');
         newEmptyDiv.classList.add('candle-div');
@@ -100,22 +106,30 @@ export abstract class StockComponent extends PageMixin(LitElement) {
         newEmptyDiv.appendChild(canvasElement);
         this.createStockCandles(canvasElement, stockDiv.id, 'M');
 
-        /*
-        //Erstellung Detail Container darunter
-        const detailContainer = document.createElement('div');
-        detailContainer.classList.add('detail-container');
-        newEmptyDiv.parentElement!.appendChild(detailContainer);
+        // Erstellung der infoDiv für zusätzliche Informationen und Buttons
+        const infoDiv = document.createElement('div');
+        infoDiv.classList.add('info-div');
+        stockDiv.appendChild(infoDiv);
 
-        //Erstellung Button Element
-        const buttonElement = document.createElement('button');
-        buttonElement.classList.add('button-div');
-        buttonElement.textContent = 'Button';
-        detailContainer.appendChild(buttonElement);
-
-        newEmptyDiv.addEventListener('click', () => {
-          newEmptyDiv.remove();
+        // Erstellung des Kaufen-Buttons
+        const buyButton = document.createElement('button');
+        buyButton.textContent = 'Kaufen';
+        buyButton.addEventListener('click', event => {
+          event.stopPropagation();
+          console.log('Kauf'); // Hier muss die entsprechende Methode für den Kauf der Aktie implementiert werden
         });
-        */
+        infoDiv.appendChild(buyButton);
+
+        // Erstellung des Verkaufen-Buttons
+        const sellButton = document.createElement('button');
+        sellButton.textContent = 'Verkaufen';
+        sellButton.addEventListener('click', event => {
+          event.stopPropagation();
+          console.log('Verkauf'); // Hier muss die entsprechende Methode für den Verkauf der Aktie implementiert werden
+        });
+        infoDiv.appendChild(sellButton);
+
+        // To:Do Hinzufügen der Informationen zur Aktie...
       }
     }
   }
@@ -185,7 +199,7 @@ export abstract class StockComponent extends PageMixin(LitElement) {
 
   unixTimestamp(s: string) {
     const now = new Date();
-    var t: Date | null = null;
+    let t: Date | null = null;
 
     if (s === 'D') {
       t = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);

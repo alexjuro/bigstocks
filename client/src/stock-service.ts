@@ -62,12 +62,6 @@ export class StockService {
     this.sendRequest(symbol, 'unsubscribe');
   }
 
-  private async getFirstData(symbol: string) {
-    const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`);
-    const data = await response.json();
-    return { price: data.c, percentage: ((data.c - data.pc) / data.pc) * 100 };
-  }
-
   public setObserver(observer: StockComponent): void {
     this.observer = observer;
   }
@@ -76,24 +70,8 @@ export class StockService {
     this.observer = null;
   }
 
-  private sendRequest(symbol: string, action = 'subscribe'): void {
-    const message = JSON.stringify({ type: action, symbol: symbol });
-    this.socket?.send(message);
-    console.log(this.socket + ' sendRequest: ' + action + ' ' + symbol);
-  }
-
-  private notifyPriceObserver(symbol: string, price: number): void {
-    if (this.observer instanceof StockComponent) {
-      this.observer!.updateStockPrice(symbol, price);
-      this.observer!.requestUpdate();
-      if (this.observer instanceof PortfolioComponent) {
-        this.observer.updateDoughnut();
-      }
-    }
-  }
-
   public async updateStockPercentages() {
-    var delay = 500;
+    const delay = 500;
     setInterval(async () => {
       for (const symbol of this.subscriptions) {
         setTimeout(async () => {
@@ -115,5 +93,27 @@ export class StockService {
     );
     const data = await response.json();
     return data.c;
+  }
+
+  private async getFirstData(symbol: string) {
+    const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`);
+    const data = await response.json();
+    return { price: data.c, percentage: ((data.c - data.pc) / data.pc) * 100 };
+  }
+
+  private sendRequest(symbol: string, action = 'subscribe'): void {
+    const message = JSON.stringify({ type: action, symbol: symbol });
+    this.socket?.send(message);
+    console.log(this.socket + ' sendRequest: ' + action + ' ' + symbol);
+  }
+
+  private notifyPriceObserver(symbol: string, price: number): void {
+    if (this.observer instanceof StockComponent) {
+      this.observer!.updateStockPrice(symbol, price);
+      this.observer!.requestUpdate();
+      if (this.observer instanceof PortfolioComponent) {
+        this.observer.updateDoughnut();
+      }
+    }
   }
 }

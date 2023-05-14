@@ -5,8 +5,7 @@
   flex-wrap: wrap;
   margin: 4vh;
 }
-.market-stock {
-  position: relative;
+.stock {
   margin: 4vh;
   height: 20%;
   width: 20%;
