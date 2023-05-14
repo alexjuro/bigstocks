@@ -16,8 +16,7 @@ class ProfilePassword extends PageMixin(LitElement) {
 
   render() {
     // TODO: add constraints and feedback
-    return html`
-      <h3>Password</h3>
+    return html` <h3>Password</h3>
       <p>
         After changing your password you will be logged out and redirect. You can then log in using your new password.
       </p>
@@ -32,29 +31,32 @@ class ProfilePassword extends PageMixin(LitElement) {
           <input id="pass2" type="password" required />
           <span />
         </div>
-        <form-control @req-submit=${this.submit} @req-cancel=${this.cancel}></form-submit>
+        <button type="button" @click=${this.submit}>Save</button>
+        <button type="button" @click=${this.cancel}>Cancel</button>
       </form>`;
   }
 
   async submit() {
+    if (!this.form.checkValidity()) {
+      this.form.classList.add('was-validated');
+      return;
+    }
+
     if (this.password !== this.passwordConfirm) {
+      this.form.classList.add('was-validated');
       this.dispatchEvent(
         new CustomEvent('submit-error', { bubbles: true, detail: new Error("Passwords don't match!") })
       );
       return;
     }
 
-    if (this.form.checkValidity()) {
-      try {
-        // TODO: pop-up 'update successful'
-        await httpClient.post('/users/profile', {
-          password: this.password
-        });
-      } catch (e) {
-        this.dispatchEvent(new CustomEvent('submit-error', { bubbles: true, detail: e }));
-      }
-    } else {
-      this.form.classList.add('was-validated');
+    try {
+      // TODO: pop-up 'update successful'
+      await httpClient.post('/users/profile', {
+        password: this.password
+      });
+    } catch (e) {
+      this.dispatchEvent(new CustomEvent('submit-error', { bubbles: true, detail: e }));
     }
   }
 

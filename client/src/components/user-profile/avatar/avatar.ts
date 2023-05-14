@@ -28,7 +28,7 @@ class ProfileAvatar extends LitElement {
       <form>
         <img src="${this.data.avatar || 'PLACEHOLDER'}" />
         <input type="file" accept="${this.media_types.join(',')}" />
-        <form-control @req-submit=${this.submit}></form-control>
+        <button type="button" @click=${this.submit}>Save</button>
       </form>
     `;
   }
@@ -41,7 +41,7 @@ class ProfileAvatar extends LitElement {
     }
 
     try {
-      await this.base64enc(file!).then(value => (this.data.avatar = value as string));
+      await this.base64enc(file!).then(base64 => (this.data.avatar = base64));
       await httpClient.post('/users/profile', this.data);
     } catch (e) {
       this.dispatchEvent(new CustomEvent('submit-error', { bubbles: true, detail: e }));
@@ -55,11 +55,11 @@ class ProfileAvatar extends LitElement {
     return valid ? files[0] : null;
   }
 
-  async base64enc(file: File) {
+  async base64enc(file: File): Promise<string> {
     const reader = new FileReader();
 
     return new Promise((res, rej) => {
-      reader.onload = () => res(reader.result);
+      reader.onload = () => res(reader.result as string);
       reader.onerror = () => rej(new Error('Failed to read image, please try again.'));
       reader.readAsDataURL(file);
     });

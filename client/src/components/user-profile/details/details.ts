@@ -20,8 +20,7 @@ class ProfileMain extends PageMixin(LitElement) {
   @property() data!: UserData;
 
   render() {
-    return html`
-      <h3>Account Information</h3>
+    return html`<h3>Account Information</h3>
       <form novalidate>
         <div>
           <label for="name">Username</label>
@@ -37,7 +36,8 @@ class ProfileMain extends PageMixin(LitElement) {
           <div id="annotation">Your email address.</div>
           <div class="invalid-feedback">Email address must be a valid email.</div>
         </div>
-        <form-control @req-submit=${this.submit} @req-cancel=${this.cancel}></form-submit>
+        <button type="button" @click=${this.submit}>Save</button>
+        <button type="button" @click=${this.cancel}>Cancel</button>
       </form>`;
   }
 
