@@ -89,7 +89,7 @@ class AppHeader extends PageMixin(LitElement) {
             <button type="button" @click="${this.getProfile}">profile</button>
           </nav>
           <button id="btn" @click="${this.toggle}">
-            <img src="../../../public/list.svg" alt="" height="27px" />
+            <img src="/list.svg" alt="" height="27px" />
           </button>
         </div>
       </div>
@@ -102,6 +102,15 @@ class AppHeader extends PageMixin(LitElement) {
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
   }
 
   async getNews() {
@@ -110,6 +119,15 @@ class AppHeader extends PageMixin(LitElement) {
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
   }
 
   async getPortfolio() {
@@ -118,13 +136,31 @@ class AppHeader extends PageMixin(LitElement) {
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
   }
 
   async getProfile() {
     try {
-      router.navigate('/users/profile');
+      router.navigate('/friends');
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
   }
 }
