@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* Autor: Alexander Schellenberg */
 
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { html } from 'lit';
 import { property, query } from 'lit-element';
 import sharedStyle from '../../shared.css?inline';
@@ -9,13 +9,13 @@ import componentStyle from './portfolio.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
 import { StockService } from '../../../stock-service.js';
 import Chart from 'chart.js/auto';
-import { StockComponent } from '../stockcomponent.js';
-import { stocks, UserStock } from '../../../interfaces/stock-interface.js';
+import { TradingComponent } from '../tradingcomponent.js';
+import { stocks } from '../../../interfaces/stock-interface.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
 
 @customElement('app-portfolio')
-export class PortfolioComponent extends StockComponent {
+export class PortfolioComponent extends TradingComponent {
   static colorArray = [
     '#800080',
     '#663399',
@@ -42,8 +42,7 @@ export class PortfolioComponent extends StockComponent {
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
   @query('#doughnut') doughnut!: HTMLCanvasElement;
   @query('#graph') graph!: HTMLCanvasElement;
-  @property({ type: Array })
-  userStocks = [
+  @state() userStocks = [
     {
       name: stocks[0].name,
       symbol: stocks[0].symbol,
@@ -258,7 +257,7 @@ export class PortfolioComponent extends StockComponent {
     return html`
     
     <div class="container">
-        <div class="flex-container">
+        <div class="part-container">
             <div class= "graph">
                 <h1 id=upp> Portfolio-Graph </h1>
                 <canvas id="graph" "</canvas>
@@ -268,22 +267,28 @@ export class PortfolioComponent extends StockComponent {
                 <canvas id="doughnut"</canvas>
             </div>
         </div>
-        <div class="portfolio-page flex-container">
+        <div class="part-container">
+          <div>
+            <p class="account" >32000$</p>
+            <p class="account" >12000$</p>
+          </div>
+          <div class="portfolio-page">
             <h1 id=upp> My Portfolio </h1>
             ${this.userStocks.map(
               stock => html`
-                <div class="stock" id=${stock.symbol} @click=${this.handleStockClick}>
+                <app-stock class="stock" id=${stock.symbol}>
                   <span id="dot${stock.symbol}" class="dot"></span>
                   <img src="${stock.image}" alt="${stock.name} Logo" />
-                  <h2>${stock.name}</h2>
+                  <h2 @click=${this.handleStockClick}>${stock.name}</h2>
                   <p class="prices" id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
                   <p class="percentages" id="perc${stock.symbol}">
                     ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
                   </p>
                   <p class="shares" id="shares${stock.symbol}">${stock.shares}x</p>
-                </div>
+                </app-stock>
               `
             )}
+          </div>
         </div>
     
 

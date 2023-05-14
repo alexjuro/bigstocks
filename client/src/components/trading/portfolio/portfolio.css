@@ -16,7 +16,7 @@ h1 {
   justify-content: center;
 }
 
-.flex-container {
+.part-container {
   margin: 4vh;
   background-color: white;
   padding: 10px;
@@ -27,7 +27,6 @@ h1 {
   height: 50%;
 }
 .graph {
-  border-bottom: solid 1px gray;
 }
 
 .allo {

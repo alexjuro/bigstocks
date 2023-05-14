@@ -87,3 +87,25 @@ img {
   top: 4.5px;
   font-size: 16px;
 }
+
+.info-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 60%;
+  margin: 0 auto;
+}
+
+.info-div button {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.stockdetails {
+  background-color: #483d8b;
+}
+
+.account {
+  font-size: 70px;
+}

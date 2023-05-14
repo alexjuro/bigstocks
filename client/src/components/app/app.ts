@@ -19,8 +19,8 @@ class AppComponent extends LitElement {
   renderSelect() {
     return router.select(
       {
-        'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
-        'users/market': () => html`<app-market></app-market>`,
+        'trading/portfolio': () => html`<app-portfolio></app-portfolio>`,
+        'trading/market': () => html`<app-market></app-market>`,
         'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,
         'users/sign-in': () => html`<sign-in></sing-in>`,
         'users/sign-up': () => html`<sign-up></sing-up>`,

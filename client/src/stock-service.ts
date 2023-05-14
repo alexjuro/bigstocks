@@ -2,42 +2,53 @@
 
 import { PortfolioComponent } from './components/trading/portfolio/portfolio';
 const apiKey = 'cgsjqchr01qkrsgj9tk0cgsjqchr01qkrsgj9tkg';
-import { StockComponent } from './components/trading/stockcomponent.js';
+import { TradingComponent } from './components/trading/tradingcomponent.js';
 
 export class StockService {
   private socket: WebSocket | null = null;
   private subscriptions: Set<string> = new Set();
-  private observer: StockComponent | null = null;
+  private observer: TradingComponent | null = null;
 
   public async connectSocket(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`);
-      this.socket.onopen = () => {
-        console.log('WebSocket connection established.');
-        resolve();
-      };
-      this.socket.onerror = error => {
-        console.error(`WebSocket error: ${error}`);
-      };
+    let isConnected = false;
 
-      this.socket.onclose = () => {
-        console.log('WebSocket connection closed. Try reconnecting!');
-        setTimeout(() => {
-          console.log('Reconnecting WebSocket...');
-          this.connectSocket(); // Aufruf der Methode zum erneuten Verbindungsaufbau
-        }, 10000);
-      };
+    while (!isConnected) {
+      try {
+        this.socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`);
+        await new Promise<void>((resolve, reject) => {
+          this.socket!.onopen = () => {
+            console.log('WebSocket connection established.');
+            isConnected = true;
+            resolve();
+          };
+          this.socket!.onerror = error => {
+            console.error(`WebSocket error: ${error}`);
+            reject(error);
+          };
+        });
+      } catch (error) {
+        console.log('WebSocket connection failed. Retrying in 10 seconds...');
+        this.socket?.close(); // WebSocket schließen, bevor erneuter Verbindungsversuch unternommen wird
+        await new Promise<void>(resolve => setTimeout(resolve, 10000));
+      }
+    }
 
-      this.socket.onmessage = event => {
-        const message = JSON.parse(event.data);
-        if (message.type === 'trade' && message.data) {
-          const { s: symbol, p: price } = message.data[0];
-          if (this.subscriptions.has(symbol)) {
-            this.notifyPriceObserver(symbol, price.toFixed(2));
-          }
+    this.socket!.onclose = event => {
+      if (!event.wasClean) {
+        console.log('WebSocket connection closed unexpectedly. Trying to reconnect...');
+        this.connectSocket();
+      }
+    };
+
+    this.socket!.onmessage = event => {
+      const message = JSON.parse(event.data);
+      if (message.type === 'trade' && message.data) {
+        const { s: symbol, p: price } = message.data[0];
+        if (this.subscriptions.has(symbol)) {
+          this.notifyPriceObserver(symbol, price.toFixed(2));
         }
-      };
-    });
+      }
+    };
   }
 
   public getSubscriptions() {
@@ -62,11 +73,11 @@ export class StockService {
     this.sendRequest(symbol, 'unsubscribe');
   }
 
-  public setObserver(observer: StockComponent): void {
+  public setObserver(observer: TradingComponent): void {
     this.observer = observer;
   }
 
-  public removeObserver(observer: StockComponent): void {
+  public removeObserver(observer: TradingComponent): void {
     this.observer = null;
   }
 
@@ -108,7 +119,7 @@ export class StockService {
   }
 
   private notifyPriceObserver(symbol: string, price: number): void {
-    if (this.observer instanceof StockComponent) {
+    if (this.observer instanceof TradingComponent) {
       this.observer!.updateStockPrice(symbol, price);
       this.observer!.requestUpdate();
       if (this.observer instanceof PortfolioComponent) {

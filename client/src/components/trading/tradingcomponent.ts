@@ -4,8 +4,9 @@ import { LitElement } from 'lit';
 import { StockService } from '../../stock-service.js';
 import { Stock } from '../../interfaces/stock-interface.js';
 import Chart from 'chart.js/auto';
+import { router } from '../../router/router.js';
 
-export abstract class StockComponent extends PageMixin(LitElement) {
+export abstract class TradingComponent extends PageMixin(LitElement) {
   protected userStocks: Stock[] = [];
   protected stockService: StockService | null = null;
   protected stockCandle: object | null = null;
@@ -86,14 +87,11 @@ export abstract class StockComponent extends PageMixin(LitElement) {
     if (stockDiv) {
       console.log('test');
       const element = stockDiv.parentElement?.querySelector('.candle-div');
+      const infoDiv = stockDiv.parentElement?.querySelector('.info-div');
 
-      if (element) {
-        element.remove();
-
-        const infoDiv = stockDiv.querySelector('.info-div');
-        if (infoDiv) {
-          infoDiv.remove();
-        }
+      if (element || infoDiv) {
+        element?.remove();
+        infoDiv?.remove();
       } else {
         const newEmptyDiv = document.createElement('div');
         newEmptyDiv.classList.add('candle-div');
@@ -128,6 +126,18 @@ export abstract class StockComponent extends PageMixin(LitElement) {
           console.log('Verkauf'); // Hier muss die entsprechende Methode für den Verkauf der Aktie implementiert werden
         });
         infoDiv.appendChild(sellButton);
+
+        // Erstellung des StockDetails-Buttons
+        const stockDetailsButton = document.createElement('button');
+        stockDetailsButton.textContent = 'StockDetails';
+        stockDetailsButton.classList.add('stockdetails');
+        stockDetailsButton.addEventListener('click', event => {
+          event.stopPropagation();
+          const stockId = stockDiv.id;
+          // Navigiere zur Route "/trading/stockdetails/:id"
+          router.navigate('/trading/stockdetails' + stockId);
+        });
+        infoDiv.appendChild(stockDetailsButton);
 
         // To:Do Hinzufügen der Informationen zur Aktie...
       }
