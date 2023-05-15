@@ -49,15 +49,22 @@ class ProfileMain extends PageMixin(LitElement) {
 
     if (this.email.value === this.data.email && this.name.value === this.data.name) return;
 
-    try {
-      await httpClient.post('/users/profile', {
-        email: this.email.value,
-        name: this.name.value
-      });
-      this.dispatchEvent(new CustomEvent('submit-suc', { bubbles: true, detail: 'Profile' }));
-    } catch (e) {
-      this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
-    }
+    this.data.email = this.email.value;
+    this.data.name = this.name.value;
+
+    this.dispatchEvent(
+      new CustomEvent('submit-req', {
+        bubbles: true,
+        detail: async () => {
+          try {
+            await httpClient.post('/users/profile', this.data);
+            this.dispatchEvent(new CustomEvent('submit-suc', { bubbles: true, detail: 'Profile update successful.' }));
+          } catch (e) {
+            this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
+          }
+        }
+      })
+    );
   }
 
   cancel() {

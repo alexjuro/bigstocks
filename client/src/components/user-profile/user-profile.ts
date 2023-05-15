@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 import sharedStyle from '../shared.css?inline';
 import componentStyle from './user-profile.css?inline';
@@ -11,6 +11,10 @@ import { UserData } from './types';
 class Profile extends PageMixin(LitElement) {
   static styles = [sharedStyle, componentStyle];
 
+  @query('dialog') modal!: HTMLDialogElement;
+  @query('form') form!: HTMLFormElement;
+  @query('input') input!: HTMLInputElement;
+
   // private userInfo = httpClient.get('/users/profile');
   private userInfo = new Promise<Response>(resolve => {
     setTimeout(() => {
@@ -19,6 +23,7 @@ class Profile extends PageMixin(LitElement) {
       resolve(res);
     }, 1000);
   });
+  private user!: UserData;
 
   constructor() {
     super();
@@ -30,21 +35,32 @@ class Profile extends PageMixin(LitElement) {
       ${until(
         this.userInfo
           .then(async res => {
-            const user: UserData = await res.json();
+            this.user = await res.json();
+
             return html`${this.renderNotification()}
+              <dialog>
+                <form @keydown=${this.preventEnter}>
+                  <label for="input">Password confirmation:</label>
+                  <input id="input" type="password" required />
+                  <button type="button" @click=${this.verifyPassword}>Confirm</button>
+                </form>
+              </dialog>
+
               <h2>Profile</h2>
-              <user-profile-avatar .data=${user}></user-profile-avatar>
+              <user-profile-avatar .data=${this.user}></user-profile-avatar>
               <div class="divider"><hr /></div>
               <user-profile-details
+                @submit-req=${this.submitRequest}
                 @submit-suc=${this.submitSuccess}
                 @submit-err=${this.submitError}
-                .data=${user}
+                .data=${this.user}
               ></user-profile-details>
               <div class="divider"><hr /></div>
               <user-profile-password
+                @submit-req=${this.submitRequest}
                 @submit-suc=${this.submitSuccess}
                 @submit-err=${this.submitError}
-                .data=${user}
+                .data=${this.user}
               ></user-profile-password>`;
           })
           .catch(() => {
@@ -56,11 +72,32 @@ class Profile extends PageMixin(LitElement) {
     `;
   }
 
+  preventEnter(e: KeyboardEvent) {
+    if ([e.key, e.code].includes('Enter')) e.preventDefault();
+  }
+
+  async verifyPassword() {
+    if (!this.form.checkValidity()) return this.form.classList.add('was-validated');
+
+    this.modal.close();
+    // TODO: bcrypt compare
+    if (this.input.value !== this.user.password) return this.showNotification('Incorrect password.', 'error');
+
+    await this.confirmCb();
+  }
+
+  async submitRequest(e: CustomEvent) {
+    this.confirmCb = e.detail;
+    this.modal.showModal();
+  }
+
   submitSuccess(e: CustomEvent) {
-    this.showNotification(e.detail + ' updated successfully.', 'info');
+    this.showNotification(e.detail, 'info');
   }
 
   submitError(e: CustomEvent) {
     this.showNotification((e.detail as Error).message, 'error');
   }
+
+  private confirmCb = async () => this.showNotification('Error calling internal.', 'error');
 }

@@ -45,22 +45,29 @@ class ProfilePassword extends PageMixin(LitElement) {
       return;
     }
 
-    // TODO: hash and compare to this.data.password
-
+    // TODO: bcrypt compare this.data.password
     if (this.password.value !== this.passwordConfirm.value) {
-      this.form.classList.add('was-validated');
       this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: new Error("Passwords don't match!") }));
       return;
     }
 
     this.data.password = this.password.value;
-    try {
-      await httpClient.post('/users/profile', this.data);
-      this.dispatchEvent(new CustomEvent('submit-suc', { bubbles: true, detail: 'Password' }));
-      // TODO: log-out and redirect
-    } catch (e) {
-      this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
-    }
+    this.dispatchEvent(
+      new CustomEvent('submit-req', {
+        bubbles: true,
+        detail: async () => {
+          try {
+            await httpClient.post('/users/profile', this.data);
+            this.dispatchEvent(
+              new CustomEvent('submit-suc', { bubbles: true, detail: 'Password updated successfully.' })
+            );
+            // TODO: log-out and redirect
+          } catch (e) {
+            this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
+          }
+        }
+      })
+    );
   }
 
   cancel() {
