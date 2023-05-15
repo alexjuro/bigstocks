@@ -1,14 +1,17 @@
 import { html, LitElement } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import sharedStyle from '../../shared.css?inline';
 import sharedLocalStyle from '../shared-local.css?inline';
 import { httpClient } from '../../../http-client';
 import { PageMixin } from '../../page.mixin';
+import { UserData } from '../types';
 
 @customElement('user-profile-password')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ProfilePassword extends PageMixin(LitElement) {
   static styles = [sharedStyle, sharedLocalStyle];
+
+  @property() data!: UserData;
 
   @query('form') form!: HTMLFormElement;
   @query('#pass1') password!: HTMLInputElement;
@@ -16,7 +19,7 @@ class ProfilePassword extends PageMixin(LitElement) {
 
   render() {
     // TODO: add constraints and feedback
-    return html` <h3>Password</h3>
+    return html`<h3>Password</h3>
       <p>
         After changing your password you will be logged out and redirect. You can then log in using your new password.
       </p>
@@ -42,21 +45,21 @@ class ProfilePassword extends PageMixin(LitElement) {
       return;
     }
 
-    if (this.password !== this.passwordConfirm) {
+    // TODO: hash and compare to this.data.password
+
+    if (this.password.value !== this.passwordConfirm.value) {
       this.form.classList.add('was-validated');
-      this.dispatchEvent(
-        new CustomEvent('submit-error', { bubbles: true, detail: new Error("Passwords don't match!") })
-      );
+      this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: new Error("Passwords don't match!") }));
       return;
     }
 
+    this.data.password = this.password.value;
     try {
-      // TODO: pop-up 'update successful'
-      await httpClient.post('/users/profile', {
-        password: this.password
-      });
+      await httpClient.post('/users/profile', this.data);
+      this.dispatchEvent(new CustomEvent('submit-suc', { bubbles: true, detail: 'Password' }));
+      // TODO: log-out and redirect
     } catch (e) {
-      this.dispatchEvent(new CustomEvent('submit-error', { bubbles: true, detail: e }));
+      this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
     }
   }
 

@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 import sharedStyle from '../shared.css?inline';
 import componentStyle from './user-profile.css?inline';
@@ -11,13 +11,11 @@ import { UserData } from './types';
 class Profile extends PageMixin(LitElement) {
   static styles = [sharedStyle, componentStyle];
 
-  @query('form') form!: HTMLFormElement;
-
   // private userInfo = httpClient.get('/users/profile');
-  private userInfo = new Promise<Response>((resolve, reject) => {
+  private userInfo = new Promise<Response>(resolve => {
     setTimeout(() => {
       const res = new Response();
-      res.json = async () => ({ name: 'admin', email: 'email' });
+      res.json = async () => ({ name: 'harry hacker', email: 'admin@bigstocks.com', password: 'password' });
       resolve(res);
     }, 1000);
   });
@@ -33,22 +31,33 @@ class Profile extends PageMixin(LitElement) {
         this.userInfo
           .then(async res => {
             const user: UserData = await res.json();
-
-            return html` ${this.renderNotification()}
+            return html`${this.renderNotification()}
               <h2>Profile</h2>
               <user-profile-avatar .data=${user}></user-profile-avatar>
               <div class="divider"><hr /></div>
-              <user-profile-details @submit-error=${this.submitError} .data=${user}></user-profile-details>
+              <user-profile-details
+                @submit-suc=${this.submitSuccess}
+                @submit-err=${this.submitError}
+                .data=${user}
+              ></user-profile-details>
               <div class="divider"><hr /></div>
-              <user-profile-password @submit-error=${this.submitError}></user-profile-password>`;
+              <user-profile-password
+                @submit-suc=${this.submitSuccess}
+                @submit-err=${this.submitError}
+                .data=${user}
+              ></user-profile-password>`;
           })
           .catch(() => {
-            // TODO: pop-up 'failed to load'
+            this.showNotification('Failed to load user data. Please try again.');
             window.location.assign('/');
           }),
         html`Loading...`
       )}
     `;
+  }
+
+  submitSuccess(e: CustomEvent) {
+    this.showNotification(e.detail + ' updated successfully.', 'info');
   }
 
   submitError(e: CustomEvent) {

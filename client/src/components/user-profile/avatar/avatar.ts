@@ -36,7 +36,7 @@ class ProfileAvatar extends LitElement {
   async submit() {
     const file = this.checkValidity();
     if (!file) {
-      this.dispatchEvent(new CustomEvent('submit-error', { bubbles: true, detail: new Error('Invalid file.') }));
+      this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: new Error('Invalid file.') }));
       return;
     }
 
@@ -44,7 +44,7 @@ class ProfileAvatar extends LitElement {
       await this.base64enc(file!).then(base64 => (this.data.avatar = base64));
       await httpClient.post('/users/profile', this.data);
     } catch (e) {
-      this.dispatchEvent(new CustomEvent('submit-error', { bubbles: true, detail: e }));
+      this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
     }
   }
 
