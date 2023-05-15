@@ -83,9 +83,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
 
   handleStockClick(event: MouseEvent) {
     const stockDiv = (event.target as HTMLElement).closest('.stock');
-    console.log('EVENT!');
     if (stockDiv) {
-      console.log('test');
       const element = stockDiv.parentElement?.querySelector('.candle-div');
       const infoDiv = stockDiv.parentElement?.querySelector('.info-div');
 
@@ -135,7 +133,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
           event.stopPropagation();
           const stockId = stockDiv.id;
           // Navigiere zur Route "/trading/stockdetails/:id"
-          router.navigate('/trading/stockdetails' + stockId);
+          router.navigate(`/trading/${stockId}`);
         });
         infoDiv.appendChild(stockDetailsButton);
 

@@ -66,6 +66,7 @@ export class MarketComponent extends TradingComponent {
 
   render() {
     return html`
+      ${this.renderNotification()}
       <div class="container">
         <h1 id="upp">Marketplace</h1>
         <div class="market-stocks">

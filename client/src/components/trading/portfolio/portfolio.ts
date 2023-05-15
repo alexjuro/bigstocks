@@ -135,7 +135,6 @@ export class PortfolioComponent extends TradingComponent {
   async connectedCallback() {
     super.connectedCallback();
     await this.stockService.connectSocket();
-    console.log('test');
     this.stockService.setObserver(this);
     this.sendSubscriptions();
     this.stockService.updateStockPercentages();
@@ -255,7 +254,7 @@ export class PortfolioComponent extends TradingComponent {
 
   render() {
     return html`
-    
+    ${this.renderNotification()}
     <div class="container">
         <div class="part-container">
             <div class= "graph">

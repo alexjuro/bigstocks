@@ -9,6 +9,7 @@ import './components/news/FinnHubMarketNews.ts';
 import './components/widgets/notification/notification.ts';
 import './components/trading/portfolio/portfolio.js';
 import './components/trading/market/market.js';
+import './components/trading/trading-details/trading-details.js';
 import './components/main/main.ts';
 import './components/header/header.ts';
 import './components/leaderboard/leaderboard.ts';
