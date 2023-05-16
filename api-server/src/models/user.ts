@@ -1,11 +1,16 @@
 /* Author: Nico Pareigis */
 
-import { Binary } from 'mongodb';
 import { Entity } from './entity';
 
+export enum Role {
+  ADMIN,
+  USER
+}
+
 export interface User extends Entity {
-  name: string;
+  avatar: string;
   email: string;
+  name: string;
   password: string;
-  avatar: Binary;
+  role: Role;
 }
