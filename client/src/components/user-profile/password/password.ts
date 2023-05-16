@@ -18,7 +18,11 @@ class ProfilePassword extends PageMixin(LitElement) {
   @query('#pass2') passwordConfirm!: HTMLInputElement;
 
   render() {
-    // TODO: add constraints and feedback
+    // TODO:
+    // * constraints and feedback
+    // * validation
+    // * button to show password
+    // * entropy bar
     return html`<h3>Password</h3>
       <p>
         After changing your password you will be logged out and redirect. You can then log in using your new password.
@@ -26,12 +30,12 @@ class ProfilePassword extends PageMixin(LitElement) {
       <form novalidate>
         <div>
           <label for="pass1">New Password</label>
-          <input id="pass1" type="password" required />
+          <input id="pass1" type="password" autocomplete="off" required />
           <span />
         </div>
         <div>
           <label for="pass2">New Password Confirmation</label>
-          <input id="pass2" type="password" required />
+          <input id="pass2" type="password" autocomplete="off" required />
           <span />
         </div>
         <button type="button" @click=${this.submit}>Save</button>
@@ -51,6 +55,7 @@ class ProfilePassword extends PageMixin(LitElement) {
       return;
     }
 
+    // FIX: this overwrites the value in the parent component
     this.data.password = this.password.value;
     this.dispatchEvent(
       new CustomEvent('submit-req', {

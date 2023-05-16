@@ -41,7 +41,7 @@ class Profile extends PageMixin(LitElement) {
               <dialog>
                 <form @keydown=${this.preventEnter}>
                   <label for="input">Password confirmation:</label>
-                  <input id="input" type="password" required />
+                  <input id="input" type="password" autocomplete="off" required />
                   <button type="button" @click=${this.verifyPassword}>Confirm</button>
                 </form>
               </dialog>
