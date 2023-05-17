@@ -2,16 +2,17 @@
 import { PageMixin } from '../page.mixin';
 import { LitElement } from 'lit';
 import { StockService } from '../../stock-service.js';
-import { Stock } from '../../interfaces/stock-interface.js';
+import { UserStock, Stock } from '../../interfaces/stock-interface.js';
 import Chart from 'chart.js/auto';
 import { router } from '../../router/router.js';
+import { httpClient } from '../../http-client';
 
 export abstract class TradingComponent extends PageMixin(LitElement) {
-  protected userStocks: Stock[] = [];
+  protected userStocks: UserStock[] = [];
   protected stockService: StockService | null = null;
   protected stockCandle: object | null = null;
 
-  getStocks(): Stock[] {
+  getStocks(): UserStock[] {
     return this.userStocks;
   }
 
@@ -81,7 +82,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     }
   }
 
-  handleStockClick(event: MouseEvent) {
+  handleStockClick(event: MouseEvent, stock: UserStock) {
     const stockDiv = (event.target as HTMLElement).closest('.stock');
     if (stockDiv) {
       const element = stockDiv.parentElement?.querySelector('.candle-div');
@@ -131,9 +132,9 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         stockDetailsButton.classList.add('stockdetails');
         stockDetailsButton.addEventListener('click', event => {
           event.stopPropagation();
-          const stockId = stockDiv.id;
+          const symbol = stockDiv.id;
           // Navigiere zur Route "/trading/stockdetails/:id"
-          router.navigate(`/trading/${stockId}`);
+          router.navigate(`trading/details/${symbol}`);
         });
         infoDiv.appendChild(stockDetailsButton);
 
@@ -222,6 +223,36 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         timestamp: Math.floor(t.getTime() / 1000).toString(),
         now: Math.floor(now.getTime() / 1000).toString()
       };
+    }
+  }
+
+  async buyStock(event: Event, stock: UserStock) {
+    const partialStock: Partial<Stock> = {
+      symbol: stock.symbol,
+      name: stock.name,
+      image: stock.image,
+      price: stock.price
+    };
+    try {
+      const response = await httpClient.post('/trading/', partialStock);
+      const resStock = await response.json();
+      stock.shares = resStock.shares;
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+  }
+
+  async sellStock(event: Event, stock: UserStock) {
+    try {
+      const response = await httpClient.delete(`/trading/${stock.symbol}`);
+      const resStock = await response.json();
+      if (resStock.shares == 0) {
+        this.userStocks = this.userStocks.filter(st => st.symbol !== stock.symbol);
+      } else {
+        stock.shares = resStock.shares;
+      }
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
     }
   }
 }

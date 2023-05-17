@@ -105,9 +105,9 @@ export const stocks: Stock[] = [
     dailyPercentage: 0
   },
   {
-    name: 'Verizon Communications',
-    symbol: 'VZ',
-    image: 'https://logo.clearbit.com/verizon.com',
+    name: 'Telekom',
+    symbol: 'DTEGY',
+    image: 'https://logo.clearbit.com/telekom.com',
     price: 0,
     dailyPercentage: 0
   },

@@ -278,7 +278,7 @@ export class PortfolioComponent extends TradingComponent {
                 <app-stock class="stock" id=${stock.symbol}>
                   <span id="dot${stock.symbol}" class="dot"></span>
                   <img src="${stock.image}" alt="${stock.name} Logo" />
-                  <h2 @click=${this.handleStockClick}>${stock.name}</h2>
+                  <h2 @click=${(event: MouseEvent) => this.handleStockClick(event, stock)}>${stock.name}</h2>
                   <p class="prices" id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
                   <p class="percentages" id="perc${stock.symbol}">
                     ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}

@@ -9,16 +9,22 @@ export class StockService {
   private subscriptions: Set<string> = new Set();
   private observer: TradingComponent | null = null;
 
-  public async connectSocket(): Promise<void> {
-    let isConnected = false;
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  public isConnected = false; // Verbindungsstatus des WebSockets
 
-    while (!isConnected) {
+  public async connectSocket(): Promise<void> {
+    if (this.isConnected) {
+      console.log('WebSocket is already connected.');
+      return;
+    }
+
+    while (!this.isConnected) {
       try {
         this.socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`);
         await new Promise<void>((resolve, reject) => {
           this.socket!.onopen = () => {
             console.log('WebSocket connection established.');
-            isConnected = true;
+            this.isConnected = true;
             resolve();
           };
           this.socket!.onerror = error => {
@@ -28,7 +34,7 @@ export class StockService {
         });
       } catch (error) {
         console.log('WebSocket connection failed. Retrying in 10 seconds...');
-        this.socket?.close(); // WebSocket schließen, bevor erneuter Verbindungsversuch unternommen wird
+        this.socket?.close();
         await new Promise<void>(resolve => setTimeout(resolve, 10000));
       }
     }
@@ -36,11 +42,18 @@ export class StockService {
     this.socket!.onclose = event => {
       if (!event.wasClean) {
         console.log('WebSocket connection closed unexpectedly. Trying to reconnect...');
+        this.isConnected = false; // WebSocket-Verbindung ist geschlossen
         this.connectSocket();
       }
     };
 
     this.socket!.onmessage = event => {
+      if (!this.isConnected) {
+        // WebSocket ist nicht verbunden, daher Operation abbrechen
+        console.log('WebSocket is not connected. Ignoring incoming message.');
+        return;
+      }
+
       const message = JSON.parse(event.data);
       if (message.type === 'trade' && message.data) {
         const { s: symbol, p: price } = message.data[0];
