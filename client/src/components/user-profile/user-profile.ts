@@ -39,7 +39,7 @@ class Profile extends PageMixin(LitElement) {
 
             return html`${this.renderNotification()}
               <dialog>
-                <form @keydown=${this.preventEnter}>
+                <form novalidate @submit=${this.verifyPassword}>
                   <label for="input">Password confirmation:</label>
                   <input id="input" type="password" autocomplete="off" required />
                   <button type="button" @click=${this.verifyPassword}>Confirm</button>
@@ -72,11 +72,9 @@ class Profile extends PageMixin(LitElement) {
     `;
   }
 
-  preventEnter(e: KeyboardEvent) {
-    if ([e.key, e.code].includes('Enter')) e.preventDefault();
-  }
+  async verifyPassword(e: Event) {
+    e.type == 'submit' && e.preventDefault();
 
-  async verifyPassword() {
     if (!this.form.checkValidity()) return this.form.classList.add('was-validated');
 
     this.modal.close();
