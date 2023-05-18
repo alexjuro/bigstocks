@@ -11,18 +11,14 @@ import { UserData } from '../types';
 class ProfilePassword extends PageMixin(LitElement) {
   static styles = [sharedStyle, sharedLocalStyle];
 
-  @property() data!: UserData;
+  @property() data!: Pick<UserData, 'id' | 'password'>;
 
   @query('form') form!: HTMLFormElement;
   @query('#pass1') password!: HTMLInputElement;
   @query('#pass2') passwordConfirm!: HTMLInputElement;
 
   render() {
-    // TODO:
-    // * constraints and feedback
-    // * validation
-    // * button to show password
-    // * entropy bar
+    // TODO: show-password button, entropy bar
     return html`<h3>Password</h3>
       <p>
         After changing your password you will be logged out and redirect. You can then log in using your new password.
@@ -58,7 +54,6 @@ class ProfilePassword extends PageMixin(LitElement) {
       return;
     }
 
-    // FIX: this overwrites the value in the parent component
     this.data.password = this.password.value;
     this.dispatchEvent(
       new CustomEvent('submit-req', {

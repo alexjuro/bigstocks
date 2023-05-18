@@ -10,7 +10,7 @@ import { UserData } from '../types';
 class ProfileAvatar extends LitElement {
   static styles = [sharedStyle, componentStyle];
 
-  @property() data!: UserData;
+  @property() data!: Pick<UserData, 'id' | 'avatar'>;
 
   @query('input') input!: HTMLInputElement;
   @query('img') img!: HTMLImageElement;

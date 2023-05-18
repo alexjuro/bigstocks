@@ -19,7 +19,7 @@ class Profile extends PageMixin(LitElement) {
   private userInfo = new Promise<Response>(resolve => {
     setTimeout(() => {
       const res = new Response();
-      res.json = async () => ({ name: 'harry hacker', email: 'admin@bigstocks.com', password: 'password' });
+      res.json = async () => ({ id: 1, email: 'admin@bigstocks.com', name: 'harry-hacker', password: 'password' });
       resolve(res);
     }, 1000);
   });
@@ -47,20 +47,20 @@ class Profile extends PageMixin(LitElement) {
               </dialog>
 
               <h2>Profile</h2>
-              <user-profile-avatar .data=${this.user}></user-profile-avatar>
+              <user-profile-avatar .data=${{ id: this.user.id, avatar: this.user.avatar }}></user-profile-avatar>
               <div class="divider"><hr /></div>
               <user-profile-details
                 @submit-req=${this.submitRequest}
                 @submit-suc=${this.submitSuccess}
                 @submit-err=${this.submitError}
-                .data=${this.user}
+                .data=${{ id: this.user.id, email: this.user.email, name: this.user.name }}
               ></user-profile-details>
               <div class="divider"><hr /></div>
               <user-profile-password
                 @submit-req=${this.submitRequest}
                 @submit-suc=${this.submitSuccess}
                 @submit-err=${this.submitError}
-                .data=${this.user}
+                .data=${{ id: this.user.id, password: this.user.password }}
               ></user-profile-password>`;
           })
           .catch(() => {

@@ -17,7 +17,7 @@ class ProfileMain extends PageMixin(LitElement) {
   @query('#name') name!: HTMLInputElement;
   @query('#email') email!: HTMLInputElement;
 
-  @property() data!: UserData;
+  @property() data!: Pick<UserData, 'id' | 'email' | 'name'>;
 
   render() {
     return html`<h3>Account Information</h3>
