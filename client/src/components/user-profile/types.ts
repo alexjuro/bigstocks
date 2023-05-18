@@ -1,3 +1,5 @@
+/* Author: Nico Pareigis */
+
 export type UserData = {
   id: string;
   name: string;

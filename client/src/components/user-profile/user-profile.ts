@@ -1,3 +1,5 @@
+/* Author: Nico Pareigis */
+
 import { html, LitElement } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';

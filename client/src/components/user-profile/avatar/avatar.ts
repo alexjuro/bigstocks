@@ -1,3 +1,5 @@
+/* Author: Nico Pareigis */
+
 import { html, LitElement } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { httpClient } from '../../../http-client';
