@@ -61,15 +61,15 @@ class ProfilePassword extends PageMixin(LitElement) {
       new CustomEvent('submit-req', {
         bubbles: true,
         detail: async () => {
-          try {
-            await httpClient.post('/users/profile', this.data);
-            this.dispatchEvent(
-              new CustomEvent('submit-suc', { bubbles: true, detail: 'Password updated successfully.' })
-            );
-            // TODO: log-out and redirect
-          } catch (e) {
-            this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
-          }
+          await httpClient
+            .post('/users/profile', this.data)
+            .then(() =>
+              // TODO: log-out and redirect
+              this.dispatchEvent(
+                new CustomEvent('submit-suc', { bubbles: true, detail: 'Password updated successfully.' })
+              )
+            )
+            .catch(e => this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e })));
         }
       })
     );
