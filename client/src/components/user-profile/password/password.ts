@@ -1,9 +1,10 @@
 /* Author: Nico Pareigis */
 
 import { html, LitElement } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import sharedStyle from '../../shared.css?inline';
 import sharedLocalStyle from '../shared-local.css?inline';
+import componentStyle from './password.css?inline';
 import { httpClient } from '../../../http-client';
 import { PageMixin } from '../../page.mixin';
 import { UserData } from '../types';
@@ -11,7 +12,7 @@ import { UserData } from '../types';
 @customElement('user-profile-password')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ProfilePassword extends PageMixin(LitElement) {
-  static styles = [sharedStyle, sharedLocalStyle];
+  static styles = [sharedStyle, sharedLocalStyle, componentStyle];
 
   @property() data!: Pick<UserData, 'id' | 'password'>;
 
@@ -19,8 +20,10 @@ class ProfilePassword extends PageMixin(LitElement) {
   @query('#pass1') password!: HTMLInputElement;
   @query('#pass2') passwordConfirm!: HTMLInputElement;
 
+  @state() isText = false;
+
   render() {
-    // TODO: show-password button, entropy bar
+    // TODO: entropy bar
     return html`<h3>Password</h3>
       <p>
         After changing your password you will be logged out and redirect. You can then log in using your new password.
@@ -28,17 +31,25 @@ class ProfilePassword extends PageMixin(LitElement) {
       <form novalidate>
         <div>
           <label for="pass1">New Password</label>
-          <input id="pass1" type="password" autocomplete="off" required />
+          <input id="pass1" type=${this.isText ? 'text' : 'password'} autocomplete="off" required />
           <span />
+          <img
+            src="http://localhost:8080/app/eye_${this.isText ? 'off' : 'on'}28.png"
+            @click=${this.togglePasswordVisibility}
+          />
         </div>
         <div>
           <label for="pass2">New Password Confirmation</label>
-          <input id="pass2" type="password" autocomplete="off" required />
+          <input id="pass2" type=${this.isText ? 'text' : 'password'} autocomplete="off" required />
           <span />
         </div>
         <button type="button" @click=${this.submit}>Save</button>
         <button type="button" @click=${this.cancel}>Cancel</button>
       </form>`;
+  }
+
+  togglePasswordVisibility() {
+    this.isText = !this.isText;
   }
 
   async submit() {
