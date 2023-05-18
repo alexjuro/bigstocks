@@ -66,7 +66,7 @@ class ProfileMain extends PageMixin(LitElement) {
         bubbles: true,
         detail: async () => {
           await httpClient
-            .post('/users/profile', this.data)
+            .post('/users/profile/details', this.data)
             .then(() =>
               this.dispatchEvent(new CustomEvent('submit-suc', { bubbles: true, detail: 'Profile update successful.' }))
             )

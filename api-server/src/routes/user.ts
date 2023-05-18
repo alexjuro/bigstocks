@@ -5,8 +5,13 @@ import { GenericDAO } from '../models/generic.dao.js';
 import { User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
 
-const isValidRequest = <T>(validProperties: string[], obj: T | unknown): obj is T => {
-  return Object.getOwnPropertyNames(obj).map(p => validProperties.includes(p)).length == validProperties.length;
+const isValid = <T>(properties: Map<string, string>, obj: T | unknown): obj is T => {
+  return (
+    Object.getOwnPropertyNames(obj)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map(p => properties.has(p) && (obj as any)[p] !== null && properties.get(p) === typeof (obj as any)[p])
+      .filter(Boolean).length === properties.size
+  );
 };
 
 const router = express.Router();
@@ -26,10 +31,19 @@ router.get('/profile', authService.authenticationMiddleware, async (req, res) =>
 });
 
 router.post('/profile/avatar', authService.authenticationMiddleware, async (req, res) => {
-  type Avatar = Pick<User, 'avatar' | 'email'>;
+  type Avatar = Pick<User, 'id' | 'avatar'>;
   const dao: GenericDAO<User> = req.app.locals.userDAO;
 
-  if (!isValidRequest<Avatar>(['avatar', 'email'], req.body)) return res.status(400).json({ status: 'bad request' });
+  if (
+    !isValid<Avatar>(
+      new Map([
+        ['id', 'number'],
+        ['avatar', 'string']
+      ]),
+      req.body
+    )
+  )
+    return res.status(400).json({ status: 'bad request' });
 
   dao
     .update(req.body)
@@ -38,7 +52,7 @@ router.post('/profile/avatar', authService.authenticationMiddleware, async (req,
 });
 
 router.post('/profile/details', authService.authenticationMiddleware, async (req, res) => {
-  type Details = Pick<User, 'email' | 'name'>;
+  type Details = Pick<User, 'id' | 'email' | 'name'>;
 
   // equivalent to internal validation for 'input type="email"' (see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/email#basic_validation)
   const reEmail =
@@ -48,7 +62,14 @@ router.post('/profile/details', authService.authenticationMiddleware, async (req
 
   if (
     !(
-      isValidRequest<Details>(['email', 'name'], req.body) &&
+      isValid<Details>(
+        new Map([
+          ['id', 'number'],
+          ['email', 'string'],
+          ['name', 'string']
+        ]),
+        req.body
+      ) &&
       reEmail.test(req.body.email) &&
       reName.test(req.body.name)
     )
@@ -62,11 +83,21 @@ router.post('/profile/details', authService.authenticationMiddleware, async (req
 });
 
 router.post('/profile/password', authService.authenticationMiddleware, async (req, res) => {
-  type Password = Pick<User, 'email' | 'password'>;
+  type Password = Pick<User, 'id' | 'password'>;
   const dao: GenericDAO<User> = req.app.locals.userDAO;
   const re = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d).{8,32}$/;
 
-  if (!(isValidRequest<Password>(['email', 'password'], req.body) && re.test(req.body.password)))
+  if (
+    !(
+      isValid<Password>(
+        new Map([
+          ['id', 'number'],
+          ['password', 'string']
+        ]),
+        req.body
+      ) && re.test(req.body.password)
+    )
+  )
     return res.status(400).json({ status: 'bad request' });
 
   dao

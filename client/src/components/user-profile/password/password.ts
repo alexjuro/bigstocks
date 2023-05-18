@@ -73,7 +73,7 @@ class ProfilePassword extends PageMixin(LitElement) {
         bubbles: true,
         detail: async () => {
           await httpClient
-            .post('/users/profile', this.data)
+            .post('/users/profile/password', this.data)
             .then(() =>
               // TODO: log-out and redirect
               this.dispatchEvent(
