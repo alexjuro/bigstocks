@@ -42,6 +42,13 @@ class ProfileMain extends PageMixin(LitElement) {
   }
 
   async submit() {
+    const reEmail =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    const reName = /^[\w-.]{4,32}$/;
+
+    this.email.setCustomValidity(reEmail.test(this.email.value) ? '' : 'pattern-mismatch');
+    this.name.setCustomValidity(reName.test(this.name.value) ? '' : 'pattern-mismatch');
+
     if (!this.form.checkValidity()) {
       this.form.classList.add('was-validated');
       return;

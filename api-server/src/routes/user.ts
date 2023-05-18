@@ -40,7 +40,7 @@ router.post('/profile/details', authService.authenticationMiddleware, async (req
   // equivalent to internal validation for 'input type="email"' (see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/email#basic_validation)
   const reEmail =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-  const reName = /^[\w-_.]{4,32}$/;
+  const reName = /^[\w-.]{4,32}$/;
   const dao: GenericDAO<User> = req.app.locals.userDAO;
 
   if (

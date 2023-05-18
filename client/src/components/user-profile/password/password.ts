@@ -44,6 +44,9 @@ class ProfilePassword extends PageMixin(LitElement) {
   }
 
   async submit() {
+    const re = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d).{8,32}$/;
+    this.password.setCustomValidity(re.test(this.password.value) ? '' : 'pattern-mismatch');
+
     if (!this.form.checkValidity()) {
       this.form.classList.add('was-validated');
       return;
