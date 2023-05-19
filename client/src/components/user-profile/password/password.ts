@@ -87,6 +87,7 @@ class ProfilePassword extends PageMixin(LitElement) {
   }
 
   cancel() {
+    this.form.classList.remove('was-validated');
     this.form.reset();
   }
 }
