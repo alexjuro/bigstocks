@@ -8,14 +8,14 @@ import componentStyle from './market.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
 import { StockService } from '../../../stock-service.js';
 import { TradingComponent } from '../tradingcomponent.js';
-import { stocks, Stock } from '../../../interfaces/stock-interface.js';
+import { stocks, Stock, UserStock } from '../../../interfaces/stock-interface.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
 
 @customElement('app-market')
 export class MarketComponent extends TradingComponent {
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
-  @state() userStocks: Stock[] = stocks;
+  @state() userStocks: UserStock[] = stocks;
   @property({ type: Object })
   stockService = new StockService();
   constructor() {
@@ -25,11 +25,21 @@ export class MarketComponent extends TradingComponent {
   async firstUpdated() {
     try {
       this.startAsyncInit();
-      const newStatusJSON = await httpClient.get('/users/new' + location.search);
-      const newStatus = (await newStatusJSON.json()).new;
-      if (newStatus) {
-        this.showNotification('new user was created successfully', 'info');
-      }
+      const response = await httpClient.get('trading/market' + location.search);
+      const data = await response.json();
+      const userTransactions = data.results;
+      this.money = data.money;
+      this.userStocks = userTransactions.map((transaction: UserStock) => ({
+        name: transaction.name,
+        symbol: transaction.symbol,
+        price: 0,
+        image: transaction.image,
+        shares: transaction.shares,
+        dailyPercentage: 0
+      }));
+      this.stockService.setObserver(this);
+      await this.stockService.connectSocket();
+      this.sendSubscriptions();
     } catch (e) {
       if ((e as { statusCode: number }).statusCode === 401) {
         router.navigate('/users/sign-in');
@@ -41,24 +51,6 @@ export class MarketComponent extends TradingComponent {
     }
   }
 
-  async connectedCallback() {
-    super.connectedCallback();
-    await this.stockService.connectSocket();
-    this.stockService.setObserver(this);
-    this.sendSubscriptions();
-  }
-
-  /*  async connectedCallback() {
-    super.connectedCallback();
-    await this.stockService.connectSocket();
-    console.log('test');
-    this.stockService.setObserver(this);
-    this.sendSubscriptions();
-    this.stockService.updateStockPercentages();
-    this.createDoughnut();
-    this.createGraph();
-  }*/
-
   disconnectedCallback() {
     super.disconnectedCallback();
     this.stockService.closeSocket();
@@ -69,17 +61,25 @@ export class MarketComponent extends TradingComponent {
       ${this.renderNotification()}
       <div class="container">
         <h1 id="upp">Marketplace</h1>
+        <div>
+          <p class="account">CASH: ${this.money}$</p>
+          <p class="account">STOCKS: ${this.calculateTotalValue()}$</p>
+        </div>
         <div class="market-stocks">
           ${this.userStocks.map(
             stock => html`
-              <app-stock class="stock" id=${stock.symbol} @click=${this.handleStockClick}>
-                <span id="dot${stock.symbol}" class="dot"></span>
+              <app-stock
+                class="stock"
+                id=${stock.symbol}
+                @click="${(event: MouseEvent) => this.handleStockClick(event, stock)}"
+              >
                 <img src="${stock.image}" alt="${stock.name} Logo" />
                 <h2>${stock.name}</h2>
                 <p id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
                 <p class="percentages" id="perc${stock.symbol}">
                   ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
                 </p>
+                ${stock.shares > 0 ? html` <p class="shares" id="shares${stock.symbol}">${stock.shares}x</p> ` : ''}
               </app-stock>
             `
           )}

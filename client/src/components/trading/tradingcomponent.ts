@@ -6,11 +6,17 @@ import { UserStock, Stock } from '../../interfaces/stock-interface.js';
 import Chart from 'chart.js/auto';
 import { router } from '../../router/router.js';
 import { httpClient } from '../../http-client';
+import { PortfolioComponent } from './portfolio/portfolio';
 
 export abstract class TradingComponent extends PageMixin(LitElement) {
   protected userStocks: UserStock[] = [];
   protected stockService: StockService | null = null;
   protected stockCandle: object | null = null;
+  protected money = 0;
+
+  getMoney(): number {
+    return this.money;
+  }
 
   getStocks(): UserStock[] {
     return this.userStocks;
@@ -82,7 +88,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     }
   }
 
-  handleStockClick(event: MouseEvent, stock: UserStock) {
+  async handleStockClick(event: MouseEvent, stock: UserStock) {
     const stockDiv = (event.target as HTMLElement).closest('.stock');
     if (stockDiv) {
       const element = stockDiv.parentElement?.querySelector('.candle-div');
@@ -114,6 +120,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         buyButton.addEventListener('click', event => {
           event.stopPropagation();
           console.log('Kauf'); // Hier muss die entsprechende Methode für den Kauf der Aktie implementiert werden
+          this.buyStock(event, stock);
         });
         infoDiv.appendChild(buyButton);
 
@@ -123,6 +130,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         sellButton.addEventListener('click', event => {
           event.stopPropagation();
           console.log('Verkauf'); // Hier muss die entsprechende Methode für den Verkauf der Aktie implementiert werden
+          this.sellStock(event, stock);
         });
         infoDiv.appendChild(sellButton);
 
@@ -226,17 +234,56 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     }
   }
 
+  // Funktion zur Berechnung des Wertes einer einzelnen Aktie
+  calculateStockValue(stock: UserStock): number {
+    return stock.price * stock.shares;
+  }
+
+  // Funktion zur Berechnung des Gesamtwertes aller Aktien
+  calculateTotalValue(): number {
+    let totalValue = 0;
+    for (const stock of this.userStocks) {
+      if (stock.shares > 0) {
+        totalValue += this.calculateStockValue(stock);
+      }
+    }
+    return Number(totalValue.toFixed(2));
+  }
+
   async buyStock(event: Event, stock: UserStock) {
-    const partialStock: Partial<Stock> = {
-      symbol: stock.symbol,
-      name: stock.name,
-      image: stock.image,
-      price: stock.price
-    };
+    console.log(stock);
     try {
-      const response = await httpClient.post('/trading/', partialStock);
-      const resStock = await response.json();
-      stock.shares = resStock.shares;
+      if (!this.stockService) {
+        throw new Error('StockService not active!');
+      }
+      const bPrice = (await this.stockService.getFirstData(stock.symbol)).price;
+      if (!bPrice || isNaN(bPrice)) {
+        // Überprüfen, ob bPrice leer oder ungültig ist
+        this.showNotification('Failed to retrieve stock price', 'error');
+        return;
+      }
+      if (this.money < bPrice) {
+        throw new Error('Insufficient funds');
+      }
+      const pValue = this.money + this.calculateTotalValue();
+      const response = await httpClient.post('/trading/', {
+        symbol: stock.symbol,
+        name: stock.name,
+        image: stock.image,
+        bPrice: bPrice,
+        pValue: pValue
+      });
+      if (response.status === 201) {
+        const data = await response.json();
+        stock.shares++;
+        this.money = data.money;
+        if (this instanceof PortfolioComponent) {
+          this.updateDoughnut();
+        }
+        this.requestUpdate();
+      } else {
+        throw new Error('Failed to purchase stock');
+      }
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }
@@ -244,13 +291,37 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
 
   async sellStock(event: Event, stock: UserStock) {
     try {
-      const response = await httpClient.delete(`/trading/${stock.symbol}`);
-      const resStock = await response.json();
-      if (resStock.shares == 0) {
-        this.userStocks = this.userStocks.filter(st => st.symbol !== stock.symbol);
-      } else {
-        stock.shares = resStock.shares;
+      if (stock.shares == 0) {
+        throw new Error('No Share in Stock!');
       }
+      if (!this.stockService) {
+        throw new Error('StockService not active!');
+      }
+      const sPrice = (await this.stockService.getFirstData(stock.symbol)).price;
+      if (!sPrice || isNaN(sPrice)) {
+        // Überprüfen, ob bPrice leer oder ungültig ist
+        this.showNotification('Failed to retrieve stock price', 'error');
+        return;
+      }
+      const pValue = this.money + this.calculateTotalValue();
+      const response = await httpClient.patch('/trading/', {
+        symbol: stock.symbol,
+        name: stock.name,
+        image: stock.image,
+        sPrice: sPrice,
+        pValue: pValue
+      });
+      const data = await response.json();
+      stock.shares--;
+      if (this instanceof PortfolioComponent) {
+        this.updateDoughnut();
+        if (stock.shares === 0) {
+          this.userStocks = this.userStocks.filter(s => s.symbol !== stock.symbol);
+          this.showNotification(`Last stock of ${stock.name} was sold`, 'info');
+        }
+      }
+      this.money = data.money;
+      this.requestUpdate();
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }

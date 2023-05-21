@@ -10,14 +10,15 @@ import sharedTradingStyle from '../shared-trading.css?inline';
 import { StockService } from '../../../stock-service.js';
 import Chart from 'chart.js/auto';
 import { TradingComponent } from '../tradingcomponent.js';
-import { stocks } from '../../../interfaces/stock-interface.js';
+import { UserStock } from '../../../interfaces/stock-interface.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
+// import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 @customElement('app-portfolio')
 export class PortfolioComponent extends TradingComponent {
   static colorArray = [
-    '#800080',
+    '#20FCB6',
     '#663399',
     '#BA55D3',
     '#DDA0DD',
@@ -42,56 +43,6 @@ export class PortfolioComponent extends TradingComponent {
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
   @query('#doughnut') doughnut!: HTMLCanvasElement;
   @query('#graph') graph!: HTMLCanvasElement;
-  @state() userStocks = [
-    {
-      name: stocks[0].name,
-      symbol: stocks[0].symbol,
-      price: stocks[0].price,
-      image: stocks[0].image,
-      shares: 2,
-      dailyPercentage: stocks[0].dailyPercentage
-    },
-    {
-      name: stocks[1].name,
-      symbol: stocks[1].symbol,
-      price: stocks[1].price,
-      image: stocks[1].image,
-      shares: 1,
-      dailyPercentage: stocks[1].dailyPercentage
-    },
-    {
-      name: stocks[15].name,
-      symbol: stocks[15].symbol,
-      price: stocks[15].price,
-      image: stocks[15].image,
-      shares: 8,
-      dailyPercentage: stocks[15].dailyPercentage
-    },
-    {
-      name: stocks[3].name,
-      symbol: stocks[3].symbol,
-      price: stocks[3].price,
-      image: stocks[3].image,
-      shares: 3,
-      dailyPercentage: stocks[3].dailyPercentage
-    },
-    {
-      name: stocks[4].name,
-      symbol: stocks[4].symbol,
-      price: stocks[4].price,
-      image: stocks[4].image,
-      shares: 5,
-      dailyPercentage: stocks[4].dailyPercentage
-    },
-    {
-      name: stocks[18].name,
-      symbol: stocks[18].symbol,
-      price: stocks[18].price,
-      image: stocks[18].image,
-      shares: 28,
-      dailyPercentage: stocks[18].dailyPercentage
-    }
-  ];
   @property({ type: Object })
   stockService = new StockService();
   @property({ type: Object })
@@ -106,11 +57,26 @@ export class PortfolioComponent extends TradingComponent {
   async firstUpdated() {
     try {
       this.startAsyncInit();
-      const newStatusJSON = await httpClient.get('/users/new' + location.search);
-      const newStatus = (await newStatusJSON.json()).new;
-      if (newStatus) {
-        this.showNotification('new user was created successfully', 'info');
-      }
+      const response = await httpClient.get('trading' + location.search);
+      const data = await response.json();
+      const userTransactions = data.results;
+      this.money = data.money;
+      this.userStocks = userTransactions.map((transaction: UserStock) => ({
+        name: transaction.name,
+        symbol: transaction.symbol,
+        price: 0,
+        image: transaction.image,
+        shares: transaction.shares,
+        dailyPercentage: 0
+      }));
+
+      this.stockService.setObserver(this);
+      await this.stockService.connectSocket();
+      this.sendSubscriptions();
+      this.stockService.updateStockPercentages();
+      // Chart.register(ChartDataLabels);
+      this.createDoughnut();
+      this.createGraph(data.performance);
     } catch (e) {
       if ((e as { statusCode: number }).statusCode === 401) {
         router.navigate('/users/sign-in');
@@ -132,16 +98,6 @@ export class PortfolioComponent extends TradingComponent {
     return cum;
   }
 
-  async connectedCallback() {
-    super.connectedCallback();
-    await this.stockService.connectSocket();
-    this.stockService.setObserver(this);
-    this.sendSubscriptions();
-    this.stockService.updateStockPercentages();
-    this.createDoughnut();
-    this.createGraph();
-  }
-
   disconnectedCallback() {
     super.disconnectedCallback();
     this.stockService.closeSocket();
@@ -152,13 +108,19 @@ export class PortfolioComponent extends TradingComponent {
   }
 
   createDoughnut() {
+    const stockNames = this.getStockNames();
+    const cumulatedPrices = this.getCumulatedPrices();
+    const totalMoney = this.money;
+
+    stockNames.unshift('Bar Money');
+    cumulatedPrices.unshift(totalMoney);
     this.ChartDoughnut = new Chart(this.doughnut, {
       type: 'doughnut',
       data: {
-        labels: this.getStockNames(),
+        labels: stockNames,
         datasets: [
           {
-            data: this.getCumulatedPrices(),
+            data: cumulatedPrices,
             backgroundColor: PortfolioComponent.colorArray
           }
         ]
@@ -197,21 +159,29 @@ export class PortfolioComponent extends TradingComponent {
   }
 
   updateDoughnut() {
+    const stockNames = this.getStockNames();
+    const cumulatedPrices = this.getCumulatedPrices();
+    const totalMoney = this.money;
+
+    stockNames.unshift('CASH');
+    cumulatedPrices.unshift(totalMoney);
     if (this.ChartDoughnut instanceof Chart) {
-      this.ChartDoughnut.data.labels = this.getStockNames();
-      this.ChartDoughnut.data.datasets[0].data = this.getCumulatedPrices();
+      this.ChartDoughnut.data.labels = stockNames;
+      this.ChartDoughnut.data.datasets[0].data = cumulatedPrices;
       this.ChartDoughnut.update();
     }
   }
 
-  createGraph() {
+  createGraph(performance: { date: string; value: number }[]) {
+    const labels = performance.map(entry => entry.date.slice(0, 5));
+    const values = performance.map(entry => entry.value);
     this.ChartGraph = new Chart(this.graph, {
       type: 'line',
       data: {
-        labels: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+        labels: labels,
         datasets: [
           {
-            data: [20, 30, 40, 35, 45, 70, 60, 65, 40, 30, 40, 35, 45, 45, 40, 55],
+            data: values,
             borderColor: '#9370DB',
             backgroundColor: '#9370DB',
             borderWidth: 3,
@@ -254,45 +224,48 @@ export class PortfolioComponent extends TradingComponent {
 
   render() {
     return html`
-    ${this.renderNotification()}
-    <div class="container">
+      ${this.renderNotification()}
+      <div class="container">
         <div class="part-container">
-            <div class= "graph">
-                <h1 id=upp> Portfolio-Graph </h1>
-                <canvas id="graph" "</canvas>
-            </div>
-            <div class="allo">
-                <h1 id=upp> Portfolio-Allocation </h1>
-                <canvas id="doughnut"</canvas>
-            </div>
+          <div class="graph">
+            <h1 id="upp">Portfolio-Graph</h1>
+            <canvas id="graph"></canvas>
+          </div>
+          <div class="allo">
+            <h1 id="upp">Portfolio-Allocation</h1>
+            <canvas id="doughnut"></canvas>
+          </div>
         </div>
         <div class="part-container">
           <div>
-            <p class="account" >32000$</p>
-            <p class="account" >12000$</p>
+            <p class="account">CASH: ${this.money}$</p>
+            <p class="account">STOCKS: ${this.calculateTotalValue()}$</p>
           </div>
-          <div class="portfolio-page">
-            <h1 id=upp> My Portfolio </h1>
-            ${this.userStocks.map(
-              stock => html`
-                <app-stock class="stock" id=${stock.symbol}>
-                  <span id="dot${stock.symbol}" class="dot"></span>
-                  <img src="${stock.image}" alt="${stock.name} Logo" />
-                  <h2 @click=${(event: MouseEvent) => this.handleStockClick(event, stock)}>${stock.name}</h2>
-                  <p class="prices" id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
-                  <p class="percentages" id="perc${stock.symbol}">
-                    ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
-                  </p>
-                  <p class="shares" id="shares${stock.symbol}">${stock.shares}x</p>
-                </app-stock>
+          ${this.userStocks.length > 0
+            ? html`
+                <div class="portfolio-page">
+                  <h1 id="upp">My Portfolio</h1>
+                  ${this.userStocks.map(
+                    stock => html`
+                      <app-stock class="stock" id=${stock.symbol}>
+                        <span id="dot${stock.symbol}" class="dot"></span>
+                        <img src="${stock.image}" alt="${stock.name} Logo" />
+                        <h2 @click=${(event: MouseEvent) => this.handleStockClick(event, stock)}>${stock.name}</h2>
+                        <p class="prices" id="price${stock.symbol}">
+                          Price: ${stock.price ? stock.price + '$' : 'N/A'}
+                        </p>
+                        <p class="percentages" id="perc${stock.symbol}">
+                          ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
+                        </p>
+                        <p class="shares" id="shares${stock.symbol}">${stock.shares}x</p>
+                      </app-stock>
+                    `
+                  )}
+                </div>
               `
-            )}
-          </div>
+            : ''}
         </div>
-    
-
-    </div>
-    
+      </div>
     `;
   }
 }

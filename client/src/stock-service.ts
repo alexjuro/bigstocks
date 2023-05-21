@@ -8,6 +8,7 @@ export class StockService {
   private socket: WebSocket | null = null;
   private subscriptions: Set<string> = new Set();
   private observer: TradingComponent | null = null;
+  private intervalId: NodeJS.Timeout | null = null;
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   public isConnected = false; // Verbindungsstatus des WebSockets
@@ -68,6 +69,10 @@ export class StockService {
     return this.subscriptions;
   }
 
+  public getSocket() {
+    return this.socket;
+  }
+
   public closeSocket() {
     this.socket?.close();
   }
@@ -90,7 +95,7 @@ export class StockService {
     this.observer = observer;
   }
 
-  public removeObserver(observer: TradingComponent): void {
+  public removeObserver(): void {
     this.observer = null;
   }
 
@@ -98,7 +103,7 @@ export class StockService {
     const delay = 500;
     setInterval(async () => {
       for (const symbol of this.subscriptions) {
-        setTimeout(async () => {
+        this.intervalId = setTimeout(async () => {
           const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`);
           const data = await response.json();
           const dailyPercentage = ((data.c - data.pc) / data.pc) * 100;
@@ -110,6 +115,13 @@ export class StockService {
     }, 20000);
   }
 
+  public stopUpdatingStockPercentages() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+  }
+
   public async getStockCandles(symbol: string, intervall: string, from: string, to: string) {
     const response = await fetch(
       `https://finnhub.io/api/v1/stock/candle?symbol=${symbol}&resolution=${intervall}&from=${from}&to=${to}&token=` +
@@ -119,7 +131,7 @@ export class StockService {
     return data.c;
   }
 
-  private async getFirstData(symbol: string) {
+  public async getFirstData(symbol: string) {
     const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`);
     const data = await response.json();
     return { price: data.c, percentage: ((data.c - data.pc) / data.pc) * 100 };

@@ -6,7 +6,7 @@ export interface Transaction extends Stock {
   userId: string;
   symbol: string;
   name: string;
-  imgsrc: string;
+  image: string;
   bPrice: number;
   sPrice: number;
   status: boolean;
