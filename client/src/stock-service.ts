@@ -81,7 +81,7 @@ export class StockService {
     this.subscriptions.add(symbol);
     this.sendRequest(symbol);
     this.getFirstData(symbol).then(value => {
-      this.notifyPriceObserver(symbol, value.price),
+      this.notifyPriceObserver(symbol, value.price.toFixed(2)),
         this.observer!.updateStockDailyPercentage(symbol, Number(value.percentage.toFixed(1)));
     });
   }
@@ -149,6 +149,7 @@ export class StockService {
       this.observer!.requestUpdate();
       if (this.observer instanceof PortfolioComponent) {
         this.observer.updateDoughnut();
+        this.observer.updateGraph();
       }
     }
   }

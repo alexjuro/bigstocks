@@ -279,6 +279,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         this.money = data.money;
         if (this instanceof PortfolioComponent) {
           this.updateDoughnut();
+          this.updateGraph();
         }
         this.requestUpdate();
       } else {
@@ -315,6 +316,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
       stock.shares--;
       if (this instanceof PortfolioComponent) {
         this.updateDoughnut();
+        this.updateGraph();
         if (stock.shares === 0) {
           this.userStocks = this.userStocks.filter(s => s.symbol !== stock.symbol);
           this.showNotification(`Last stock of ${stock.name} was sold`, 'info');

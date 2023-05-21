@@ -18,7 +18,7 @@ import { router } from '../../../router/router';
 @customElement('app-portfolio')
 export class PortfolioComponent extends TradingComponent {
   static colorArray = [
-    '#20FCB6',
+    '#E58400',
     '#663399',
     '#BA55D3',
     '#DDA0DD',
@@ -144,12 +144,15 @@ export class PortfolioComponent extends TradingComponent {
 
           subtitle: {
             display: true,
-            text: 'You have ' + this.userStocks.length + ' stocks!'
+            text: 'You have ' + this.userStocks.length + ' stocks!',
+            font: {
+              size: 16
+            }
           },
           legend: {
             labels: {
               font: {
-                size: 16
+                size: 14
               }
             }
           }
@@ -175,6 +178,9 @@ export class PortfolioComponent extends TradingComponent {
   createGraph(performance: { date: string; value: number }[]) {
     const labels = performance.map(entry => entry.date.slice(0, 5));
     const values = performance.map(entry => entry.value);
+    const firstValue = values[0];
+    const lastValue = values[values.length - 1];
+    const percentageChange = ((lastValue - firstValue) / firstValue) * 100;
     this.ChartGraph = new Chart(this.graph, {
       type: 'line',
       data: {
@@ -182,13 +188,13 @@ export class PortfolioComponent extends TradingComponent {
         datasets: [
           {
             data: values,
-            borderColor: '#9370DB',
-            backgroundColor: '#9370DB',
+            borderColor: '#663399',
             borderWidth: 3,
             tension: 0.2,
-            fill: true,
-            pointBackgroundColor: '#411080',
-            pointBorderColor: '#6A5ACD'
+            pointBackgroundColor: '#E6E6FA',
+            pointBorderColor: '#663399',
+            pointRadius: 5,
+            fill: { above: 'rgba(0, 200, 0,0.7)', below: 'rgba(200, 0, 0,0.7)', target: { value: values[0] } }
           }
         ]
       },
@@ -197,8 +203,8 @@ export class PortfolioComponent extends TradingComponent {
         plugins: {
           subtitle: {
             display: true,
-            text: '69% in the last week',
-            font: { weight: 'bold' },
+            text: `${percentageChange.toFixed(2)}% from ${labels[0]} to ${labels[labels.length - 1]}`,
+            font: { size: 16, weight: 'bold' },
             position: 'top'
           },
           legend: {
@@ -214,32 +220,50 @@ export class PortfolioComponent extends TradingComponent {
             grace: '10%',
             grid: { display: false }
           }
-        } /*,
-        animation: {
-          onComplete: function () {}
-        }*/
+        }
       }
     });
+  }
+
+  updateGraph() {
+    if (this.ChartGraph instanceof Chart) {
+      const labels = this.ChartGraph.data.labels;
+      const data = this.ChartGraph.data.datasets[0].data;
+      const day = new Date().toLocaleDateString().slice(0, 5);
+      console.log(day);
+      labels?.pop();
+      labels?.push(day);
+      data.pop();
+      data.push(this.money + this.calculateTotalValue());
+      this.ChartGraph.update();
+    }
   }
 
   render() {
     return html`
       ${this.renderNotification()}
       <div class="container">
-        <div class="part-container">
+        <div class="part-container graph-container">
           <div class="graph">
             <h1 id="upp">Portfolio-Graph</h1>
             <canvas id="graph"></canvas>
           </div>
+        </div>
+        <div class="part-container allo-container">
           <div class="allo">
             <h1 id="upp">Portfolio-Allocation</h1>
             <canvas id="doughnut"></canvas>
           </div>
         </div>
-        <div class="part-container">
+        <div class="part-container info-container">
           <div>
-            <p class="account">CASH: ${this.money}$</p>
-            <p class="account">STOCKS: ${this.calculateTotalValue()}$</p>
+            <p class="account" style="color: ${PortfolioComponent.colorArray[0]}">
+              <img src="./../../../../public/dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
+            </p>
+            <p class="account" style="color: ${PortfolioComponent.colorArray[1]}">
+              <img src="./../../../../public/stock.png" alt="Cash Icon" class="icon" />
+              ${this.calculateTotalValue()}$
+            </p>
           </div>
           ${this.userStocks.length > 0
             ? html`
