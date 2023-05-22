@@ -24,6 +24,8 @@ class SignUpComponent extends PageMixin(LitElement) {
 
   @query('#password-check') private passwordCheckElement!: HTMLInputElement;
 
+  private pageName = 'Sign-Up';
+
   render() {
     return html`
       ${this.renderNotification()}
@@ -43,12 +45,12 @@ class SignUpComponent extends PageMixin(LitElement) {
             </div>
             <div>
               <label for="password">Password</label>
-              <input type="password" required minlength="10" id="password" placeholder="Password" />
+              <input type="password" required minlength="10" id="password" placeholder="Password" autocomplete="off"/>
               <div class="invalid-feedback">Passwort ist erforderlich und muss mind. 10 Zeichen lang sein</div>
             </div>
             <div>
               <label for="password-check">Enter password again</label>
-              <input type="password" required minlength="10" id="password-check" placeholder="Password again" />
+              <input type="password" required minlength="10" id="password-check" placeholder="Password again" autocomplete="off"/>
               <div class="invalid-feedback">
                 Re-entering the password is required and must match the first password entered
               </div>
@@ -95,5 +97,10 @@ class SignUpComponent extends PageMixin(LitElement) {
   async signIn() {
     // window.location.href = 'users/sign-in';
     router.navigate('users/sign-in');
+  }
+  async firstUpdated() {
+    const appHeader = this.dispatchEvent(
+      new CustomEvent('update-pagename', { detail: this.pageName, bubbles: true, composed: true })
+    );
   }
 }

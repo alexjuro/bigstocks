@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import componentStyle from './header.css?inline';
 import { PageMixin } from '../page.mixin';
 import { httpClient } from '../../http-client';
@@ -8,6 +8,7 @@ import { router } from '../../router/router';
 @customElement('app-header')
 class AppHeader extends PageMixin(LitElement) {
   static styles = componentStyle;
+  @property() pagename = 'pagename';
 
   private visable: boolean;
 
@@ -81,7 +82,7 @@ class AppHeader extends PageMixin(LitElement) {
         <div id="left" class="headelem">
           <button type="button" @click="${this.getLeaderboard}">BigStocks</button>
         </div>
-        <div id="mid" class="headelem"><a href="">pagename</a></div>
+        <div id="mid" class="headelem"><a href="">${this.pagename}</a></div>
         <div id="right" class="headelem">
           <nav id="dnav">
             <a href="">news</a>

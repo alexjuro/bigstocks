@@ -1,62 +1,125 @@
-/* Autor: Lakzan Nathan*/
-
 import { LitElement, html } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, query, state } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import { PageMixin } from '../page.mixin.js';
 import { router } from '../../router/router.js';
-
 import sharedStyle from '../shared.css?inline';
 import style from './style.css?inline';
 
 @customElement('sign-in')
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class SignInComponent extends PageMixin(LitElement) {
   static styles = [style, sharedStyle];
 
-  @query('form') private form!: HTMLFormElement;
+  @query('form')
+  private form!: HTMLFormElement;
 
-  @query('#email') private emailElement!: HTMLInputElement;
+  @query('#email')
+  private emailElement!: HTMLInputElement;
 
-  @query('#password') private passwordElement!: HTMLInputElement;
+  @query('#password')
+  private passwordElement!: HTMLInputElement;
+
+  @state()
+  private step = 1;
+
+  private pagenName = 'Sign-In';
+
+  private email = '';
+  private password = '';
+
+  async firstUpdated() {
+    const appHeader = this.dispatchEvent(
+      new CustomEvent('update-pagename', { detail: this.pagenName, bubbles: true, composed: true })
+    );
+  }
 
   render() {
     return html`
       ${this.renderNotification()}
       <div class="Login-Page">
-        <div class="form">
-          <h1>Log-In</h1>
-          <form novalidate class="login-form">
-            <div>
-              <label for="email">E-Mail</label>
-              <input type="email" autofocus required id="email" placeholder="Email" />
-              <div class="invalid-feedback">Email is required and must be valid</div>
-            </div>
-            <div>
-              <label for="password">Password</label>
-              <input type="password" required id="password" placeholder="Password" />
-              <div class="invalid-feedback">Password is required</div>
-            </div>
-            <button type="button" @click="${this.submit}">Sign-In</button>
-            <p class="message">
-              Not registered?
-              <button @click="${this.signUp}">Create an account</button>
-            </p>
-          </form>
-        </div>
+        <div class="form">${this.step === 1 ? this.renderEmailStep() : this.renderPasswordStep()}</div>
       </div>
     `;
+  }
+
+  renderEmailStep() {
+    return html`
+      <h1>Log-In</h1>
+      <form novalidate class="login-form">
+        <div>
+          <label for="email">E-Mail</label>
+          <input
+            type="email"
+            autofocus
+            required
+            id="email"
+            placeholder="Email"
+            .value=${this.email}
+            @input=${this.handleEmailChange}
+          />
+          <div class="invalid-feedback">Email is required and must be valid</div>
+        </div>
+        <button type="button" @click=${this.nextStep}>Next</button>
+        <p class="message">
+          Not registered?
+          <button @click=${this.signUp}>Create an account</button>
+        </p>
+      </form>
+    `;
+  }
+
+  renderPasswordStep() {
+    return html`
+      <h1>Log-In</h1>
+      <form novalidate class="login-form">
+        <div>
+          <label for="password">Password</label>
+          <input
+            type="password"
+            required
+            id="password"
+            placeholder="Password"
+            autocomplete="off"
+            .value=${this.password}
+            @input=${this.handlePasswordChange}
+          />
+          <div class="invalid-feedback">Password is required</div>
+        </div>
+        <button type="button" @click=${this.submit}>Sign-In</button>
+        <p class="message">
+          Not registered?
+          <button @click=${this.signUp}>Create an account</button>
+        </p>
+      </form>
+    `;
+  }
+
+  handleEmailChange(event: InputEvent) {
+    this.email = (event.target as HTMLInputElement).value;
+  }
+
+  handlePasswordChange(event: InputEvent) {
+    this.password = (event.target as HTMLInputElement).value;
+  }
+
+  nextStep() {
+    if (this.isFormValid()) {
+      this.step = 2;
+    } else {
+      this.form.classList.add('was-validated');
+    }
   }
 
   async submit() {
     if (this.isFormValid()) {
       const authData = {
-        email: this.emailElement.value,
-        password: this.passwordElement.value
+        email: this.email,
+        password: this.password
       };
       try {
         await httpClient.post('/users/sign-in', authData);
         router.navigate('/news');
+        this.step = 1; // Zurücksetzen auf den ersten Schritt nach erfolgreichem Einloggen
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
       }

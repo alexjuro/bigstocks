@@ -12,3 +12,4 @@ import './components/trading/market/market.js';
 import './components/main/main.ts';
 import './components/header/header.ts';
 import './components/leaderboard/leaderboard.ts';
+import './components/widgets/rating/my-rating.js';
