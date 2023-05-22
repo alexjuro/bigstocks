@@ -118,7 +118,8 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
       image,
       bPrice,
       sPrice: 0,
-      status: true
+      status: true,
+      soldAt: 0
     });
 
     const moneyToDeduct = Number(bPrice);
@@ -167,6 +168,7 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
 
     lowestPriceTransaction.sPrice = Number(sPrice.toFixed(2));
     lowestPriceTransaction.status = false;
+    lowestPriceTransaction.soldAt = new Date().getTime();
 
     // Update the transaction
     await transactionDAO.update(lowestPriceTransaction);

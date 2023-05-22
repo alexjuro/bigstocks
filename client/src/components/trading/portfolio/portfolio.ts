@@ -188,13 +188,13 @@ export class PortfolioComponent extends TradingComponent {
         datasets: [
           {
             data: values,
-            borderColor: '#663399',
+            borderColor: '#9370DB',
             borderWidth: 3,
-            tension: 0.2,
+            borderDash: [5, 5],
+            tension: 0.3,
             pointBackgroundColor: '#E6E6FA',
-            pointBorderColor: '#663399',
-            pointRadius: 5,
-            fill: { above: 'rgba(0, 200, 0,0.7)', below: 'rgba(200, 0, 0,0.7)', target: { value: values[0] } }
+            pointRadius: 3,
+            fill: { above: 'rgba(0, 230, 0,0.1)', below: 'rgba(230,0, 0,0.1)', target: { value: values[0] } }
           }
         ]
       },
@@ -226,17 +226,20 @@ export class PortfolioComponent extends TradingComponent {
   }
 
   updateGraph() {
+    /*
     if (this.ChartGraph instanceof Chart) {
-      const labels = this.ChartGraph.data.labels;
+      const labels = this.ChartGraph.data.labels ?? [];
       const data = this.ChartGraph.data.datasets[0].data;
       const day = new Date().toLocaleDateString().slice(0, 5);
-      console.log(day);
-      labels?.pop();
-      labels?.push(day);
-      data.pop();
-      data.push(this.money + this.calculateTotalValue());
-      this.ChartGraph.update();
+      if (day == labels[labels?.length - 1]) {
+        labels?.pop();
+        labels?.push(day);
+        data.pop();
+        data.push(this.money + this.calculateTotalValue());
+        this.ChartGraph.update();
+      }
     }
+    */
   }
 
   render() {
@@ -248,15 +251,13 @@ export class PortfolioComponent extends TradingComponent {
             <h1 id="upp">Portfolio-Graph</h1>
             <canvas id="graph"></canvas>
           </div>
-        </div>
-        <div class="part-container allo-container">
           <div class="allo">
             <h1 id="upp">Portfolio-Allocation</h1>
             <canvas id="doughnut"></canvas>
           </div>
         </div>
         <div class="part-container info-container">
-          <div>
+          <div style="margin-top: 0px">
             <p class="account" style="color: ${PortfolioComponent.colorArray[0]}">
               <img src="./../../../../public/dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
             </p>
@@ -268,7 +269,7 @@ export class PortfolioComponent extends TradingComponent {
           ${this.userStocks.length > 0
             ? html`
                 <div class="portfolio-page">
-                  <h1 id="upp">My Portfolio</h1>
+                  <h1 id="upp">Your Stocks</h1>
                   ${this.userStocks.map(
                     stock => html`
                       <app-stock class="stock" id=${stock.symbol}>

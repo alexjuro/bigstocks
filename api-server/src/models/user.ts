@@ -8,5 +8,5 @@ export interface User extends Entity {
   password: string;
   new: boolean;
   money: number;
-  performance: [{ date: string; performance: number }];
+  performance: [{ date: string; value: number }];
 }

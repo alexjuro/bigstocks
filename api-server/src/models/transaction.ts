@@ -10,4 +10,5 @@ export interface Transaction extends Stock {
   bPrice: number;
   sPrice: number;
   status: boolean;
+  soldAt: number;
 }

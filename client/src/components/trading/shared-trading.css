@@ -5,9 +5,9 @@
 }
 
 button {
-  background-color: #9370db;
+  background-color: rgba(230, 230, 250, 0.5);
   border: 2px solid #6a5acd;
-  color: #ffffff;
+  color: #373737;
   padding: 10px 20px;
   font-size: 16px;
   font-weight: bold;
@@ -17,6 +17,7 @@ button {
 
 button:hover {
   background-color: #6a5acd;
+  color: #ffffff;
 }
 
 #upp {
@@ -102,11 +103,10 @@ img {
   width: 100%;
   font-size: 12px;
   text-align: center;
-  border-radius: 10%;
 }
 
 .stockdetails {
-  background-color: #903fb6a7;
+  background-color: rgba(210, 210, 240, 0.9);
 }
 
 .account {

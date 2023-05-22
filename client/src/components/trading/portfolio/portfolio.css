@@ -25,27 +25,20 @@ h1 {
   box-shadow: 0 0 15px 0 rgba(173, 168, 168, 0.2), 0 5px 5px 0 rgba(186, 183, 183, 0.24);
   border-radius: 1em;
   flex-basis: 45%;
-  max-width: 600px;
+  max-width: 700px;
 }
 
 .graph-container {
-  flex-basis: 60%;
+  flex-basis: 45%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   margin-right: 10px;
-}
-
-.allo-container {
-  flex-basis: 25%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin-right: 10px;
+  margin-top: 10px;
 }
 
 .info-container {
-  flex-basis: 45%;
+  flex-basis: 25%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -56,11 +49,16 @@ h1 {
 }
 
 .portfolio-page {
+  margin-top: 10px;
   flex: 1;
   overflow: auto;
-  max-height: 70vh;
+  max-height: 110vh;
 }
 
+.allo {
+  width: 100%;
+  height: 100%;
+}
 /* Weitere Styles hier... */
 
 .stock {

@@ -119,7 +119,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         buyButton.textContent = 'Kaufen';
         buyButton.addEventListener('click', event => {
           event.stopPropagation();
-          console.log('Kauf'); // Hier muss die entsprechende Methode für den Kauf der Aktie implementiert werden
+          console.log('Buy'); // Hier muss die entsprechende Methode für den Kauf der Aktie implementiert werden
           this.buyStock(event, stock);
         });
         infoDiv.appendChild(buyButton);
@@ -129,14 +129,14 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         sellButton.textContent = 'Verkaufen';
         sellButton.addEventListener('click', event => {
           event.stopPropagation();
-          console.log('Verkauf'); // Hier muss die entsprechende Methode für den Verkauf der Aktie implementiert werden
+          console.log('Sell'); // Hier muss die entsprechende Methode für den Verkauf der Aktie implementiert werden
           this.sellStock(event, stock);
         });
         infoDiv.appendChild(sellButton);
 
         // Erstellung des StockDetails-Buttons
         const stockDetailsButton = document.createElement('button');
-        stockDetailsButton.textContent = 'StockDetails';
+        stockDetailsButton.textContent = 'Details';
         stockDetailsButton.classList.add('stockdetails');
         stockDetailsButton.addEventListener('click', event => {
           event.stopPropagation();
@@ -169,8 +169,9 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
           {
             data: data,
             borderColor: '#9370DB',
-            backgroundColor: '#9370DB',
+            backgroundColor: 'rgba(230, 230, 250,0.5)',
             borderWidth: 3,
+            borderDash: [5, 5],
             tension: 0.3,
             fill: true,
             pointBackgroundColor: '#411080',
