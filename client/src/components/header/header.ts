@@ -29,8 +29,8 @@ class AppHeader extends PageMixin(LitElement) {
         this.visable = false;
       }, 150);
     } else {
-      circle!.style.width = '220px';
-      circle!.style.height = '220px';
+      circle!.style.width = '255px';
+      circle!.style.height = '255px';
       setTimeout(() => {
         mnav!.style.visibility = 'visible';
       }, 280);
@@ -74,6 +74,7 @@ class AppHeader extends PageMixin(LitElement) {
             <li><button type="button" @click="${this.getNews}">news</button></li>
             <li><button type="button" @click="${this.getPortfolio}">portfolio</button></li>
             <li><button type="button" @click="${this.getProfile}">profile</button></li>
+            <li><button type="button" @click="${this.getProfile}">anmelden</button></li>
           </ul>
         </nav>
       </div>
@@ -81,12 +82,13 @@ class AppHeader extends PageMixin(LitElement) {
         <div id="left" class="headelem">
           <button type="button" @click="${this.getLeaderboard}">bigStocks</button>
         </div>
-        <div id="mid" class="headelem"><a href="">pagename</a></div>
+        <div id="mid" class="headelem"><a href="#top">pagename</a></div>
         <div id="right" class="headelem">
           <nav id="dnav">
             <button type="button" @click="${this.getNews}">news</button>
             <button type="button" @click="${this.getPortfolio}">portfolio</button>
             <button type="button" @click="${this.getProfile}">profile</button>
+            <button type="button" @click="${this.getProfile}">anmelden</button>
           </nav>
           <button id="btn" @click="${this.toggle}">
             <img src="/list.svg" alt="" height="27px" />

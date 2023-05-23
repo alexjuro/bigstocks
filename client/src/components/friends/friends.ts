@@ -15,6 +15,13 @@ class AppFriendsComponent extends LitElement {
     this.circle = false;
   }
 
+  requests = [{ name: 'Patrick' }, { name: 'Spongebob' }];
+  friends = [
+    { name: 'John', score: 1000.23 },
+    { name: 'John', score: 1000.23 },
+    { name: 'John', score: 1000.23 }
+  ];
+
   render() {
     return html`
       <div id="background">
@@ -30,7 +37,7 @@ class AppFriendsComponent extends LitElement {
             <div id="textFreunde" class="textone">Freund hinzufügen:</div>
             <!--Das Fenster zum absenden-->
             <div id="addwindow" class="window">
-              <input type="text" name="username" placeholder="Username" />
+              <input type="text" name="username" placeholder="Username" onfocus="this.value=''" id="input" />
               <button type="submit" @click="${this._displayFeedback}">Senden</button>
             </div>
 
@@ -40,29 +47,37 @@ class AppFriendsComponent extends LitElement {
             <div id="textFreunde">Freundschaftsanfragen:</div>
             <div id="requestwindow" class="window">
               <!--Beispiel fuer eine Anfrage-->
-              <div class="friendelem">
-                <div class="a">
-                  <div class="frame"></div>
-                </div>
-                <div class="b"><button>name</button></div>
-                <div class="c">
-                  <button>accept</button>
-                  <button>decline</button>
-                </div>
-              </div>
+              ${this.requests.map(
+                request => html`
+                  <div class="friendelem">
+                    <div class="a">
+                      <div class="frame"></div>
+                    </div>
+                    <div class="b"><button>${request.name}</button></div>
+                    <div class="c">
+                      <button @click="${this.accept(request.name)}">accept</button>
+                      <button>decline</button>
+                    </div>
+                  </div>
+                `
+              )}
             </div>
           </div>
 
           <div id="friendsList" class="containerelem">
             <div id="textFreunde">Freunde:</div>
             <div id="friendswindow" class="window">
-              <div class="friendelem">
-                <div class="a">
-                  <div class="frame"></div>
-                </div>
-                <div class="b"><button>name</button></div>
-                <div class="c">score</div>
-              </div>
+              ${this.friends.map(
+                friend => html`
+                  <div class="friendelem">
+                    <div class="a">
+                      <div class="frame"></div>
+                    </div>
+                    <div class="b"><button>${friend.name}</button></div>
+                    <div class="c">${friend.score} €</div>
+                  </div>
+                `
+              )}
             </div>
           </div>
         </div>
@@ -76,6 +91,7 @@ class AppFriendsComponent extends LitElement {
   }
 
   async _displayFeedback() {
+    const inputElement = this.shadowRoot!.getElementById('input');
     const feedbackElement = this.shadowRoot!.getElementById('feedback');
     feedbackElement!.classList.remove('yes');
     feedbackElement!.classList.remove('no');
@@ -97,5 +113,10 @@ class AppFriendsComponent extends LitElement {
       }, 2000);
       this.circle = true;
     }
+  }
+
+  async accept(name: string) {
+    this.requests = [];
+    this.requestUpdate();
   }
 }
