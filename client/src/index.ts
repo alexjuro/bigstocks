@@ -11,6 +11,7 @@ import './components/trading/portfolio/portfolio.js';
 import './components/trading/market/market.js';
 
 //Alex L:
+import './components/trading/trading-details/trading-details.js';
 import './components/main/main.ts';
 import './components/header/header.ts';
 import './components/leaderboard/leaderboard.ts';

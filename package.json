@@ -1,1 +1,6 @@
-{}
+{
+  "dependencies": {
+    "chartjs-plugin-annotation": "^3.0.1",
+    "chartjs-plugin-datalabels": "^2.2.0"
+  }
+}

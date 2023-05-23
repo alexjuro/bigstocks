@@ -2,15 +2,24 @@
 import { PageMixin } from '../page.mixin';
 import { LitElement } from 'lit';
 import { StockService } from '../../stock-service.js';
-import { Stock } from '../../interfaces/stock-interface.js';
+import { UserStock, Stock } from '../../interfaces/stock-interface.js';
 import Chart from 'chart.js/auto';
+import { router } from '../../router/router.js';
+import { httpClient } from '../../http-client';
+import { PortfolioComponent } from './portfolio/portfolio';
 
-export abstract class StockComponent extends PageMixin(LitElement) {
-  protected userStocks: Stock[] = [];
+export abstract class TradingComponent extends PageMixin(LitElement) {
+  protected userStocks: UserStock[] = [];
   protected stockService: StockService | null = null;
   protected stockCandle: object | null = null;
+  protected money = 0;
+  protected publicUrl = './../../../../public/';
 
-  getStocks(): Stock[] {
+  getMoney(): number {
+    return this.money;
+  }
+
+  getStocks(): UserStock[] {
     return this.userStocks;
   }
 
@@ -80,20 +89,15 @@ export abstract class StockComponent extends PageMixin(LitElement) {
     }
   }
 
-  handleStockClick(event: MouseEvent) {
+  async handleStockClick(event: MouseEvent, stock: UserStock) {
     const stockDiv = (event.target as HTMLElement).closest('.stock');
-    console.log('EVENT!');
     if (stockDiv) {
-      console.log('test');
       const element = stockDiv.parentElement?.querySelector('.candle-div');
+      const infoDiv = stockDiv.parentElement?.querySelector('.info-div');
 
-      if (element) {
-        element.remove();
-
-        const infoDiv = stockDiv.querySelector('.info-div');
-        if (infoDiv) {
-          infoDiv.remove();
-        }
+      if (element || infoDiv) {
+        element?.remove();
+        infoDiv?.remove();
       } else {
         const newEmptyDiv = document.createElement('div');
         newEmptyDiv.classList.add('candle-div');
@@ -113,21 +117,49 @@ export abstract class StockComponent extends PageMixin(LitElement) {
 
         // Erstellung des Kaufen-Buttons
         const buyButton = document.createElement('button');
-        buyButton.textContent = 'Kaufen';
+        buyButton.textContent = 'Buy';
+        buyButton.classList.add('buy');
         buyButton.addEventListener('click', event => {
           event.stopPropagation();
-          console.log('Kauf'); // Hier muss die entsprechende Methode für den Kauf der Aktie implementiert werden
+          console.log('Buy'); // Hier muss die entsprechende Methode für den Kauf der Aktie implementiert werden
+          this.buyStock(event, stock);
         });
         infoDiv.appendChild(buyButton);
 
+        const buyImg = document.createElement('img');
+        buyImg.src = './../../../../buy.png';
+        buyButton.appendChild(buyImg);
+
         // Erstellung des Verkaufen-Buttons
         const sellButton = document.createElement('button');
-        sellButton.textContent = 'Verkaufen';
+        sellButton.textContent = 'Sell';
+        sellButton.classList.add('sell');
         sellButton.addEventListener('click', event => {
           event.stopPropagation();
-          console.log('Verkauf'); // Hier muss die entsprechende Methode für den Verkauf der Aktie implementiert werden
+          console.log('Sell');
+          this.sellStock(event, stock);
         });
         infoDiv.appendChild(sellButton);
+
+        const sellImg = document.createElement('img');
+        sellImg.src = './../../../../sell.png';
+        sellButton.appendChild(sellImg);
+
+        // Erstellung des StockDetails-Buttons
+        const stockDetailsButton = document.createElement('button');
+        stockDetailsButton.textContent = 'Details';
+        stockDetailsButton.classList.add('stockdetails');
+        stockDetailsButton.addEventListener('click', event => {
+          event.stopPropagation();
+          const symbol = stockDiv.id;
+          // Navigiere zur Route "/trading/stockdetails/:id"
+          router.navigate(`trading/details/${symbol}`);
+        });
+        infoDiv.appendChild(stockDetailsButton);
+
+        const detailImg = document.createElement('img');
+        detailImg.src = './../../../../details.png';
+        stockDetailsButton.appendChild(detailImg);
 
         // To:Do Hinzufügen der Informationen zur Aktie...
       }
@@ -152,8 +184,9 @@ export abstract class StockComponent extends PageMixin(LitElement) {
           {
             data: data,
             borderColor: '#9370DB',
-            backgroundColor: '#9370DB',
+            backgroundColor: 'rgba(230, 230, 250,0.5)',
             borderWidth: 3,
+            borderDash: [5, 5],
             tension: 0.3,
             fill: true,
             pointBackgroundColor: '#411080',
@@ -214,6 +247,101 @@ export abstract class StockComponent extends PageMixin(LitElement) {
         timestamp: Math.floor(t.getTime() / 1000).toString(),
         now: Math.floor(now.getTime() / 1000).toString()
       };
+    }
+  }
+
+  // Funktion zur Berechnung des Wertes einer einzelnen Aktie
+  calculateStockValue(stock: UserStock): number {
+    return stock.price * stock.shares;
+  }
+
+  // Funktion zur Berechnung des Gesamtwertes aller Aktien
+  calculateTotalValue(): number {
+    let totalValue = 0;
+    for (const stock of this.userStocks) {
+      if (stock.shares > 0) {
+        totalValue += this.calculateStockValue(stock);
+      }
+    }
+    return Number(totalValue.toFixed(2));
+  }
+
+  async buyStock(event: Event, stock: UserStock) {
+    console.log(stock);
+    try {
+      if (!this.stockService) {
+        throw new Error('StockService not active!');
+      }
+      const bPrice = (await this.stockService.getFirstData(stock.symbol)).price;
+      if (!bPrice || isNaN(bPrice)) {
+        // Überprüfen, ob bPrice leer oder ungültig ist
+        this.showNotification('Failed to retrieve stock price', 'error');
+        return;
+      }
+      if (this.money < bPrice) {
+        throw new Error('Insufficient funds');
+      }
+      const pValue = this.money + this.calculateTotalValue();
+      const response = await httpClient.post('/trading/', {
+        symbol: stock.symbol,
+        name: stock.name,
+        image: stock.image,
+        bPrice: bPrice,
+        pValue: pValue
+      });
+      if (response.status === 201) {
+        const data = await response.json();
+        stock.shares++;
+        this.money = data.money;
+        if (this instanceof PortfolioComponent) {
+          this.updateDoughnut();
+          this.updateGraph();
+        }
+        this.requestUpdate();
+      } else {
+        throw new Error('Failed to purchase stock');
+      }
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+  }
+
+  async sellStock(event: Event, stock: UserStock) {
+    try {
+      if (stock.shares == 0) {
+        throw new Error('No Share in Stock!');
+      }
+      if (!this.stockService) {
+        throw new Error('StockService not active!');
+      }
+      const sPrice = (await this.stockService.getFirstData(stock.symbol)).price;
+      if (!sPrice || isNaN(sPrice)) {
+        // Überprüfen, ob bPrice leer oder ungültig ist
+        this.showNotification('Failed to retrieve stock price', 'error');
+        return;
+      }
+      const pValue = this.money + this.calculateTotalValue();
+      const response = await httpClient.patch('/trading/', {
+        symbol: stock.symbol,
+        name: stock.name,
+        image: stock.image,
+        sPrice: sPrice,
+        pValue: pValue
+      });
+      const data = await response.json();
+      stock.shares--;
+      if (this instanceof PortfolioComponent) {
+        this.updateDoughnut();
+        this.updateGraph();
+        if (stock.shares === 0) {
+          this.userStocks = this.userStocks.filter(s => s.symbol !== stock.symbol);
+          this.showNotification(`Last stock of ${stock.name} was sold`, 'info');
+        }
+      }
+      this.money = data.money;
+      this.requestUpdate();
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
     }
   }
 }
