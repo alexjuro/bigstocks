@@ -8,6 +8,7 @@ import componentStyle from './user-profile.css?inline';
 import { PageMixin } from '../page.mixin.js';
 import { UserData } from './types';
 
+// TODO: escape / sanitize inputs
 @customElement('user-profile')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class Profile extends PageMixin(LitElement) {
@@ -23,7 +24,7 @@ class Profile extends PageMixin(LitElement) {
       const res = new Response();
       res.json = async () => ({ id: 1, email: 'admin@bigstocks.com', name: 'harry-hacker', password: 'password' });
       resolve(res);
-    }, 1000);
+    }, 3000);
   });
   private user!: UserData;
 
@@ -41,10 +42,10 @@ class Profile extends PageMixin(LitElement) {
 
             return html`${this.renderNotification()}
               <dialog>
-                <form novalidate @submit=${this.verifyPassword}>
+                <form novalidate @submit="${this.verifyPassword}">
                   <label for="input">Password confirmation:</label>
                   <input id="input" type="password" autocomplete="off" required />
-                  <button type="button" @click=${this.verifyPassword}>Confirm</button>
+                  <button type="button" @click="${this.verifyPassword}">Confirm</button>
                 </form>
               </dialog>
 
@@ -52,24 +53,24 @@ class Profile extends PageMixin(LitElement) {
               <user-profile-avatar .data=${{ id: this.user.id, avatar: this.user.avatar }}></user-profile-avatar>
               <div class="divider"><hr /></div>
               <user-profile-details
-                @submit-req=${this.submitRequest}
-                @submit-suc=${this.submitSuccess}
-                @submit-err=${this.submitError}
-                .data=${{ id: this.user.id, email: this.user.email, name: this.user.name }}
+                @submit-req="${this.submitRequest}"
+                @submit-suc="${this.submitSuccess}"
+                @submit-err="${this.submitError}"
+                .data="${{ id: this.user.id, email: this.user.email, name: this.user.name }}"
               ></user-profile-details>
               <div class="divider"><hr /></div>
               <user-profile-password
-                @submit-req=${this.submitRequest}
-                @submit-suc=${this.submitSuccess}
-                @submit-err=${this.submitError}
-                .data=${{ id: this.user.id, password: this.user.password }}
+                @submit-req="${this.submitRequest}"
+                @submit-suc="${this.submitSuccess}"
+                @submit-err="${this.submitError}"
+                .data="${{ id: this.user.id, password: this.user.password }}"
               ></user-profile-password>`;
           })
           .catch(() => {
             this.showNotification('Failed to load user data. Please try again.');
             window.location.assign('/');
           }),
-        html`Loading...`
+        html`<is-loading></is-loading>`
       )}
     `;
   }
@@ -81,7 +82,7 @@ class Profile extends PageMixin(LitElement) {
 
     this.modal.close();
     // TODO: bcrypt compare
-    if (this.input.value !== this.user.password) return this.showNotification('Incorrect password.', 'error');
+    if (this.input.value !== this.user.password) return this.showNotification('Password incorrect.', 'error');
 
     await this.confirmCb();
   }

@@ -26,20 +26,20 @@ class ProfileMain extends PageMixin(LitElement) {
       <form novalidate>
         <div>
           <label for="name">Username</label>
-          <input id="name" type="text" value=${this.data.name} required />
+          <input id="name" type="text" value="${this.data.name}" required />
           <span />
           <div class="invalid-feedback">Username must not be empty.</div>
           <div id="annotation">Your public username.</div>
         </div>
         <div>
           <label for="email">Email address</label>
-          <input id="email" type="email" value=${this.data.email} required />
+          <input id="email" type="email" value="${this.data.email}" required />
           <span />
           <div id="annotation">Your email address.</div>
           <div class="invalid-feedback">Email address must be a valid email.</div>
         </div>
-        <button type="button" @click=${this.submit}>Save</button>
-        <button type="button" @click=${this.cancel}>Cancel</button>
+        <button type="button" @click="${this.submit}">Save</button>
+        <button type="button" @click="${this.cancel}">Cancel</button>
       </form>`;
   }
 

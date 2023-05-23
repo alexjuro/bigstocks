@@ -31,20 +31,20 @@ class ProfilePassword extends PageMixin(LitElement) {
       <form novalidate>
         <div>
           <label for="pass1">New Password</label>
-          <input id="pass1" type=${this.isText ? 'text' : 'password'} autocomplete="off" required />
+          <input id="pass1" type="${this.isText ? 'text' : 'password'}" autocomplete="off" required />
           <span />
           <img
             src="http://localhost:8080/app/eye_${this.isText ? 'off' : 'on'}28.png"
-            @click=${this.togglePasswordVisibility}
+            @click="${this.togglePasswordVisibility}"
           />
         </div>
         <div>
           <label for="pass2">New Password Confirmation</label>
-          <input id="pass2" type=${this.isText ? 'text' : 'password'} autocomplete="off" required />
+          <input id="pass2" type="${this.isText ? 'text' : 'password'}" autocomplete="off" required />
           <span />
         </div>
-        <button type="button" @click=${this.submit}>Save</button>
-        <button type="button" @click=${this.cancel}>Cancel</button>
+        <button type="button" @click="${this.submit}">Save</button>
+        <button type="button" @click="${this.cancel}">Cancel</button>
       </form>`;
   }
 

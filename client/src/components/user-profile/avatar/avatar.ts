@@ -21,19 +21,17 @@ class ProfileAvatar extends LitElement {
 
   firstUpdated() {
     // TODO: emit generic error -> notification failed to load profile picture
-    this.img.onerror = () => (this.img.src = 'http://localhost:8080/app/placeholder.png');
+    this.img.onerror = () => (this.img.src = '');
   }
 
   render() {
-    return html`
-      <h3>Avatar</h3>
+    return html`<h3>Avatar</h3>
       <p>Accepted image formats are PNG and JPEG. The image's size must not exceed 200KiB.</p>
       <form>
         <img src="${this.data.avatar || 'http://localhost:8080/app/placeholder.png'}" />
         <input type="file" accept="${this.media_types.join(',')}" />
-        <button type="button" @click=${this.submit}>Save</button>
-      </form>
-    `;
+        <button type="button" @click="${this.submit}">Save</button>
+      </form>`;
   }
 
   async submit() {

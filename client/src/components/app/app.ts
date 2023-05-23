@@ -1,7 +1,7 @@
 /* Autor: Alexander Schellenberg */
 
 import { LitElement, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { httpClient } from '../../http-client';
 import { router } from '../../router/router';
 
@@ -17,14 +17,15 @@ class AppComponent extends LitElement {
   renderSelect() {
     return router.select(
       {
+        'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,
+        'news': () => html`<finnhub-market-news></finnhub-market-news>`,
+        'profile': () => html`<user-profile></user-profile>`,
+        'stonks': () => html`<app-stonks></app-stonks>`,
         'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
         'users/market': () => html`<app-market></app-market>`,
-        'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,
         'users/sign-in': () => html`<sign-in></sing-in>`,
         'users/sign-up': () => html`<sign-up></sing-up>`,
-        'users/sign-out': () => html`<sign-out></sign-out>`,
-        'stonks': () => html`<app-stonks></app-stonks>`,
-        'news': () => html`<finnhub-market-news></finnhub-market-news>`
+        'users/sign-out': () => html`<sign-out></sign-out>`
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;

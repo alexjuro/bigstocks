@@ -9,11 +9,15 @@
   justify-content: center;
   flex-direction: row;
   width: 6rem;
-  height: 4rem;
+  height: 3.2rem;
 }
 
-#b1 { border-bottom-left-radius: 0.4rem; }
-#b2 { border-bottom-right-radius: 0.4rem; }
+#b1 {
+  border-bottom-left-radius: 0.4rem;
+}
+#b2 {
+  border-bottom-right-radius: 0.4rem;
+}
 
 .bar {
   width: 12.5%;
