@@ -258,13 +258,13 @@ export class PortfolioComponent extends TradingComponent {
         <div class="part-container info-container">
           <div style="margin-top: 0px" class="money">
             <p class="account" style="color: ${PortfolioComponent.colorArray[0]}">
-              <img src="./../../../../public/dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
+              <img src="${this.publicUrl}dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
             </p>
-            <img src="./../../../../public/up.png" alt="Up Icon" class="icon" />
+            <img src="${this.publicUrl}up.png" alt="Up Icon" class="icon" />
             <p class="account pValue">${(this.money + this.calculateTotalValue()).toFixed(1)}$</p>
-            <img src="./../../../../public/down.png" alt="Down Icon" class="icon" />
+            <img src="${this.publicUrl}down.png" alt="Down Icon" class="icon" />
             <p class="account" style="color: ${PortfolioComponent.colorArray[1]}">
-              <img src="./../../../../public/stock.png" alt="Stock Icon" class="icon" />
+              <img src="${this.publicUrl}stock.png" alt="Stock Icon" class="icon" />
               ${this.calculateTotalValue()}$
             </p>
           </div>

@@ -13,6 +13,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
   protected stockService: StockService | null = null;
   protected stockCandle: object | null = null;
   protected money = 0;
+  protected publicUrl = './../../../../public/';
 
   getMoney(): number {
     return this.money;
@@ -136,6 +137,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         sellButton.addEventListener('click', event => {
           event.stopPropagation();
           console.log('Sell');
+          this.sellStock(event, stock);
         });
         infoDiv.appendChild(sellButton);
 

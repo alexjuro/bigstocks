@@ -1,14 +1,21 @@
 /* Autor: Alexander Schellenberg */
 
 import { PortfolioComponent } from './components/trading/portfolio/portfolio';
-const apiKey = 'cgsjqchr01qkrsgj9tk0cgsjqchr01qkrsgj9tkg';
 import { TradingComponent } from './components/trading/tradingcomponent.js';
+
+const apiKey = [
+  'cgsjqchr01qkrsgj9tk0cgsjqchr01qkrsgj9tkg',
+  'chm9grpr01qs8kipkgf0chm9grpr01qs8kipkgfg',
+  'chm9k69r01qs8kipkhlgchm9k69r01qs8kipkhm0',
+  'chm9lj9r01qs8kipki20chm9lj9r01qs8kipki2g'
+];
 
 export class StockService {
   private socket: WebSocket | null = null;
   private subscriptions: Set<string> = new Set();
   private observer: TradingComponent | null = null;
   private intervalId: NodeJS.Timeout | null = null;
+  private apiCounter = 0;
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   public isConnected = false; // Verbindungsstatus des WebSockets
@@ -21,7 +28,7 @@ export class StockService {
 
     while (!this.isConnected) {
       try {
-        this.socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`);
+        this.socket = new WebSocket(`wss://ws.finnhub.io?token=${this.getApiKey()}`);
         await new Promise<void>((resolve, reject) => {
           this.socket!.onopen = () => {
             console.log('WebSocket connection established.');
@@ -36,7 +43,7 @@ export class StockService {
       } catch (error) {
         console.log('WebSocket connection failed. Retrying in 4 seconds...');
         this.socket?.close();
-        await new Promise<void>(resolve => setTimeout(resolve, 4000));
+        await new Promise<void>(resolve => setTimeout(resolve, 2000));
       }
     }
 
@@ -104,7 +111,7 @@ export class StockService {
     setInterval(async () => {
       for (const symbol of this.subscriptions) {
         this.intervalId = setTimeout(async () => {
-          const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`);
+          const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${this.getApiKey()}`);
           const data = await response.json();
           const dailyPercentage = ((data.c - data.pc) / data.pc) * 100;
           this.observer!.updateStockDailyPercentage(symbol, Number(dailyPercentage.toFixed(1)));
@@ -125,16 +132,25 @@ export class StockService {
   public async getStockCandles(symbol: string, intervall: string, from: string, to: string) {
     const response = await fetch(
       `https://finnhub.io/api/v1/stock/candle?symbol=${symbol}&resolution=${intervall}&from=${from}&to=${to}&token=` +
-        apiKey
+        this.getApiKey()
     );
     const data = await response.json();
     return data.c;
   }
 
   public async getFirstData(symbol: string) {
-    const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`);
+    const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${this.getApiKey()}`);
     const data = await response.json();
     return { price: data.c, percentage: ((data.c - data.pc) / data.pc) * 100 };
+  }
+
+  private getApiKey() {
+    const key = apiKey[this.apiCounter];
+    this.apiCounter++;
+    if (this.apiCounter >= apiKey.length) {
+      this.apiCounter = 0;
+    }
+    return key;
   }
 
   private sendRequest(symbol: string, action = 'subscribe'): void {

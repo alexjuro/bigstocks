@@ -15,6 +15,7 @@ import { router } from '../../../router/router';
 @customElement('app-market')
 export class MarketComponent extends TradingComponent {
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
+  static publicUrl = './../../../../public/';
   @state() userStocks: UserStock[] = stocks;
   @property({ type: Object })
   stockService = new StockService();
@@ -63,10 +64,10 @@ export class MarketComponent extends TradingComponent {
         <h1 id="upp">Marketplace</h1>
         <div>
           <p class="account" style="color: #E58400">
-            <img src="./../../../../public/dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
+            <img src="${this.publicUrl}dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
           </p>
           <p class="account" style="color: #663399">
-            <img src="./../../../../public/stock.png" alt="Cash Icon" class="icon" />
+            <img src="${this.publicUrl}stock.png" alt="Stocks Icon" class="icon" />
             ${this.calculateTotalValue()}$
           </p>
         </div>
