@@ -1,5 +1,22 @@
 /* Author: Nico Pareigis */
 
+button {
+  color: ghostwhite;
+  background-color: var(--primary);
+  border-radius: .2rem;
+  padding: .2rem .4rem;
+  transition: .1s;
+}
+
+button:active {
+  background-color: var(--secondary);
+}
+
+h3 {
+  font-size: 1.3rem;
+  margin-top: 0;
+}
+
 input {
   display: inline-block;
   width: 300px;
@@ -8,20 +25,12 @@ input {
   padding: 4px 6px;
 }
 
+input:focus {
+  border: 1px solid gray;
+}
+
 label {
   color: 777;
   display: block;
   margin-bottom: 0.2rem;
-}
-
-span {
-  position: relative;
-  display: inline;
-}
-
-span::before {
-  position: absolute;
-  right: 10px;
-  top: -4px;
-  color: var(--app-error-color);
 }

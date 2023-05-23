@@ -1,12 +1,68 @@
 /* Author: Nico Pareigis */
 
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.inner {
+  display: inline-flex;
+  gap: 2rem;
+  align-items: start;
+}
+
+#file {
+  font-size: .9rem;
+  display: none;
+}
+
+#size {
+  color: gray;
+  font-size: .8rem;
+}
+
+button {
+  visibility: hidden;
+  margin: 0;
+}
+
+h4 {
+  margin: 0;
+}
+
 img {
   display: inline;
-  min-width: 100px;
-  max-width: 100px;
-  min-height: 100px;
-  max-height: 100px;
-  border: 1px solid #aaa;
+  width: 84px;
+  height: auto;
+  border: 1px solid var(--primary);
   border-radius: 50%;
-  object-fit: cover;
+}
+
+input {
+  display: none;
+}
+
+label {
+  font-size: .9rem;
+  display: inline-block;
+  color: ghostwhite;
+  background-color: var(--primary);
+  border-radius: .2rem;
+  padding: .5rem .4rem;
+  transition: .15s;
+}
+
+label:hover {
+  cursor: pointer;
+  background-color: var(--primaryVariation);
+}
+
+@media (min-width: 900px) {
+  .container {
+    flex-direction: row;
+    gap: 6rem;
+  }
+  #file {
+    display: inline;
+  }
 }

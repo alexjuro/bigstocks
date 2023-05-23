@@ -4,34 +4,61 @@ import { html, LitElement } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { httpClient } from '../../../http-client';
 import sharedStyle from '../../shared.css?inline';
+import sharedLocalStyle from '../shared-local.css?inline';
 import componentStyle from './avatar.css?inline';
 import { UserData } from '../types';
 
 @customElement('user-profile-avatar')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ProfileAvatar extends LitElement {
-  static styles = [sharedStyle, componentStyle];
+  static styles = [sharedStyle, sharedLocalStyle, componentStyle];
 
   @property() data!: Pick<UserData, 'id' | 'avatar'>;
+  // TODO: sanitize filename
+  @property() file = 'No file chosen.';
 
   @query('input') input!: HTMLInputElement;
+  @query('button') button!: HTMLButtonElement;
   @query('img') img!: HTMLImageElement;
 
   private media_types = ['image/png', 'image/jpeg'];
 
   firstUpdated() {
-    // TODO: emit generic error -> notification failed to load profile picture
-    this.img.onerror = () => (this.img.src = '');
+    this.img.onerror = () => {
+      this.img.src = '';
+      this.dispatchEvent(new CustomEvent('load-failure', { bubbles: true, detail: 'Failed to load avatar.' }));
+    };
   }
 
   render() {
-    return html`<h3>Avatar</h3>
-      <p>Accepted image formats are PNG and JPEG. The image's size must not exceed 200KiB.</p>
+    return html`<div class="container">
+      <div>
+        <h3>Avatar</h3>
+        <p>Accepted image formats are PNG and JPEG.</p>
+      </div>
       <form>
-        <img src="${this.data.avatar || 'http://localhost:8080/app/placeholder.png'}" />
-        <input type="file" accept="${this.media_types.join(',')}" />
-        <button type="button" @click="${this.submit}">Save</button>
-      </form>`;
+        <div class="inner">
+          <img src="${this.data.avatar || '../../../../../../public/placeholder.png'}" />
+          <div>
+            <h4>Change avatar</h4>
+            <div>
+              <label for="input">Choose file...</label>
+              <p id="file">${this.file}</p>
+              <input id="input" type="file" accept="${this.media_types.join(',')}" @change="${this.updateFile}" />
+            </div>
+            <p id="size">Image size must not exceed 200KiB.</p>
+            <button type="button" @click="${this.submit}">Upload</button>
+          </div>
+        </div>
+      </form>
+    </div>`;
+  }
+
+  updateFile() {
+    if (this.input.files) {
+      this.file = this.input.files[0].name;
+      this.button.style.visibility = 'visible';
+    }
   }
 
   async submit() {
@@ -61,7 +88,7 @@ class ProfileAvatar extends LitElement {
 
     return new Promise((res, rej) => {
       reader.onload = () => res(reader.result as string);
-      reader.onerror = () => rej(new Error('Failed to read image, please try again.'));
+      reader.onerror = () => rej(new Error('Failed to load image, please try again.'));
       reader.readAsDataURL(file);
     });
   }
