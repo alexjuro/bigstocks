@@ -19,11 +19,22 @@ class ProfilePassword extends PageMixin(LitElement) {
   @query('form') form!: HTMLFormElement;
   @query('#pass1') password!: HTMLInputElement;
   @query('#pass2') passwordConfirm!: HTMLInputElement;
+  @query('#entropy') entropyWrapper!: HTMLDivElement;
 
   @state() isText = false;
+  @state() entropy = 0;
+
+  private qualityLevels = [
+    { minEntropy: 0, quality: 'Poor', color: '#ff0d0d' },
+    { minEntropy: 25, quality: 'Weak', color: '#ff4e11' },
+    { minEntropy: 50, quality: 'Average', color: '#fab733' },
+    { minEntropy: 75, quality: 'Superb', color: '#acb334' },
+    { minEntropy: 100, quality: 'Fantastic', color: '#69b34c' }
+  ];
+  private quality = this.qualityLevels[0].quality;
+  private color = this.qualityLevels[0].color;
 
   render() {
-    // TODO: entropy bar
     return html`<h3>Password</h3>
       <p>
         After changing your password you will be logged out and redirect. You can then log in using your new password.
@@ -31,12 +42,24 @@ class ProfilePassword extends PageMixin(LitElement) {
       <form novalidate>
         <div>
           <label for="pass1">New Password</label>
-          <input id="pass1" type="${this.isText ? 'text' : 'password'}" autocomplete="off" required />
+          <input
+            id="pass1"
+            type=${this.isText ? 'text' : 'password'}
+            @focus=${this.showEntropy}
+            @input=${this.updateEntropy}
+            autocomplete="off"
+            required
+          />
           <span />
           <img
             src="http://localhost:8080/app/eye_${this.isText ? 'off' : 'on'}28.png"
             @click="${this.togglePasswordVisibility}"
           />
+          <div id="entropy">
+            <div class="indicator" style="--color:${this.color}"></div>
+            <p id="quality">${this.quality}</p>
+            <div class="indicator" style="--color:${this.color}"></div>
+          </div>
         </div>
         <div>
           <label for="pass2">New Password Confirmation</label>
@@ -46,6 +69,35 @@ class ProfilePassword extends PageMixin(LitElement) {
         <button type="button" @click="${this.submit}">Save</button>
         <button type="button" @click="${this.cancel}">Cancel</button>
       </form>`;
+  }
+
+  showEntropy() {
+    this.entropyWrapper.style.display = 'block';
+  }
+
+  updateEntropy() {
+    const str = this.password.value;
+
+    const unique = new Set();
+    str.split('').forEach(c => unique.add(c));
+
+    // NOTE: does not account for all possible characters
+    let chr = 0;
+    if (/[a-z]/.test(str)) chr += 26;
+    if (/[A-Z]/.test(str)) chr += 26;
+    if (/\d/.test(str)) chr += 10;
+    // owasp common special password characters (see https://owasp.org/www-community/password-special-characters)
+    if (/[ !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/.test(str)) chr += 33;
+
+    const penalty = Math.max(0.6, unique.size / (str.length || 1));
+    this.entropy = str.length * Math.log2((chr || 1) * penalty);
+
+    this.qualityLevels.forEach(l => {
+      if (this.entropy >= l.minEntropy) {
+        this.quality = l.quality;
+        this.color = l.color;
+      }
+    });
   }
 
   togglePasswordVisibility() {
