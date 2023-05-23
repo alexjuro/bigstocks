@@ -22,6 +22,7 @@ class AppComponent extends LitElement {
         'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
         'users/market': () => html`<app-market></app-market>`,
         'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,
+        'friends': () => html`<app-friends></app-friends>`,
         'users/sign-in': () => html`<sign-in></sing-in>`,
         'users/sign-up': () => html`<sign-up></sing-up>`,
         'users/sign-out': () => html`<sign-out></sign-out>`,

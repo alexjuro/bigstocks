@@ -29,8 +29,8 @@ class AppHeader extends PageMixin(LitElement) {
         this.visable = false;
       }, 150);
     } else {
-      circle!.style.width = '220px';
-      circle!.style.height = '220px';
+      circle!.style.width = '255px';
+      circle!.style.height = '255px';
       setTimeout(() => {
         mnav!.style.visibility = 'visible';
       }, 280);
@@ -71,25 +71,27 @@ class AppHeader extends PageMixin(LitElement) {
       <div id="background2">
         <nav id="mnav">
           <ul>
-            <li><a href="">news</a></li>
-            <li><a href="">users/portfolio</a></li>
-            <li><a href="">profile</a></li>
+            <li><button type="button" @click="${this.getNews}">news</button></li>
+            <li><button type="button" @click="${this.getPortfolio}">portfolio</button></li>
+            <li><button type="button" @click="${this.getProfile}">profile</button></li>
+            <li><button type="button" @click="${this.getProfile}">anmelden</button></li>
           </ul>
         </nav>
       </div>
       <div id="flexheader">
         <div id="left" class="headelem">
-          <button type="button" @click="${this.getLeaderboard}">BigStocks</button>
+          <button type="button" @click="${this.getLeaderboard}">bigStocks</button>
         </div>
-        <div id="mid" class="headelem"><a href="">pagename</a></div>
+        <div id="mid" class="headelem"><a href="#top">pagename</a></div>
         <div id="right" class="headelem">
           <nav id="dnav">
-            <a href="">news</a>
-            <a href="">portfolio</a>
-            <a href="">profile</a>
+            <button type="button" @click="${this.getNews}">news</button>
+            <button type="button" @click="${this.getPortfolio}">portfolio</button>
+            <button type="button" @click="${this.getProfile}">profile</button>
+            <button type="button" @click="${this.getProfile}">anmelden</button>
           </nav>
           <button id="btn" @click="${this.toggle}">
-            <img src="../../../public/list.svg" alt="" height="27px" />
+            <img src="/list.svg" alt="" height="27px" />
           </button>
         </div>
       </div>
@@ -102,5 +104,65 @@ class AppHeader extends PageMixin(LitElement) {
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
+  }
+
+  async getNews() {
+    try {
+      router.navigate('/news');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
+  }
+
+  async getPortfolio() {
+    try {
+      router.navigate('/users/portfolio');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
+  }
+
+  async getProfile() {
+    try {
+      router.navigate('/friends');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
   }
 }
