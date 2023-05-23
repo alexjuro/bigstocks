@@ -1,7 +1,7 @@
-/* Autor: TODO */
+/* Autor: Alexander Schellenberg */
 
 import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { httpClient } from '../../http-client';
 import { router } from '../../router/router';
 
@@ -14,16 +14,26 @@ class AppComponent extends LitElement {
     httpClient.init({ baseURL: `${location.protocol}//${location.hostname}:${port}/api/` });
   }
 
-  renderRouterOutlet() {
+  renderSelect() {
     return router.select(
       {
-        profile: () => html`<user-profile></user-profile>`
+        'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
+        'users/market': () => html`<app-market></app-market>`,
+        'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,
+        'users/sign-in': () => html`<sign-in></sing-in>`,
+        'users/sign-up': () => html`<sign-up></sing-up>`,
+        'users/sign-out': () => html`<sign-out></sign-out>`,
+        'stonks': () => html`<app-stonks></app-stonks>`,
+        'news': () => html`<finnhub-market-news></finnhub-market-news>`
       },
-      () => html`main_page_redirect`
+      () => {
+        return html`<app-portfolio></app-portfolio>`;
+      }
     );
   }
 
   render() {
-    return html`<div class="main">${this.renderRouterOutlet()}</div>`;
+    return html`<app-header></app-header>
+      <div class="main">${this.renderSelect()}</div> `;
   }
 }

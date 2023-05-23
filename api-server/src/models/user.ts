@@ -1,4 +1,4 @@
-/* Author: Nico Pareigis */
+/* Author: Nico Pareigis and Lakzan Nathan */
 
 import { Entity } from './entity';
 
@@ -13,4 +13,5 @@ export interface User extends Entity {
   name: string;
   password: string;
   role: Role;
+  new: boolean;
 }

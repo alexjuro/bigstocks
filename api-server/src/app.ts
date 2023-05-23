@@ -1,4 +1,4 @@
-/* Autor: Prof. Dr. Norman Lahme-Hütig (FH Münster) */
+/* Autor: Lakzan Nathan */
 
 import express, { Express } from 'express';
 import cookieParser from 'cookie-parser';
@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url';
 import startDB from './db.js';
 import { corsService } from './services/cors.service.js';
 import { pathToFileURL } from 'node:url';
-import user from './routes/user.js';
-
+import users from './routes/users.js';
+import mainPage from './routes/mainPage.js';
 import config from '../config.json' assert { type: 'json' };
 
 function configureApp(app: Express) {
@@ -20,7 +20,9 @@ function configureApp(app: Express) {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(corsService.corsMiddleware);
-  app.use('/api/users', user);
+  app.use('/api/users', users);
+  app.use('/api/main', mainPage);
+  // TODO: Routen einbinden
 }
 
 export async function start() {

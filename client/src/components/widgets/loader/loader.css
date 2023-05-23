@@ -1,0 +1,51 @@
+/* Author: Nico Pareigis */
+
+#container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  width: 6rem;
+  height: 4rem;
+}
+
+#b1 { border-bottom-left-radius: 0.4rem; }
+#b2 { border-bottom-right-radius: 0.4rem; }
+
+.bar {
+  width: 12.5%;
+  margin: 0.2rem auto;
+  border-radius: 0.4rem 0.4rem 0 0;
+  background-color: transparent;
+  transform-origin: bottom;
+  animation: load 1.9s linear infinite;
+  animation-delay: calc(var(--delay) * 100ms);
+}
+
+@keyframes load {
+  0%,
+  10% {
+    transform: scaleY(0.1);
+    background: transparent;
+  }
+  25% {
+    transform: scaleY(0.1);
+    background: var(--primaryVariation);
+  }
+  50% {
+    transform: scaleY(1);
+    background: var(--primaryVariation);
+  }
+  75% {
+    transform: scaleY(0.1);
+    background: var(--secondary);
+  }
+  90%,
+  100% {
+    transform: scaleY(0.1);
+    background: transparent;
+  }
+}

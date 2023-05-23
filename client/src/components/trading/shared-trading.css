@@ -1,0 +1,89 @@
+/* Autor: Alexander Schellenberg */
+
+.stock:hover {
+  box-shadow: inset 800px 0 0 0 #f5f0f0d4;
+}
+
+button {
+  background-color: #9370db;
+  border: 2px solid #6a5acd;
+  color: #ffffff;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #6a5acd;
+}
+
+#upp {
+  font-size: 20px;
+  color: #373737;
+  text-align: center;
+}
+
+.blinkGreen {
+  animation: blinkGreen 1s linear;
+}
+
+@keyframes blinkGreen {
+  0% {
+    background-color: lightgreen;
+  }
+  50% {
+    background-color: transparent;
+  }
+  100% {
+    background-color: lightgreen;
+  }
+}
+
+.blinkRed {
+  animation: blinkRed 1s linear;
+}
+
+@keyframes blinkRed {
+  0% {
+    background-color: lightcoral;
+  }
+  50% {
+    background-color: transparent;
+  }
+  100% {
+    background-color: lightcoral;
+  }
+}
+
+.dot {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  opacity: 100%;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+}
+img {
+  height: 30px;
+  width: 30px;
+  border-radius: 20%;
+  top: 10px;
+}
+
+.setTextRed {
+  color: red;
+}
+
+.setTextGreen {
+  color: green;
+}
+
+.percentages {
+  position: absolute;
+  right: 5px;
+  top: 4.5px;
+  font-size: 16px;
+}
