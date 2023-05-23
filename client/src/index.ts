@@ -11,5 +11,5 @@ import './components/sign-out/sign-out.ts';
 import './components/sign-up/sign-up.ts';
 import './components/trading/market/market.js';
 import './components/trading/portfolio/portfolio.js';
-import './components/widgets/loading-animation/loading-animation.ts';
+import './components/widgets/loader/loader.ts';
 import './components/widgets/notification/notification.ts';

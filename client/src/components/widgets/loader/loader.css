@@ -12,34 +12,17 @@
   height: 4rem;
 }
 
+#b1 { border-bottom-left-radius: 0.4rem; }
+#b2 { border-bottom-right-radius: 0.4rem; }
+
 .bar {
   width: 12.5%;
   margin: 0.2rem auto;
   border-radius: 0.4rem 0.4rem 0 0;
-  animation: load 1.9s linear infinite;
-  transform-origin: bottom;
   background-color: transparent;
-}
-
-#b1 {
-  animation-delay: 0.1s;
-  border-bottom-left-radius: 0.4rem;
-}
-#b2 {
-  animation-delay: 0.2s;
-}
-#b3 {
-  animation-delay: 0.3s;
-}
-#b4 {
-  animation-delay: 0.4s;
-}
-#b5 {
-  animation-delay: 0.5s;
-}
-#b6 {
-  animation-delay: 0.6s;
-  border-bottom-right-radius: 0.4rem;
+  transform-origin: bottom;
+  animation: load 1.9s linear infinite;
+  animation-delay: calc(var(--delay) * 100ms);
 }
 
 @keyframes load {
@@ -50,15 +33,15 @@
   }
   25% {
     transform: scaleY(0.1);
-    background: plum;
+    background: var(--primaryVariation);
   }
   50% {
     transform: scaleY(1);
-    background: plum;
+    background: var(--primaryVariation);
   }
   75% {
     transform: scaleY(0.1);
-    background: purple;
+    background: var(--secondary);
   }
   90%,
   100% {
