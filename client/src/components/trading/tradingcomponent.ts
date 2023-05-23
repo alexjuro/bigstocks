@@ -116,7 +116,8 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
 
         // Erstellung des Kaufen-Buttons
         const buyButton = document.createElement('button');
-        buyButton.textContent = 'Kaufen';
+        buyButton.textContent = 'Buy';
+        buyButton.classList.add('buy');
         buyButton.addEventListener('click', event => {
           event.stopPropagation();
           console.log('Buy'); // Hier muss die entsprechende Methode für den Kauf der Aktie implementiert werden
@@ -124,15 +125,23 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         });
         infoDiv.appendChild(buyButton);
 
+        const buyImg = document.createElement('img');
+        buyImg.src = './../../../../buy.png';
+        buyButton.appendChild(buyImg);
+
         // Erstellung des Verkaufen-Buttons
         const sellButton = document.createElement('button');
-        sellButton.textContent = 'Verkaufen';
+        sellButton.textContent = 'Sell';
+        sellButton.classList.add('sell');
         sellButton.addEventListener('click', event => {
           event.stopPropagation();
-          console.log('Sell'); // Hier muss die entsprechende Methode für den Verkauf der Aktie implementiert werden
-          this.sellStock(event, stock);
+          console.log('Sell');
         });
         infoDiv.appendChild(sellButton);
+
+        const sellImg = document.createElement('img');
+        sellImg.src = './../../../../sell.png';
+        sellButton.appendChild(sellImg);
 
         // Erstellung des StockDetails-Buttons
         const stockDetailsButton = document.createElement('button');
@@ -145,6 +154,10 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
           router.navigate(`trading/details/${symbol}`);
         });
         infoDiv.appendChild(stockDetailsButton);
+
+        const detailImg = document.createElement('img');
+        detailImg.src = './../../../../details.png';
+        stockDetailsButton.appendChild(detailImg);
 
         // To:Do Hinzufügen der Informationen zur Aktie...
       }

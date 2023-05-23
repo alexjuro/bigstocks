@@ -62,7 +62,7 @@ export class MarketComponent extends TradingComponent {
       <div class="container">
         <h1 id="upp">Marketplace</h1>
         <div>
-          <p class="account" style="color: #E58400}">
+          <p class="account" style="color: #E58400">
             <img src="./../../../../public/dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
           </p>
           <p class="account" style="color: #663399">

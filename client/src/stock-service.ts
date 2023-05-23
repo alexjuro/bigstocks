@@ -34,9 +34,9 @@ export class StockService {
           };
         });
       } catch (error) {
-        console.log('WebSocket connection failed. Retrying in 10 seconds...');
+        console.log('WebSocket connection failed. Retrying in 4 seconds...');
         this.socket?.close();
-        await new Promise<void>(resolve => setTimeout(resolve, 10000));
+        await new Promise<void>(resolve => setTimeout(resolve, 4000));
       }
     }
 

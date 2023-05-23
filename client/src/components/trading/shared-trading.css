@@ -105,13 +105,24 @@ img {
   text-align: center;
 }
 
+.info-div button img {
+  width: 30px;
+  height: 30px;
+  opacity: 80%;
+}
+
 .stockdetails {
   background-color: rgba(210, 210, 240, 0.9);
 }
 
 .account {
-  font-size: 24px;
+  font-size: 22px;
   text-align: center;
+}
+.pValue {
+  font-size: 30px;
+  text-align: center;
+  color: #373737;
 }
 
 .shares {

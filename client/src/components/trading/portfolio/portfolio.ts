@@ -74,7 +74,6 @@ export class PortfolioComponent extends TradingComponent {
       await this.stockService.connectSocket();
       this.sendSubscriptions();
       this.stockService.updateStockPercentages();
-      // Chart.register(ChartDataLabels);
       this.createDoughnut();
       this.createGraph(data.performance);
     } catch (e) {
@@ -176,7 +175,7 @@ export class PortfolioComponent extends TradingComponent {
   }
 
   createGraph(performance: { date: string; value: number }[]) {
-    const labels = performance.map(entry => entry.date.slice(0, 5));
+    const labels = performance.map(entry => entry.date.slice(0, entry.date.indexOf('.') + 2));
     const values = performance.map(entry => entry.value);
     const firstValue = values[0];
     const lastValue = values[values.length - 1];
@@ -199,6 +198,7 @@ export class PortfolioComponent extends TradingComponent {
         ]
       },
       options: {
+        animation: false,
         responsive: true,
         plugins: {
           subtitle: {
@@ -226,12 +226,12 @@ export class PortfolioComponent extends TradingComponent {
   }
 
   updateGraph() {
-    /*
     if (this.ChartGraph instanceof Chart) {
       const labels = this.ChartGraph.data.labels ?? [];
+      const lastLabel = labels[labels?.length - 1];
       const data = this.ChartGraph.data.datasets[0].data;
-      const day = new Date().toLocaleDateString().slice(0, 5);
-      if (day == labels[labels?.length - 1]) {
+      const day = new Date().toLocaleDateString().slice(0, lastLabel.length);
+      if (day == lastLabel) {
         labels?.pop();
         labels?.push(day);
         data.pop();
@@ -239,7 +239,6 @@ export class PortfolioComponent extends TradingComponent {
         this.ChartGraph.update();
       }
     }
-    */
   }
 
   render() {
@@ -247,22 +246,25 @@ export class PortfolioComponent extends TradingComponent {
       ${this.renderNotification()}
       <div class="container">
         <div class="part-container graph-container">
+          <h1 id="upp">Portfolio-Graph</h1>
           <div class="graph">
-            <h1 id="upp">Portfolio-Graph</h1>
             <canvas id="graph"></canvas>
           </div>
+          <h1 id="upp">Portfolio-Allocation</h1>
           <div class="allo">
-            <h1 id="upp">Portfolio-Allocation</h1>
             <canvas id="doughnut"></canvas>
           </div>
         </div>
         <div class="part-container info-container">
-          <div style="margin-top: 0px">
+          <div style="margin-top: 0px" class="money">
             <p class="account" style="color: ${PortfolioComponent.colorArray[0]}">
               <img src="./../../../../public/dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
             </p>
+            <img src="./../../../../public/up.png" alt="Up Icon" class="icon" />
+            <p class="account pValue">${(this.money + this.calculateTotalValue()).toFixed(1)}$</p>
+            <img src="./../../../../public/down.png" alt="Down Icon" class="icon" />
             <p class="account" style="color: ${PortfolioComponent.colorArray[1]}">
-              <img src="./../../../../public/stock.png" alt="Cash Icon" class="icon" />
+              <img src="./../../../../public/stock.png" alt="Stock Icon" class="icon" />
               ${this.calculateTotalValue()}$
             </p>
           </div>
