@@ -33,7 +33,8 @@ router.post('/sign-up', async (req, res) => {
     password: await bcrypt.hash(req.body.password, 10),
     new: true,
     money: 5000,
-    performance: [{ date: new Date().toLocaleDateString(), value: 5000 }]
+    performance: [{ date: new Date().toLocaleDateString(), value: 5000 }],
+    friends: [{ name: 'blank', accepted: false }]
   });
 
   authService.createAndSetToken({ id: newUser.id }, res);

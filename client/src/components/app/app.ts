@@ -31,7 +31,8 @@ class AppComponent extends LitElement {
         'users/sign-up': () => html`<sign-up></sing-up>`,
         'users/sign-out': () => html`<sign-out></sign-out>`,
         'stonks': () => html`<app-stonks></app-stonks>`,
-        'news': () => html`<finnhub-market-news></finnhub-market-news>`
+        'news': () => html`<finnhub-market-news></finnhub-market-news>`,
+        'cool': () => html`<app-minesweeper></app-minesweeper>`
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;

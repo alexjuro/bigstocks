@@ -9,4 +9,5 @@ export interface User extends Entity {
   new: boolean;
   money: number;
   performance: [{ date: string; value: number }];
+  friends: [{ name: string; accepted: boolean }];
 }

@@ -16,3 +16,4 @@ import './components/main/main.ts';
 import './components/header/header.ts';
 import './components/leaderboard/leaderboard.ts';
 import './components/friends/friends.ts';
+import './components/bigstocksgobrrr/secret.ts';
