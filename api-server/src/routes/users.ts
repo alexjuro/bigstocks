@@ -31,7 +31,8 @@ router.post('/sign-up', async (req, res) => {
     name: req.body.name,
     email: req.body.email,
     password: await bcrypt.hash(req.body.password, 10),
-    new: true
+    new: true,
+    rating: false
   });
 
   authService.createAndSetToken({ id: newUser.id }, res);
@@ -79,6 +80,20 @@ router.get('/new', authService.authenticationMiddleware, async (req, res) => {
   filter.new = false;
   await userDAO.update(filter);
   res.json({ new: newUser?.new });
+});
+
+router.get('/rating', authService.authenticationMiddleware, async (req, res) => {
+  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const filter: Partial<User> = { id: res.locals.user.id };
+  const newUser = await userDAO.findOne(filter);
+  if (newUser && newUser.rating) {
+    console.log(newUser.rating);
+    res.json({ rating: newUser?.rating });
+  } else {
+    filter.rating = true;
+    await userDAO.update(filter);
+    res.json({ rating: false });
+  }
 });
 
 function hasNotRequiredFields(object: { [key: string]: unknown }, requiredFields: string[], errors: string[]) {

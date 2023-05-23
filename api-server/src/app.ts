@@ -13,6 +13,7 @@ import { pathToFileURL } from 'node:url';
 import users from './routes/users.js';
 import mainPage from './routes/mainPage.js';
 import config from '../config.json' assert { type: 'json' };
+import comment from './routes/comment.js';
 
 function configureApp(app: Express) {
   app.use(express.urlencoded({ extended: true }));
@@ -22,6 +23,7 @@ function configureApp(app: Express) {
   app.use(corsService.corsMiddleware);
   app.use('/api/users', users);
   app.use('/api/main', mainPage);
+  app.use('/api/comment', comment);
   // TODO: Routen einbinden
 }
 

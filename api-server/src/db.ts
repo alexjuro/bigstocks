@@ -8,6 +8,7 @@ import { PsqlGenericDAO } from './models/psql-generic.dao.js';
 import { InMemoryGenericDAO } from './models/in-memory-generic.dao.js';
 import config from '../config.json' assert { type: 'json' };
 import { User } from './models/user.js';
+import { Comment } from './models/comment.js';
 const { MongoClient } = mongodb;
 const { Client } = pg;
 
@@ -31,6 +32,7 @@ async function startMongoDB(app: Express) {
   const client = await connectToMongoDB();
   const db = client.db('bigstocks');
   app.locals.userDAO = new MongoGenericDAO<User>(db, 'users');
+  app.locals.commentDAO = new MongoGenericDAO<Comment>(db, 'comments');
 
   // TODO: DAOs erzeugen
   return async () => await client.close();

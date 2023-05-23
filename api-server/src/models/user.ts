@@ -7,4 +7,6 @@ export interface User extends Entity {
   email: string;
   password: string;
   new: boolean;
+
+  rating: boolean;
 }
