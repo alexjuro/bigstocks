@@ -6,6 +6,7 @@ import './components/sign-up/sign-up.ts';
 import './components/main/stonks.ts';
 import './components/sign-out/sign-out.ts';
 import './components/news/FinnHubMarketNews.ts';
+import './components/sign-up/activation.ts';
 import './components/widgets/notification/notification.ts';
 import './components/trading/portfolio/portfolio.js';
 import './components/trading/market/market.js';

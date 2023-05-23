@@ -13,8 +13,8 @@ class SignInComponent extends PageMixin(LitElement) {
   @query('form')
   private form!: HTMLFormElement;
 
-  @query('#email')
-  private emailElement!: HTMLInputElement;
+  @query('#username')
+  private usernameElement!: HTMLInputElement;
 
   @query('#password')
   private passwordElement!: HTMLInputElement;
@@ -24,7 +24,7 @@ class SignInComponent extends PageMixin(LitElement) {
 
   private pagenName = 'Sign-In';
 
-  private email = '';
+  private username = '';
   private password = '';
 
   async firstUpdated() {
@@ -47,17 +47,17 @@ class SignInComponent extends PageMixin(LitElement) {
       <h1>Log-In</h1>
       <form novalidate class="login-form">
         <div>
-          <label for="email">E-Mail</label>
+          <label for="username">Username</label>
           <input
-            type="email"
+            type="text"
             autofocus
             required
-            id="email"
-            placeholder="Email"
-            .value=${this.email}
-            @input=${this.handleEmailChange}
+            id="text"
+            placeholder="Username"
+            .value=${this.username}
+            @input=${this.handleUsernameChange}
           />
-          <div class="invalid-feedback">Email is required and must be valid</div>
+          <div class="invalid-feedback">Username is required and must be valid</div>
         </div>
         <button type="button" @click=${this.nextStep}>Next</button>
         <p class="message">
@@ -85,6 +85,7 @@ class SignInComponent extends PageMixin(LitElement) {
           />
           <div class="invalid-feedback">Password is required</div>
         </div>
+        <button type="button" @click=${this.backStep}>Back</button>
         <button type="button" @click=${this.submit}>Sign-In</button>
         <p class="message">
           Not registered?
@@ -94,8 +95,8 @@ class SignInComponent extends PageMixin(LitElement) {
     `;
   }
 
-  handleEmailChange(event: InputEvent) {
-    this.email = (event.target as HTMLInputElement).value;
+  handleUsernameChange(event: InputEvent) {
+    this.username = (event.target as HTMLInputElement).value;
   }
 
   handlePasswordChange(event: InputEvent) {
@@ -109,11 +110,14 @@ class SignInComponent extends PageMixin(LitElement) {
       this.form.classList.add('was-validated');
     }
   }
+  backStep() {
+    this.step = 1;
+  }
 
   async submit() {
     if (this.isFormValid()) {
       const authData = {
-        email: this.email,
+        username: this.username,
         password: this.password
       };
       try {

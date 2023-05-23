@@ -28,6 +28,7 @@ class AppComponent extends LitElement {
         'users/sign-in': () => html`<sign-in></sing-in>`,
         'users/sign-up': () => html`<sign-up></sing-up>`,
         'users/sign-out': () => html`<sign-out></sign-out>`,
+        'users/activation': () => html`<app-activation></app-activation>`,
         'stonks': () => html`<app-stonks></app-stonks>`,
         'news': () => html`<finnhub-market-news></finnhub-market-news>`
       },

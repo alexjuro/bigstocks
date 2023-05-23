@@ -3,9 +3,11 @@
 import { Entity } from './entity';
 
 export interface User extends Entity {
-  name: string;
+  username: string;
   email: string;
   password: string;
+  activation: boolean;
+  code: number;
   new: boolean;
 
   rating: boolean;
