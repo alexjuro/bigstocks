@@ -7,50 +7,50 @@ import { authService } from '../services/auth.service.js';
 
 const router = express.Router();
 
-router.get('/friends', authService.authenticationMiddleware, async (req, res) => {
+router.get('/', async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-  const filter: Partial<User> = { name: req.app.locals.user };
-  const userObject = await userDAO.findOne(filter);
+  const email = 'al568412@fh-muenster.de';
 
-  if (userObject) {
-    const friendsArray = userObject.friends.map(friend => friend.name);
+  try {
+    const user = await userDAO.findOne({ email: email });
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
 
-    res.status(200).json({ friendsArray });
-  } else {
-    res.status(404).json({ error: 'User not found' });
+    res.json({ friends: user.friends });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
   }
 });
 
-router.post('/friends', authService.authenticationMiddleware, async (req, res) => {
+router.post('/', async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-  const errors: string[] = [];
+  const email = 'al568412@fh-muenster.de';
 
-  const sendErrMsg = (message: string) => {
-    authService.removeToken(res);
-    res.status(400).json({ message });
-  };
+  try {
+    const user = await userDAO.findOne({ email: email });
 
-  const filter: Partial<User> = { name: req.app.locals.user };
-
-  if (await userDAO.findOne(filter)) {
-    const userObject = await userDAO.findOne(filter);
-    const friendExists = userObject?.friends.some(friend => friend.name === req.body.friend);
-
-    if (friendExists) {
-      return sendErrMsg('You are already friends');
+    //wenn der freund nicht gefunden wurde
+    if (!(await userDAO.findOne({ name: req.body.friend }))) {
+      res.status(400).json({ error: "The friend couldn't be found" });
     } else {
-      // Der Benutzer hat keinen Freund mit dem Namen "Alex"
-      const newFriend = { name: 'Alex', accepted: false };
-      userObject?.friends.push(newFriend);
+      //wenn sie bereits freunde sind
+      if (user?.friends.some(friend => friend.name === req.body.friend)) {
+        res.status(401).json({ error: 'You are already friends' });
+      } else {
+        const newFriend = { name: 'Alex', accepted: false };
+        user?.friends.push(newFriend);
 
-      // Benutzer aktualisieren
-      if (userObject) {
-        await userDAO.update(userObject);
+        // Benutzer aktualisieren
+        if (user) {
+          await userDAO.update(user);
+        }
+        res.send(200);
       }
-      res.status(200);
     }
-  } else {
-    return sendErrMsg('The User was not found');
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
   }
 });
 

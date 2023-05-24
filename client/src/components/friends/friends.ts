@@ -1,6 +1,6 @@
 /* Autor: Alexander Lesnjak */
 
-import { LitElement, html } from 'lit';
+import { LitElement, PropertyValueMap, html } from 'lit';
 import { httpClient } from '../../http-client.js';
 import { customElement, query } from 'lit/decorators.js';
 import { router } from '../../router/router.js';
@@ -20,33 +20,22 @@ class AppFriendsComponent extends LitElement {
   requests: any[] = [];
   friends: any[] = [];
 
-  async connectedCallback() {
-    super.connectedCallback();
-
-    // Beim Laden der Komponente Freunde des Benutzers abrufen
+  protected async firstUpdated() {
     try {
-      const response = await fetch('/friends', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-          //'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await httpClient.get('friends');
+      const data = await response.json();
+      const friendsArray = data.friends;
 
-      if (response.ok) {
-        const data = await response.json();
-        const { friends, requests } = data;
+      const friends = friendsArray.filter((friend: any) => friend.accepted === true);
+      const requests = friendsArray.filter((friend: any) => friend.accepted === false);
 
-        this.friends = friends.filter((friend: any) => friend.accepted === true);
-        this.requests = requests.filter((request: any) => request.accepted === false);
+      this.friends = friends;
+      this.requests = requests;
 
-        this.requestUpdate();
-      } else {
-        // Fehler beim Abrufen der Freunde
-        console.error('Fehler beim Abrufen der Freunde:', response.status, response.statusText);
-      }
-    } catch (error) {
-      console.error('Fehler beim Abrufen der Freunde:', error);
+      console.log('Friends:', this.friends);
+      console.log('Requests:', this.requests);
+    } catch (e) {
+      console.log((e as Error).message, 'error');
     }
   }
 
@@ -65,8 +54,15 @@ class AppFriendsComponent extends LitElement {
             <div id="textFreunde" class="textone">Freund hinzufügen:</div>
             <!--Das Fenster zum absenden-->
             <div id="addwindow" class="window">
-              <form>
-                <input type="text" name="username" placeholder="Username" onfocus="this.value=''" id="input" />
+              <form autocomplete="off">
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Username"
+                  onfocus="this.value=''"
+                  id="input"
+                  autocomplete="off"
+                />
                 <button type="submit" @click="${this._addFriend}">Senden</button>
               </form>
             </div>
@@ -129,6 +125,7 @@ class AppFriendsComponent extends LitElement {
       this._displaySuccess();
     } catch (e) {
       this._displayError((e as Error).message);
+      console.log((e as Error).message);
     }
   }
 

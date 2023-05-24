@@ -7,22 +7,19 @@ import { authService } from '../services/auth.service';
 
 const router = express.Router();
 
-router.get('/leaderboard', authService.authenticationMiddleware, async (req: Request, res: Response) => {
+router.get('/', async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-
   try {
     const users = await userDAO.findAll();
+
     const leaderboard = users.map(user => ({
       name: user.name,
-      money: user.money
+      money: user.money,
+      performance: user.performance
     }));
-
-    // Sortiere das Leaderboard nach der Geldsumme absteigend
-    leaderboard.sort((a, b) => b.money - a.money);
-
     res.json(leaderboard);
   } catch (error) {
-    res.status(500).json({ error: 'Fehler beim Abrufen des Leaderboards' });
+    res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
   }
 });
 

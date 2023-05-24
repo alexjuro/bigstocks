@@ -2,6 +2,7 @@
 
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { httpClient } from '../../http-client.js';
 import componentStyle from './leaderboard.css?inline';
 
 @customElement('app-leaderboard')
@@ -10,26 +11,21 @@ class AppLeaderboardComponent extends LitElement {
 
   scores: any[] = [];
 
-  async connectedCallback() {
-    super.connectedCallback();
-
+  protected async firstUpdated() {
     try {
-      const response = await fetch('/top-scores', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await httpClient.get('leaderboard');
+      const data = await response.json();
 
-      if (response.ok) {
-        const data = await response.json();
-        this.scores = data.slice(0, 5); // Begrenze die Anzahl der Top Scores auf 5
-        this.requestUpdate();
-      } else {
-        console.error('Fehler beim Abrufen der Top Scores:', response.status, response.statusText);
-      }
-    } catch (error) {
-      console.error('Fehler beim Abrufen der Top Scores:', error);
+      const scores = data
+        .filter((user: { name?: any; performance?: any }) => user.name && user.performance) // Filtere Benutzer mit Namen und Leistungsdaten
+        .map((user: { name: any; performance: any }) => ({
+          name: user.name,
+          performance: user.performance[user.performance.length - 1].value
+        }));
+
+      console.log('scores:', scores);
+    } catch (e) {
+      console.log((e as Error).message, 'error');
     }
   }
 

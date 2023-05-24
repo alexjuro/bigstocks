@@ -13,6 +13,8 @@ import { pathToFileURL } from 'node:url';
 import users from './routes/users.js';
 import mainPage from './routes/mainPage.js';
 import trading from './routes/trading.js';
+import friends from './routes/friends.js';
+import leaderboard from './routes/leaderboard.js';
 import config from '../config.json' assert { type: 'json' };
 
 function configureApp(app: Express) {
@@ -24,6 +26,8 @@ function configureApp(app: Express) {
   app.use('/api/users', users);
   app.use('/api/main', mainPage);
   app.use('/api/trading', trading);
+  app.use('/api/friends', friends);
+  app.use('/api/leaderboard', leaderboard);
   // TODO: Routen einbinden
 }
 
