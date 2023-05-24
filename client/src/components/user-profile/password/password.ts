@@ -17,66 +17,78 @@ class ProfilePassword extends PageMixin(LitElement) {
   @property() data!: Pick<UserData, 'id' | 'password'>;
 
   @query('form') form!: HTMLFormElement;
-  @query('#pass1') password!: HTMLInputElement;
-  @query('#pass2') passwordConfirm!: HTMLInputElement;
-  @query('#entropy') entropyWrapper!: HTMLDivElement;
+  @query('#pass1') pass!: HTMLInputElement;
+  @query('#pass2') passConfirm!: HTMLInputElement;
+  @query('.indicator') entropyIndicator!: HTMLDivElement;
 
   @state() isText = false;
   @state() entropy = 0;
+  @state() visibility = 'hidden';
 
-  private qualityLevels = [
-    { minEntropy: 0, quality: 'Poor', color: '#ff0d0d' },
-    { minEntropy: 25, quality: 'Weak', color: '#ff4e11' },
-    { minEntropy: 50, quality: 'Average', color: '#fab733' },
-    { minEntropy: 75, quality: 'Superb', color: '#acb334' },
-    { minEntropy: 100, quality: 'Fantastic', color: '#69b34c' }
+  private quality = [
+    { minEntropy: 0, color: '#ff0d0d' },
+    { minEntropy: 25, color: '#ff4e11' },
+    { minEntropy: 50, color: '#fab733' },
+    { minEntropy: 75, color: '#acb334' },
+    { minEntropy: 100, color: '#69b34c' }
   ];
-  private quality = this.qualityLevels[0].quality;
-  private color = this.qualityLevels[0].color;
+  private color = this.quality[0].color;
 
   render() {
-    return html`<h3>Password</h3>
-      <p>
-        After changing your password you will be logged out and redirect. You can then log in using your new password.
-      </p>
+    return html`<div class="container">
+      <div>
+        <h3>Password</h3>
+        <p>
+          After changing your password you will be logged out and redirect. You can then log in using your new password.
+        </p>
+      </div>
       <form novalidate>
         <div>
-          <label for="pass1">New Password</label>
+          <label for="pass1">
+            New Password
+            <div class="tooltip">
+              ?
+              <span>
+                Password must be between 8 and 32 characters long and contain at least one upper case letter, one lower
+                case letter, and one digit.<br />The coloured bar below the input gives an indication of how strong the
+                password is.
+              </span>
+            </div>
+          </label>
           <input
             id="pass1"
-            type=${this.isText ? 'text' : 'password'}
-            @focus=${this.showEntropy}
+            type="${this.isText ? 'text' : 'password'}"
+            @focus="${this.toggleEntropy}"
+            @blur="${this.toggleEntropy}"
             @input=${this.updateEntropy}
             autocomplete="off"
             required
           />
-          <span />
-          <img
-            src="http://localhost:8080/app/eye_${this.isText ? 'off' : 'on'}28.png"
-            @click="${this.togglePasswordVisibility}"
-          />
-          <div id="entropy">
-            <div class="indicator" style="--color:${this.color}"></div>
-            <p id="quality">${this.quality}</p>
-            <div class="indicator" style="--color:${this.color}"></div>
-          </div>
+          <span @click="${this.togglePasswordVisibility}"></span>
+
+          <!--TODO: add image to span-->
+          <!-- <img src="http://localhost:8080/app/eye_${this.isText ? 'off' : 'on'}28.png"
+            @click="${this.togglePasswordVisibility}" /> -->
+
+          <div class="indicator" style="--color:${this.color};--visibility:${this.visibility}"></div>
         </div>
         <div>
           <label for="pass2">New Password Confirmation</label>
-          <input id="pass2" type="${this.isText ? 'text' : 'password'}" autocomplete="off" required />
-          <span />
+          <input id="pass2" type="password" autocomplete="off" required />
         </div>
         <button type="button" @click="${this.submit}">Save</button>
         <button type="button" @click="${this.cancel}">Cancel</button>
-      </form>`;
+      </form>
+    </div>`;
   }
 
-  showEntropy() {
-    this.entropyWrapper.style.display = 'block';
+  toggleEntropy(e: Event) {
+    if (e.type === 'focus') return (this.visibility = 'visible');
+    this.visibility = this.pass.value === '' ? 'hidden' : 'visible';
   }
 
   updateEntropy() {
-    const str = this.password.value;
+    const str = this.pass.value;
 
     const unique = new Set();
     str.split('').forEach(c => unique.add(c));
@@ -92,21 +104,19 @@ class ProfilePassword extends PageMixin(LitElement) {
     const penalty = Math.max(0.6, unique.size / (str.length || 1));
     this.entropy = str.length * Math.log2((chr || 1) * penalty);
 
-    this.qualityLevels.forEach(l => {
-      if (this.entropy >= l.minEntropy) {
-        this.quality = l.quality;
-        this.color = l.color;
-      }
+    this.quality.forEach(l => {
+      if (this.entropy >= l.minEntropy) this.color = l.color;
     });
   }
 
   togglePasswordVisibility() {
     this.isText = !this.isText;
+    this.passConfirm.disabled = this.isText;
   }
 
   async submit() {
     const re = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d).{8,32}$/;
-    this.password.setCustomValidity(re.test(this.password.value) ? '' : 'pattern-mismatch');
+    this.pass.setCustomValidity(re.test(this.pass.value) ? '' : 'pattern-mismatch');
 
     if (!this.form.checkValidity()) {
       this.form.classList.add('was-validated');
@@ -114,12 +124,12 @@ class ProfilePassword extends PageMixin(LitElement) {
     }
 
     // TODO: bcrypt compare this.data.password
-    if (this.password.value !== this.passwordConfirm.value) {
+    if (this.pass.value !== this.passConfirm.value) {
       this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: new Error("Passwords don't match!") }));
       return;
     }
 
-    this.data.password = this.password.value;
+    this.data.password = this.pass.value;
     this.dispatchEvent(
       new CustomEvent('submit-req', {
         bubbles: true,

@@ -24,7 +24,7 @@ class Profile extends PageMixin(LitElement) {
       const res = new Response();
       res.json = async () => ({ id: 1, email: 'admin@bigstocks.com', name: 'harry-hacker', password: 'password' });
       resolve(res);
-    }, 3000);
+    }, 100);
   });
   private user!: UserData;
 
@@ -93,10 +93,12 @@ class Profile extends PageMixin(LitElement) {
   }
 
   submitSuccess(e: CustomEvent) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.showNotification(e.detail, 'info');
   }
 
   submitError(e: CustomEvent) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.showNotification((e.detail as Error).message, 'error');
   }
 
