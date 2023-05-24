@@ -1,10 +1,5 @@
 /* Author: Nico Pareigis */
 
-.container {
-  display: flex;
-  flex-direction: column;
-}
-
 .inner {
   display: inline-flex;
   gap: 2rem;
@@ -58,10 +53,6 @@ label:hover {
 }
 
 @media (min-width: 900px) {
-  .container {
-    flex-direction: row;
-    gap: 6rem;
-  }
   #file {
     display: inline;
   }

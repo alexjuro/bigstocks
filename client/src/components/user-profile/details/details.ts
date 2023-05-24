@@ -22,34 +22,62 @@ class ProfileMain extends PageMixin(LitElement) {
   @property() data!: Pick<UserData, 'id' | 'email' | 'name'>;
 
   render() {
-    return html`<h3>Account Information</h3>
+    return html`<div class="container">
+      <div>
+        <h3>Account Information</h3>
+        <p>General account information.</p>
+      </div>
       <form novalidate>
         <div>
-          <label for="name">Username</label>
-          <input id="name" type="text" value="${this.data.name}" required />
-          <span />
-          <div class="invalid-feedback">Username must not be empty.</div>
-          <div id="annotation">Your public username.</div>
+          <label for="name">
+            Username
+            <div class="tooltip">
+              ?
+              <span>
+                Username must be between 4 and 32 characters long. Legal characters are upper- and lower-case letters,
+                numbers, and hyphenation characters (i.e. any of '-_.').
+              </span>
+            </div>
+          </label>
+          <input id="name" type="text" value="${this.data.name}" @input="${() => this.checkValidity(false)}" required />
+
+          <div class="invalid-feedback">Invalid username.</div>
+          <div class="annotation">Your public username.</div>
         </div>
+
         <div>
-          <label for="email">Email address</label>
-          <input id="email" type="email" value="${this.data.email}" required />
-          <span />
-          <div id="annotation">Your email address.</div>
-          <div class="invalid-feedback">Email address must be a valid email.</div>
+          <label for="email">Email address </label>
+          <input
+            id="email"
+            type="email"
+            value="${this.data.email}"
+            @input="${() => this.checkValidity(false)}"
+            required
+          />
+
+          <div class="invalid-feedback">Invalid email address.</div>
+          <div class="annotation">Your email address.</div>
         </div>
+
         <button type="button" @click="${this.submit}">Save</button>
         <button type="button" @click="${this.cancel}">Cancel</button>
-      </form>`;
+      </form>
+    </div>`;
   }
 
-  async submit() {
+  checkValidity(force: boolean) {
+    if (!(this.form.classList.contains('was-validated') || force)) return;
+
     const reEmail =
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     const reName = /^[\w-.]{4,32}$/;
 
     this.email.setCustomValidity(reEmail.test(this.email.value) ? '' : 'pattern-mismatch');
     this.name.setCustomValidity(reName.test(this.name.value) ? '' : 'pattern-mismatch');
+  }
+
+  async submit() {
+    this.checkValidity(true);
 
     if (!this.form.checkValidity()) {
       this.form.classList.add('was-validated');

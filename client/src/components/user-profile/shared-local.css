@@ -1,11 +1,52 @@
 /* Author: Nico Pareigis */
 
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-radius: 3px;
+  padding: .1rem .2rem;
+  color: ghostwhite;
+  background-color: var(--primary);
+  transition: .2s
+}
+
+.tooltip > span {
+  visibility: hidden;
+  opacity: 0;
+  transition: .2s;
+  position: absolute;
+  left: 0px;
+  top: 18px;
+  width: max-content;
+  max-width: 40vw;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  color: ghostwhite;
+  background-color: var(--primary);
+  z-index: 1;
+}
+
+.tooltip:hover {
+  background-color: var(--secondary);
+}
+
+.tooltip:hover > span {
+  visibility: visible;
+  opacity: 1;
+}
+
 button {
   color: ghostwhite;
   background-color: var(--primary);
   border-radius: .2rem;
   padding: .2rem .4rem;
   transition: .1s;
+  vertical-align: top;
 }
 
 button:active {
@@ -19,8 +60,9 @@ h3 {
 
 input {
   display: inline-block;
-  width: 300px;
-  border: 1px solid #aaa;
+  min-width: 200px;
+  max-width: 300px;
+  border: 1px solid lightgray;
   border-radius: 2px;
   padding: 4px 6px;
 }
@@ -30,7 +72,14 @@ input:focus {
 }
 
 label {
-  color: 777;
+  color: dimgray;
   display: block;
   margin-bottom: 0.2rem;
+}
+
+@media (min-width: 900px) {
+  .container {
+    flex-direction: row;
+    gap: 6rem;
+  }
 }
