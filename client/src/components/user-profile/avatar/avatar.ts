@@ -32,7 +32,7 @@ class ProfileAvatar extends LitElement {
 
   render() {
     return html`<div class="container">
-      <div>
+      <div class="description">
         <h3>Avatar</h3>
         <p>Accepted image formats are PNG and JPEG.</p>
       </div>

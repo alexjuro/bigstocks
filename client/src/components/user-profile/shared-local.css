@@ -5,20 +5,25 @@
   flex-direction: column;
 }
 
+.description {
+  text-align: justify;
+  margin-right: 0.4rem;
+}
+
 .tooltip {
   position: relative;
   display: inline-block;
   border-radius: 3px;
-  padding: .1rem .2rem;
+  padding: 0.1rem 0.2rem;
   color: ghostwhite;
   background-color: var(--primary);
-  transition: .2s
+  transition: 0.2s;
 }
 
 .tooltip > span {
   visibility: hidden;
   opacity: 0;
-  transition: .2s;
+  transition: 0.2s;
   position: absolute;
   left: min(0px, 80vw);
   top: 18px;
@@ -43,9 +48,9 @@
 button {
   color: ghostwhite;
   background-color: var(--primary);
-  border-radius: .2rem;
-  padding: .2rem .4rem;
-  transition: .1s;
+  border-radius: 0.2rem;
+  padding: 0.2rem 0.4rem;
+  transition: 0.1s;
   vertical-align: top;
 }
 
@@ -81,5 +86,9 @@ label {
   .container {
     flex-direction: row;
     gap: 6rem;
+  }
+  .description {
+    width: 280px;
+    margin-right: 0;
   }
 }

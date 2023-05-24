@@ -36,7 +36,7 @@ class ProfilePassword extends PageMixin(LitElement) {
 
   render() {
     return html`<div class="container">
-      <div>
+      <div class="description">
         <h3>Password</h3>
         <p>
           After changing your password you will be logged out and redirect. You can then log in using your new password.
@@ -64,12 +64,7 @@ class ProfilePassword extends PageMixin(LitElement) {
             autocomplete="off"
             required
           />
-          <span @click="${this.togglePasswordVisibility}"></span>
-
-          <!--TODO: add image to span-->
-          <!-- <img src="http://localhost:8080/app/eye_${this.isText ? 'off' : 'on'}28.png"
-            @click="${this.togglePasswordVisibility}" /> -->
-
+          <div><span @click="${this.togglePasswordVisibility}"></span></div>
           <div class="indicator" style="--color:${this.color};--visibility:${this.visibility}"></div>
         </div>
         <div>

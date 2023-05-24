@@ -23,7 +23,7 @@ class ProfileMain extends PageMixin(LitElement) {
 
   render() {
     return html`<div class="container">
-      <div>
+      <div class="description">
         <h3>Account Information</h3>
         <p>General account information.</p>
       </div>
@@ -40,11 +40,9 @@ class ProfileMain extends PageMixin(LitElement) {
             </div>
           </label>
           <input id="name" type="text" value="${this.data.name}" @input="${() => this.checkValidity(false)}" required />
-
           <div class="invalid-feedback">Invalid username.</div>
           <div class="annotation">Your public username.</div>
         </div>
-
         <div>
           <label for="email">Email address </label>
           <input
@@ -54,11 +52,9 @@ class ProfileMain extends PageMixin(LitElement) {
             @input="${() => this.checkValidity(false)}"
             required
           />
-
           <div class="invalid-feedback">Invalid email address.</div>
           <div class="annotation">Your email address.</div>
         </div>
-
         <button type="button" @click="${this.submit}">Save</button>
         <button type="button" @click="${this.cancel}">Cancel</button>
       </form>
