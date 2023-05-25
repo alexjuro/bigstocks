@@ -1,3 +1,5 @@
+/* Author: Nico Pareigis */
+
 .content {
   position: absolute;
   clip-path: inset(0 100% 100% 0);
@@ -40,7 +42,8 @@ button:has(+ .shadow > .content.pinned) {
   border-bottom-right-radius: 0;
 }
 
-button:hover + .shadow > .content, .content.pinned {
+button:hover + .shadow > .content,
+.content.pinned {
   clip-path: inset(0 0 0 0 round 0 4px 4px 4px);
 }
 
@@ -56,26 +59,32 @@ ul li {
     padding-left: 0;
     padding-top: 4px;
   }
+
   .content.pinned {
     padding-top: 0;
     border-left: 0;
     border-top: 4px solid var(--primary);
   }
+
   .shadow {
     right: 0;
     top: 0;
   }
+
   button:hover {
     border-bottom-left-radius: 3px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
+
   button:has(+ .shadow > .content.pinned) {
     border-bottom-left-radius: 3px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
-  button:hover + .shadow > .content, .content.pinned {
+
+  button:hover + .shadow > .content,
+  .content.pinned {
     clip-path: inset(0 0 0 0 round 0 4px 4px 4px);
   }
 }
