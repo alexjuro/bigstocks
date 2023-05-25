@@ -38,7 +38,7 @@ class ProfileAvatar extends LitElement {
       </div>
       <form>
         <div class="inner">
-          <img src="${this.data.avatar || '../../../../../../public/placeholder.png'}" />
+          <img src="${this.data.avatar || 'placeholder.png'}" />
           <div>
             <h4>Change avatar</h4>
             <div>
