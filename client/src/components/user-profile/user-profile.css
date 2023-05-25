@@ -5,6 +5,15 @@
   margin: 1rem;
 }
 
+dialog {
+  border: 0.4rem solid var(--secondary);
+  border-radius: 6px;
+}
+
+dialog::backdrop {
+  background-color: rgba(70, 70, 70, 0.3);
+}
+
 hr {
   border: none;
   border-bottom: 2px solid #aaa;
@@ -16,24 +25,4 @@ hr {
   height: 40px;
   display: flex;
   align-items: center;
-}
-
-.was-validated input:valid {
-  border: 1px solid var(--app-info-color);
-}
-
-.was-validated input:invalid ~ span::before {
-  content: '⨯';
-}
-
-.was-validated input:valid ~ span::before {
-  color: var(--app-info-color);
-  content: '✓';
-}
-
-.was-validated input:invalid ~ .invalid-feedback {
-  color: var(--app-error-color);
-  margin-top: 0.2rem;
-  font-size: 0.8rem;
-  display: block;
 }

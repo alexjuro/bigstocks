@@ -4,6 +4,7 @@ import { html, LitElement } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 import sharedStyle from '../shared.css?inline';
+import sharedLocalStyle from './shared-local.css?inline';
 import componentStyle from './user-profile.css?inline';
 import { PageMixin } from '../page.mixin.js';
 import { UserData } from './types';
@@ -12,7 +13,7 @@ import { UserData } from './types';
 @customElement('user-profile')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class Profile extends PageMixin(LitElement) {
-  static styles = [sharedStyle, componentStyle];
+  static styles = [sharedStyle, sharedLocalStyle, componentStyle];
 
   @query('dialog') modal!: HTMLDialogElement;
   @query('form') form!: HTMLFormElement;
