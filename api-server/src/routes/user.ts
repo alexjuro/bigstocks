@@ -4,6 +4,7 @@ import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';
 import { User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
+import { hash } from 'bcryptjs';
 
 const isValid = <T>(properties: Map<string, string>, obj: unknown): obj is T => {
   return (
@@ -100,8 +101,11 @@ router.post('/profile/password', authService.authenticationMiddleware, async (re
   )
     return res.status(400).json({ status: 'bad request' });
 
+  const data = req.body;
+  data.password = await hash(data.password, 10);
+
   dao
-    .update(req.body)
+    .update(data)
     .then(() => res.status(200).json({ status: 'ok' }))
     .catch(() => res.status(500).json({ status: 'error' }));
 });
