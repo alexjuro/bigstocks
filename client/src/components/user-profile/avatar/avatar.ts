@@ -21,7 +21,7 @@ class ProfileAvatar extends LitElement {
   @query('button') button!: HTMLButtonElement;
   @query('img') img!: HTMLImageElement;
 
-  private media_types = ['image/png', 'image/jpeg'];
+  private mime_types = ['image/png', 'image/jpeg'];
 
   firstUpdated() {
     this.img.onerror = () => {
@@ -38,13 +38,13 @@ class ProfileAvatar extends LitElement {
       </div>
       <form>
         <div class="inner">
-          <img src="${this.data.avatar || 'placeholder.png'}" />
+          <img src="${this.data.avatar || 'avatar.png'}" />
           <div>
             <h4>Change avatar</h4>
             <div>
               <label for="input">Choose file...</label>
               <p id="file">${this.file}</p>
-              <input id="input" type="file" accept="${this.media_types.join(',')}" @change="${this.updateFile}" />
+              <input id="input" type="file" accept="${this.mime_types.join(',')}" @change="${this.updateFile}" />
             </div>
             <p id="size">Image size must not exceed 200KiB.</p>
             <button type="button" @click="${this.submit}">Upload</button>
@@ -91,7 +91,7 @@ class ProfileAvatar extends LitElement {
 
   checkValidity(): File | null {
     const files = this.input.files || new FileList();
-    const valid = files.length === 1 && files[0].size <= 1024 * 200 && this.media_types.includes(files[0].type);
+    const valid = files.length === 1 && files[0].size <= 1024 * 200 && this.mime_types.includes(files[0].type);
 
     return valid ? files[0] : null;
   }
