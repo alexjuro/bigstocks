@@ -8,6 +8,7 @@ import componentStyle from './password.css?inline';
 import { httpClient } from '../../../http-client';
 import { PageMixin } from '../../page.mixin';
 import { UserData } from '../types';
+import { Constraint } from '../constraints/constraints';
 
 @customElement('user-profile-password')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -34,6 +35,16 @@ class ProfilePassword extends PageMixin(LitElement) {
   ];
   private color = this.quality[0].color;
 
+  private constraints: Constraint[] = [
+    {
+      section: 'Password must be between 8 and 32 characters long, containing at least',
+      bullets: ['one lowercase letter [a-z]', 'one uppercase letter [A-Z]', 'one digit [0-9]']
+    },
+    {
+      section: "The bar below the input gives an indication to the entered password's strength"
+    }
+  ];
+
   render() {
     return html`<div class="container">
       <div class="description">
@@ -41,20 +52,11 @@ class ProfilePassword extends PageMixin(LitElement) {
         <p>
           After changing your password you will be logged out and redirect. You can then log in using your new password.
         </p>
+        <field-constraints .constraints="${this.constraints}"></field-constraints>
       </div>
       <form novalidate>
         <div>
-          <label for="pass1">
-            New Password
-            <div class="tooltip">
-              ?
-              <span>
-                Password must be between 8 and 32 characters long and contain at least one upper case letter, one lower
-                case letter, and one digit.<br />The coloured bar below the input gives an indication of how strong the
-                password is.
-              </span>
-            </div>
-          </label>
+          <label for="pass1">New Password</label>
           <input
             id="pass1"
             type="${this.isText ? 'text' : 'password'}"

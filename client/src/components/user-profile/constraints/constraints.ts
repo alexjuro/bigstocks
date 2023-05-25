@@ -8,7 +8,7 @@ import sharedLocalStyle from '../shared-local.css?inline';
 import componentStyle from './constraints.css?inline';
 import { PageMixin } from '../../page.mixin';
 
-type Constraint = {
+export type Constraint = {
   section: string;
   bullets?: string[];
 };

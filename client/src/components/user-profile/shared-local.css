@@ -21,41 +21,6 @@
   visibility: visible;
 }
 
-.tooltip {
-  position: relative;
-  display: inline-block;
-  border-radius: 3px;
-  padding: 0.1rem 0.2rem;
-  color: ghostwhite;
-  background-color: var(--primary);
-  transition: 0.2s;
-}
-
-.tooltip > span {
-  visibility: hidden;
-  opacity: 0;
-  transition: 0.2s;
-  position: absolute;
-  left: 0;
-  top: 18px;
-  width: max-content;
-  max-width: clamp(20ch, 60vw - 20ch, 100ch);
-  padding: 0.4rem 0.6rem;
-  border-radius: 4px;
-  color: ghostwhite;
-  background-color: var(--primary);
-  z-index: 1;
-}
-
-.tooltip:hover {
-  background-color: var(--secondary);
-}
-
-.tooltip:hover > span {
-  visibility: visible;
-  opacity: 1;
-}
-
 button {
   color: ghostwhite;
   background-color: var(--primary);

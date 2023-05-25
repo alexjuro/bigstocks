@@ -8,6 +8,7 @@ import componentStyle from './details.css?inline';
 import { httpClient } from '../../../http-client';
 import { PageMixin } from '../../page.mixin';
 import { UserData } from '../types';
+import { Constraint } from '../constraints/constraints';
 
 // FIX: make invalid-feedback visible even with intermediate span
 @customElement('user-profile-details')
@@ -21,24 +22,26 @@ class ProfileMain extends PageMixin(LitElement) {
 
   @property() data!: Pick<UserData, 'id' | 'email' | 'name'>;
 
+  private constraints: Constraint[] = [
+    {
+      section: 'Username must be between 4 and 32 characters long, legal characters are',
+      bullets: ['lowercase letters [a-z]', 'uppercase letters [A-Z]', 'digits [0-9]', 'hyphenation characters [-_.]']
+    },
+    {
+      section: 'Email must be a valid email address'
+    }
+  ];
+
   render() {
     return html`<div class="container">
       <div class="description">
         <h3>Account Information</h3>
         <p>General account information.</p>
+        <field-constraints .constraints="${this.constraints}"></field-constraints>
       </div>
       <form novalidate>
         <div>
-          <label for="name">
-            Username
-            <div class="tooltip">
-              ?
-              <span>
-                Username must be between 4 and 32 characters long. Legal characters are upper- and lower-case letters,
-                numbers, and hyphenation characters (i.e. any of '-_.').
-              </span>
-            </div>
-          </label>
+          <label for="name">Username</label>
           <input id="name" type="text" value="${this.data.name}" @input="${() => this.checkValidity(false)}" required />
           <div class="invalid-feedback">Invalid username.</div>
           <div class="annotation">Your public username.</div>
