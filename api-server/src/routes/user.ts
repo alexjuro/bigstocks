@@ -5,11 +5,11 @@ import { GenericDAO } from '../models/generic.dao.js';
 import { User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
 
-const isValid = <T>(properties: Map<string, string>, obj: T | unknown): obj is T => {
+const isValid = <T>(properties: Map<string, string>, obj: unknown): obj is T => {
   return (
     Object.getOwnPropertyNames(obj)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map(p => properties.has(p) && (obj as any)[p] !== null && properties.get(p) === typeof (obj as any)[p])
+      .map(p => (obj as any)[p] !== null && properties.has(p) && properties.get(p) === typeof (obj as any)[p])
       .filter(Boolean).length === properties.size
   );
 };
@@ -22,7 +22,7 @@ router.get('/profile', authService.authenticationMiddleware, async (req, res) =>
   await dao
     .findOne(req.app.locals.user)
     .then(entity => {
-      if (entity == null) return Promise.reject();
+      if (!entity) return Promise.reject();
 
       const { id, avatar, name, email, password } = entity;
       res.status(200).json({ id, avatar, name, email, password });
