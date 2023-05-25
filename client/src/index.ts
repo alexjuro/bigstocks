@@ -13,6 +13,7 @@ import './components/trading/market/market.js';
 import './components/trading/portfolio/portfolio.js';
 import './components/user-profile/user-profile.ts';
 import './components/user-profile/avatar/avatar.ts';
+import './components/user-profile/constraints/constraints.ts';
 import './components/user-profile/details/details.ts';
 import './components/user-profile/password/password.ts';
 import './components/widgets/loader/loader.ts';

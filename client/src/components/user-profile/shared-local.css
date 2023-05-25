@@ -10,6 +10,17 @@
   margin-right: 0.4rem;
 }
 
+.constraints {
+  height: 0px;
+  visibility: hidden;
+  transition: 0.2s;
+}
+
+.constraints.visible {
+  height: auto;
+  visibility: visible;
+}
+
 .tooltip {
   position: relative;
   display: inline-block;
