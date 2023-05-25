@@ -26,7 +26,7 @@ class ProfileAvatar extends LitElement {
   firstUpdated() {
     this.img.onerror = () => {
       this.img.src = '';
-      this.dispatchEvent(new CustomEvent('load-failure', { bubbles: true, detail: 'Failed to load avatar.' }));
+      this.dispatchEvent(new CustomEvent('load-err', { bubbles: true, detail: 'Failed to load avatar.' }));
     };
   }
 
@@ -68,12 +68,25 @@ class ProfileAvatar extends LitElement {
       return;
     }
 
-    try {
-      await this.base64enc(file!).then(base64 => (this.data.avatar = base64));
-      await httpClient.post('/users/profile/avatar', this.data);
-    } catch (e) {
-      this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
-    }
+    this.dispatchEvent(
+      new CustomEvent('submit-req', {
+        bubbles: true,
+        detail: async () => {
+          try {
+            await this.base64enc(file!).then(base64 => (this.data.avatar = base64));
+            await httpClient
+              .post('/users/profile/avatar', this.data)
+              .then(() =>
+                this.dispatchEvent(
+                  new CustomEvent('submit-suc', { bubbles: true, detail: 'Avatar update successful.' })
+                )
+              );
+          } catch (e) {
+            this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
+          }
+        }
+      })
+    );
   }
 
   checkValidity(): File | null {

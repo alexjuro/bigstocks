@@ -25,7 +25,7 @@ class Profile extends PageMixin(LitElement) {
       const res = new Response();
       res.json = async () => ({ id: 1, email: 'admin@bigstocks.com', name: 'harry-hacker', password: 'password' });
       resolve(res);
-    }, 100);
+    }, 2000);
   });
   private user!: UserData;
 
@@ -51,7 +51,13 @@ class Profile extends PageMixin(LitElement) {
               </dialog>
 
               <h2>Profile</h2>
-              <user-profile-avatar .data=${{ id: this.user.id, avatar: this.user.avatar }}></user-profile-avatar>
+              <user-profile-avatar
+                .data=${{ id: this.user.id, avatar: this.user.avatar }}
+                @load-err="${this.loadError}"
+                @submit-req="${this.submitRequest}"
+                @submit-suc="${this.submitSuccess}"
+                @submit-err="${this.submitError}"
+              ></user-profile-avatar>
               <div class="divider"><hr /></div>
               <user-profile-details
                 @submit-req="${this.submitRequest}"
@@ -86,6 +92,10 @@ class Profile extends PageMixin(LitElement) {
     if (this.input.value !== this.user.password) return this.showNotification('Password incorrect.', 'error');
 
     await this.confirmCb();
+  }
+
+  loadError(e: CustomEvent) {
+    this.showNotification(e.detail, 'error');
   }
 
   async submitRequest(e: CustomEvent) {
