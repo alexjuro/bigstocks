@@ -68,6 +68,7 @@ class ProfilePassword extends PageMixin(LitElement) {
           />
           <div><span @click="${this.togglePasswordVisibility}"></span></div>
           <div class="indicator" style="--color:${this.color};--visibility:${this.visibility}"></div>
+          <div class="invalid-feedback">Password does not match constraints.</div>
         </div>
         <div>
           <label for="pass2">New Password Confirmation</label>
@@ -116,8 +117,7 @@ class ProfilePassword extends PageMixin(LitElement) {
     this.pass.setCustomValidity(re.test(this.pass.value) ? '' : 'pattern-mismatch');
 
     if (!this.form.checkValidity()) {
-      this.form.classList.add('was-validated');
-      return;
+      return this.form.classList.add('was-validated');
     }
 
     // TODO: bcrypt compare this.data.password
@@ -133,12 +133,13 @@ class ProfilePassword extends PageMixin(LitElement) {
         detail: async () => {
           await httpClient
             .post('/users/profile/password', this.data)
-            .then(() =>
-              // TODO: log-out and redirect
+            .then(() => httpClient.delete('/users/sign-out'))
+            .then(() => {
+              window.location.assign('/users/sign-in');
               this.dispatchEvent(
                 new CustomEvent('submit-suc', { bubbles: true, detail: 'Password updated successfully.' })
-              )
-            )
+              );
+            })
             .catch(e => this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e })));
         }
       })
