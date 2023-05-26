@@ -8,8 +8,8 @@ import sharedLocalStyle from './shared-local.css?inline';
 import componentStyle from './user-profile.css?inline';
 import { PageMixin } from '../page.mixin.js';
 import { UserData } from './types';
+import { compare } from 'bcryptjs';
 
-// TODO: escape / sanitize inputs
 @customElement('user-profile')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class Profile extends PageMixin(LitElement) {
@@ -88,8 +88,8 @@ class Profile extends PageMixin(LitElement) {
     if (!this.form.checkValidity()) return this.form.classList.add('was-validated');
 
     this.modal.close();
-    // TODO: bcrypt compare
-    if (this.input.value !== this.user.password) return this.showNotification('Password incorrect.', 'error');
+    if (!(await compare(this.input.value, this.user.password)))
+      return this.showNotification('Incorrect password.', 'error');
 
     await this.confirmCb();
   }

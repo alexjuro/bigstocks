@@ -10,7 +10,6 @@ import { PageMixin } from '../../page.mixin';
 import { UserData } from '../types';
 import { Constraint } from '../constraints/constraints';
 
-// FIX: make invalid-feedback visible even with intermediate span
 @customElement('user-profile-details')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ProfileMain extends PageMixin(LitElement) {
