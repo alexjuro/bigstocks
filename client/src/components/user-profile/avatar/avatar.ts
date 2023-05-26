@@ -14,7 +14,6 @@ class ProfileAvatar extends LitElement {
   static styles = [sharedStyle, sharedLocalStyle, componentStyle];
 
   @property() data!: Pick<UserData, 'id' | 'avatar'>;
-  // TODO: sanitize filename
   @property() file = 'No file chosen.';
 
   @query('input') input!: HTMLInputElement;
@@ -22,13 +21,6 @@ class ProfileAvatar extends LitElement {
   @query('img') img!: HTMLImageElement;
 
   private mime_types = ['image/png', 'image/jpeg'];
-
-  firstUpdated() {
-    this.img.onerror = () => {
-      this.img.src = '';
-      this.dispatchEvent(new CustomEvent('load-err', { bubbles: true, detail: 'Failed to load avatar.' }));
-    };
-  }
 
   render() {
     return html`<div class="container">
@@ -54,9 +46,16 @@ class ProfileAvatar extends LitElement {
     </div>`;
   }
 
+  firstUpdated() {
+    this.img.onerror = () => {
+      this.img.src = '';
+      this.dispatchEvent(new CustomEvent('load-err', { bubbles: true, detail: 'Failed to load avatar.' }));
+    };
+  }
+
   updateFile() {
     if (this.input.files) {
-      this.file = this.input.files[0].name;
+      this.file = decodeURIComponent(this.input.files[0].name);
       this.button.style.visibility = 'visible';
     }
   }
