@@ -25,7 +25,7 @@ class Profile extends PageMixin(LitElement) {
       const res = new Response();
       res.json = async () => ({ id: 1, email: 'admin@bigstocks.com', name: 'harry-hacker', password: 'password' });
       resolve(res);
-    }, 2000);
+    }, 1000);
   });
   private user!: UserData;
 
@@ -47,6 +47,7 @@ class Profile extends PageMixin(LitElement) {
                   <label for="input">Password confirmation:</label>
                   <input id="input" type="password" autocomplete="off" required />
                   <button type="button" @click="${this.verifyPassword}">Confirm</button>
+                  <button type="button" @click="${() => this.modal.close()}">Cancel</button>
                 </form>
               </dialog>
 
