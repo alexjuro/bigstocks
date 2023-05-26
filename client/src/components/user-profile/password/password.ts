@@ -81,6 +81,16 @@ class ProfilePassword extends PageMixin(LitElement) {
     </div>`;
   }
 
+  firstUpdated() {
+    this.form.onkeydown = async e => {
+      if (this.isText) return;
+      if ([e.key, e.code].includes('Enter')) {
+        e.preventDefault();
+        await this.submit();
+      }
+    };
+  }
+
   toggleEntropy(e: Event) {
     if (e.type === 'focus') return (this.visibility = 'visible');
     this.visibility = this.pass.value === '' ? 'hidden' : 'visible';
@@ -133,11 +143,12 @@ class ProfilePassword extends PageMixin(LitElement) {
       );
     }
 
-    this.data.password = this.pass.value;
     this.dispatchEvent(
       new CustomEvent('submit-req', {
         bubbles: true,
         detail: async () => {
+          this.data.password = this.pass.value;
+
           await httpClient
             .post('/users/account/password', this.data)
             .then(() => httpClient.delete('/users/sign-out'))

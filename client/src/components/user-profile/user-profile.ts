@@ -83,7 +83,7 @@ class Profile extends PageMixin(LitElement) {
   }
 
   async verifyPassword(e: Event) {
-    e.type == 'submit' && e.preventDefault();
+    e.type === 'submit' && e.preventDefault();
 
     if (!this.form.checkValidity()) return this.form.classList.add('was-validated');
 

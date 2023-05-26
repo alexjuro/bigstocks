@@ -63,6 +63,15 @@ class ProfileMain extends PageMixin(LitElement) {
     </div>`;
   }
 
+  firstUpdated() {
+    this.form.onkeydown = async e => {
+      if ([e.key, e.code].includes('Enter')) {
+        e.preventDefault();
+        await this.submit();
+      }
+    };
+  }
+
   checkValidity(force: boolean) {
     if (!(this.form.classList.contains('was-validated') || force)) return;
 
@@ -77,20 +86,17 @@ class ProfileMain extends PageMixin(LitElement) {
   async submit() {
     this.checkValidity(true);
 
-    if (!this.form.checkValidity()) {
-      this.form.classList.add('was-validated');
-      return;
-    }
+    if (!this.form.checkValidity()) return this.form.classList.add('was-validated');
 
     if (this.email.value === this.data.email && this.name.value === this.data.name) return;
-
-    this.data.email = this.email.value;
-    this.data.name = this.name.value;
 
     this.dispatchEvent(
       new CustomEvent('submit-req', {
         bubbles: true,
         detail: async () => {
+          this.data.email = this.email.value;
+          this.data.name = this.name.value;
+
           await httpClient
             .post('/users/account/details', this.data)
             .then(() =>
