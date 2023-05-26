@@ -19,7 +19,7 @@ class Profile extends PageMixin(LitElement) {
   @query('form') form!: HTMLFormElement;
   @query('input') input!: HTMLInputElement;
 
-  // private userInfo = httpClient.get('/users/profile');
+  // private userInfo = httpClient.get('/users/account/profile');
   private userInfo = new Promise<Response>(resolve => {
     setTimeout(() => {
       const res = new Response();

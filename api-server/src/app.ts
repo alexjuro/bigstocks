@@ -11,6 +11,7 @@ import startDB from './db.js';
 import { corsService } from './services/cors.service.js';
 import { pathToFileURL } from 'node:url';
 import users from './routes/users.js';
+import account from './routes/account-management.js';
 import mainPage from './routes/mainPage.js';
 import config from '../config.json' assert { type: 'json' };
 
@@ -20,9 +21,9 @@ function configureApp(app: Express) {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(corsService.corsMiddleware);
-  app.use('/api/users', users);
   app.use('/api/main', mainPage);
-  // TODO: Routen einbinden
+  app.use('/api/users', users);
+  app.use('/api/users/account', account);
 }
 
 export async function start() {

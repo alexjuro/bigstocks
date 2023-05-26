@@ -9,7 +9,7 @@ import { httpClient } from '../../../http-client';
 import { PageMixin } from '../../page.mixin';
 import { UserData } from '../types';
 import { Constraint } from '../constraints/constraints';
-import { compare, hash } from 'bcryptjs';
+import { compare } from 'bcryptjs';
 
 @customElement('user-profile-password')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -139,7 +139,7 @@ class ProfilePassword extends PageMixin(LitElement) {
         bubbles: true,
         detail: async () => {
           await httpClient
-            .post('/users/profile/password', this.data)
+            .post('/users/account/password', this.data)
             .then(() => httpClient.delete('/users/sign-out'))
             .then(() => {
               window.location.assign('/users/sign-in');
