@@ -1,7 +1,7 @@
 /* Autor: Alexander Schellenberg */
 
 import { LitElement, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { httpClient } from '../../http-client';
 import { router } from '../../router/router';
 import { StockService } from '../../stock-service';
@@ -19,19 +19,23 @@ class AppComponent extends LitElement {
   firstUpdated() {
     router.subscribe(() => this.requestUpdate());
   }
+
   renderSelect() {
     return router.select(
       {
+        'friends': () => html`<app-friends></app-friends>`,
+        'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,
+        'news': () => html`<finnhub-market-news></finnhub-market-news>`,
+        'profile': () => html`<user-profile></user-profile>`,
+        'stonks': () => html`<app-stonks></app-stonks>`,
         'trading/details/:id': params => html`<app-trading-details .tradingId=${params.id}></app-trading-details>`,
         'trading/portfolio': () => html`<app-portfolio></app-portfolio>`,
         'trading/market': () => html`<app-market></app-market>`,
-        'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,
-        'friends': () => html`<app-friends></app-friends>`,
+        'users/market': () => html`<app-market></app-market>`,
+        'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
         'users/sign-in': () => html`<sign-in></sing-in>`,
+        'users/sign-out': () => html`<sign-out></sign-out>`
         'users/sign-up': () => html`<sign-up></sing-up>`,
-        'users/sign-out': () => html`<sign-out></sign-out>`,
-        'stonks': () => html`<app-stonks></app-stonks>`,
-        'news': () => html`<finnhub-market-news></finnhub-market-news>`
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;

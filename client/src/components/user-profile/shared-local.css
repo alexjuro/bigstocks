@@ -1,0 +1,70 @@
+/* Author: Nico Pareigis */
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.description {
+  text-align: justify;
+  margin-right: 0.4rem;
+}
+
+.constraints {
+  height: 0px;
+  visibility: hidden;
+  transition: 0.2s;
+}
+
+.constraints.visible {
+  height: auto;
+  visibility: visible;
+}
+
+button {
+  color: ghostwhite;
+  background-color: var(--primary);
+  border-radius: 0.2rem;
+  padding: 0.2rem 0.4rem;
+  transition: 0.1s;
+  vertical-align: top;
+}
+
+button:active {
+  background-color: var(--secondary);
+}
+
+h3 {
+  font-size: 1.3rem;
+  margin-top: 0;
+}
+
+input {
+  display: inline-block;
+  min-width: 200px;
+  max-width: 300px;
+  border: 1px solid lightgray;
+  border-radius: 2px;
+  padding: 4px 6px;
+}
+
+input:focus {
+  border: 1px solid gray;
+}
+
+label {
+  color: dimgray;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+@media (min-width: 900px) {
+  .container {
+    flex-direction: row;
+    gap: 6rem;
+  }
+  .description {
+    width: 280px;
+    margin-right: 0;
+  }
+}

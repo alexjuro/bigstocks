@@ -2,10 +2,17 @@
 
 import { Entity } from './entity';
 
+export enum Role {
+  ADMIN,
+  USER
+}
+
 export interface User extends Entity {
-  name: string;
+  avatar: string;
   email: string;
+  name: string;
   password: string;
+  role: Role;
   new: boolean;
   money: number;
   performance: [{ date: string; value: number }];
