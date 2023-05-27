@@ -14,6 +14,20 @@ a {
   font-size: 23px;
 }
 
+button {
+  text-decoration: none;
+  color: white;
+  font-size: 23px;
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  scale: 1.02;
+}
+
 nav ul {
   list-style: none;
 }
@@ -36,7 +50,7 @@ nav ul {
   z-index: 10;
   border-radius: 50%;
   position: relative;
-  left: 50px;
+  left: 60px;
   top: -10px;
   transition: all 0.3s ease-in-out;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 10px;
@@ -55,14 +69,14 @@ nav ul {
 
 .headelem {
   height: 100%;
-  width: 40%;
+  width: 46%;
   display: flex;
   align-items: center;
   margin: 0px 20px;
 }
 
 #mid {
-  width: 20%;
+  width: 8%;
   justify-content: center;
 }
 
@@ -70,7 +84,7 @@ nav ul {
   justify-content: flex-end;
 }
 
-#dnav a {
+#dnav button {
   margin-left: 20px;
 }
 
@@ -121,5 +135,29 @@ img {
     height: 40px;
     border: 1px solid rgba(0, 0, 0, 0.3);
     background-color: rgba(0, 0, 0, 0.2);
+  }
+}
+
+@media (max-width: 1024px) {
+  #left {
+    width: 30%;
+  }
+
+  #mid {
+    display: none;
+  }
+
+  #right {
+    width: 70%;
+  }
+}
+
+@media (max-width: 280px) {
+  button {
+    font-size: 20px;
+  }
+
+  #mid {
+    display: none;
   }
 }

@@ -4,28 +4,38 @@ import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { httpClient } from '../../http-client';
 import { router } from '../../router/router';
+import { StockService } from '../../stock-service';
 
 @customElement('app-root')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class AppComponent extends LitElement {
+  stockService = new StockService();
   constructor() {
     super();
     const port = 3000;
     httpClient.init({ baseURL: `${location.protocol}//${location.hostname}:${port}/api/` });
   }
 
+  firstUpdated() {
+    router.subscribe(() => this.requestUpdate());
+  }
+
   renderSelect() {
     return router.select(
       {
+        'friends': () => html`<app-friends></app-friends>`,
         'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,
         'news': () => html`<finnhub-market-news></finnhub-market-news>`,
         'profile': () => html`<user-profile></user-profile>`,
         'stonks': () => html`<app-stonks></app-stonks>`,
-        'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
+        'trading/details/:id': params => html`<app-trading-details .tradingId=${params.id}></app-trading-details>`,
+        'trading/portfolio': () => html`<app-portfolio></app-portfolio>`,
+        'trading/market': () => html`<app-market></app-market>`,
         'users/market': () => html`<app-market></app-market>`,
+        'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
         'users/sign-in': () => html`<sign-in></sing-in>`,
-        'users/sign-up': () => html`<sign-up></sing-up>`,
         'users/sign-out': () => html`<sign-out></sign-out>`
+        'users/sign-up': () => html`<sign-up></sing-up>`,
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;

@@ -14,4 +14,6 @@ export interface User extends Entity {
   password: string;
   role: Role;
   new: boolean;
+  money: number;
+  performance: [{ date: string; value: number }];
 }
