@@ -8,6 +8,7 @@ import './components/sign-out/sign-out.ts';
 import './components/sign-up/sign-up.ts';
 import './components/trading/market/market.js';
 import './components/trading/portfolio/portfolio.js';
+import './components/transaction-history/transaction-history.ts';
 import './components/user-profile/user-profile.ts';
 import './components/user-profile/avatar/avatar.ts';
 import './components/user-profile/constraints/constraints.ts';
