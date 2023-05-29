@@ -44,7 +44,8 @@ class TransactionHistory extends PageMixin(LitElement) {
           .then(json => {
             if (json.length === 0) return html`There's nothing here...`;
 
-            return html`<div class="container">
+            return html` <div class="container">
+              <div class="intro">Transaction History</div>
               ${map(json, i => {
                 const profit = this.calculateProfit(i.bPrice, i.sPrice);
                 const color = profit === 0 ? 'gray' : profit < 0 ? '#ff0d0d' : '#0d942b';
