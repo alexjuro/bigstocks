@@ -39,22 +39,25 @@ class TransactionHistory extends PageMixin(LitElement) {
 
   private readonly year = new Date().getFullYear().toString();
   private readonly pageSize = 20;
-  private readonly minPage = 0;
-  private maxPage = 0;
-  private pageDisplay!: number;
 
   render() {
-    this.pageDisplay = this.pageNumber + 1;
-
     return html`<div class="container">
       <div class="intro">Transaction History</div>
       ${until(
         this.transactions
           .then(json => {
             if (json.length === 0) return html`<p>There's nothing here...</p>`;
-            this.maxPage = Math.ceil(json.length / this.pageSize) - 1;
 
-            return html` ${map(
+            return html`<div class="top-navigation">
+                <page-navigator
+                  .length="${json.length}"
+                  .pageSize="${this.pageSize}"
+                  .pageNumber="${this.pageNumber}"
+                  .scrollOnChange="${false}"
+                  @page-change="${(e: CustomEvent) => (this.pageNumber = e.detail)}"
+                ></page-navigator>
+              </div>
+              ${map(
                 json.slice(0 + this.pageNumber * this.pageSize, this.pageSize + this.pageNumber * this.pageSize),
                 i => {
                   const profit = this.calculateProfit(i.bPrice, i.sPrice);
@@ -115,37 +118,13 @@ class TransactionHistory extends PageMixin(LitElement) {
                   </div>`;
                 }
               )}
-              <div class="page ${this.maxPage === 0 ? 'hidden' : ''}">
-                <div @click="${() => this.changePageDir('b')}">⏴</div>
-
-                <div
-                  class="${this.pageNumber === this.maxPage && this.maxPage > 1 ? '' : 'hidden'}"
-                  @click="${() => this.changePageNum(this.pageDisplay - 2)}"
-                >
-                  ${this.pageDisplay - 2}
-                </div>
-                <div
-                  class="${this.pageNumber === this.minPage ? 'hidden' : ''}"
-                  @click="${() => this.changePageNum(this.pageDisplay - 1)}"
-                >
-                  ${this.pageDisplay - 1}
-                </div>
-                <div class="selected">${this.pageDisplay}</div>
-                <div
-                  class="${this.pageNumber === this.maxPage ? 'hidden' : ''}"
-                  @click="${() => this.changePageNum(this.pageDisplay + 1)}"
-                >
-                  ${this.pageDisplay + 1}
-                </div>
-                <div
-                  class="${this.pageNumber === this.minPage && this.maxPage > 1 ? '' : 'hidden'}"
-                  @click="${() => this.changePageNum(this.pageDisplay + 2)}"
-                >
-                  ${this.pageDisplay + 2}
-                </div>
-
-                <div @click="${() => this.changePageDir('f')}">⏵</div>
-              </div>`;
+              <page-navigator
+                style="margin: auto"
+                .length="${json.length}"
+                .pageSize="${this.pageSize}"
+                .pageNumber="${this.pageNumber}"
+                @page-change="${(e: CustomEvent) => (this.pageNumber = e.detail)}"
+              ></page-navigator>`;
           })
           .catch(() => {
             this.showNotification('Failed to load transactions. Please try again.');
@@ -158,21 +137,6 @@ class TransactionHistory extends PageMixin(LitElement) {
   calculateProfit(boughtFor: number, soldFor: number): number {
     if (soldFor === 0) return -boughtFor;
     return Number(((soldFor * 100 - boughtFor * 100) / 100).toFixed(2));
-  }
-
-  changePageDir(direction: 'b' | 'f') {
-    switch (direction) {
-      case 'b':
-        this.pageNumber = Math.max(this.minPage, --this.pageNumber);
-        break;
-      case 'f':
-        this.pageNumber = Math.min(this.maxPage, ++this.pageNumber);
-        break;
-    }
-  }
-
-  changePageNum(number: number) {
-    this.pageNumber = number - 1;
   }
 
   formatPartsToObj(parts: Intl.DateTimeFormatPart[]): Date {

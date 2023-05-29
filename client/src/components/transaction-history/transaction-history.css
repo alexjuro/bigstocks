@@ -71,41 +71,6 @@
   flex-grow: 0.2;
 }
 
-.hidden {
-  display: none;
-}
-
-.page {
-  margin: 1.4rem auto;
-  user-select: none;
-}
-
-.page .hidden {
-  display: none;
-}
-
-.page > div {
-  display: inline-block;
-  padding: 0.4rem 0.6rem;
-  text-align: center;
-  transition: 0.2s;
-  border-radius: 4px;
-}
-
-.page > .selected {
-  color: ghostwhite;
-  background-color: var(--primary);
-}
-
-.page > div:hover {
-  cursor: pointer;
-  background-color: lightgray;
-}
-
-.page > div.selected:hover {
-  background-color: var(--secondary);
-}
-
 .profit {
   color: var(--color);
 }
@@ -114,6 +79,17 @@
   display: flex;
   flex-grow: 3;
   align-content: center;
+}
+
+.top-navigation {
+  display: flex;
+  justify-content: end;
+  width: clamp(320px, 70vw, 800px);
+  margin: -1.3rem auto;
+}
+
+.top-navigation > page-navigator {
+  transform: scale(0.9);
 }
 
 .transaction {

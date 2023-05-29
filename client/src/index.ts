@@ -16,6 +16,7 @@ import './components/user-profile/details/details.ts';
 import './components/user-profile/password/password.ts';
 import './components/widgets/loader/loader.ts';
 import './components/widgets/notification/notification.ts';
+import './components/widgets/page-navigator/page-navigator.ts';
 
 //Alex L:
 import './components/trading/trading-details/trading-details.js';
