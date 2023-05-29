@@ -1,7 +1,7 @@
 /* Author: Nico Pareigis */
 
 import { html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { until } from 'lit/directives/until.js';
 import { httpClient } from '../../http-client';
@@ -33,95 +33,146 @@ type Transaction = {
 class TransactionHistory extends PageMixin(LitElement) {
   static styles = [sharedStyle, componentStyle];
 
-  private readonly transactions = httpClient.get('/users/transactions');
+  @property() pageNumber = 0;
+
+  @state() transactions = httpClient.get('/users/transactions').then(async res => (await res.json()) as Transaction[]);
+
   private readonly year = new Date().getFullYear().toString();
+  private readonly pageSize = 20;
+  private readonly minPage = 0;
+  private maxPage = 0;
+  private pageDisplay!: number;
 
   render() {
-    return html`
+    this.pageDisplay = this.pageNumber + 1;
+
+    return html`<div class="container">
+      <div class="intro">Transaction History</div>
       ${until(
         this.transactions
-          .then(async res => (await res.json()) as Transaction[])
           .then(json => {
-            if (json.length === 0) return html`There's nothing here...`;
+            if (json.length === 0) return html`<p>There's nothing here...</p>`;
+            this.maxPage = Math.ceil(json.length / this.pageSize) - 1;
 
-            return html` <div class="container">
-              <div class="intro">Transaction History</div>
-              ${map(json, i => {
-                const profit = this.calculateProfit(i.bPrice, i.sPrice);
-                const color = profit === 0 ? 'gray' : profit < 0 ? '#ff0d0d' : '#0d942b';
-                const prefix = profit === 0 ? '±' : profit < 0 ? '↓' : '↑';
-                const boughtAt = this.formatPartsToObj(
-                  new Intl.DateTimeFormat([], {
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    month: 'long',
-                    second: '2-digit',
-                    year: 'numeric'
-                  }).formatToParts(i.createdAt)
-                );
-                const soldAt = this.formatPartsToObj(
-                  new Intl.DateTimeFormat([], {
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    month: 'long',
-                    second: '2-digit',
-                    year: 'numeric'
-                  }).formatToParts(i.soldAt)
-                );
+            return html` ${map(
+                json.slice(0 + this.pageNumber * this.pageSize, this.pageSize + this.pageNumber * this.pageSize),
+                i => {
+                  const profit = this.calculateProfit(i.bPrice, i.sPrice);
+                  const color = profit === 0 ? 'gray' : profit < 0 ? '#ff0d0d' : '#0d942b';
+                  const prefix = profit === 0 ? '±' : profit < 0 ? '↓' : '↑';
+                  const boughtAt = this.formatPartsToObj(
+                    new Intl.DateTimeFormat([], {
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      month: 'long',
+                      second: '2-digit',
+                      year: 'numeric'
+                    }).formatToParts(i.createdAt)
+                  );
+                  const soldAt = this.formatPartsToObj(
+                    new Intl.DateTimeFormat([], {
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      month: 'long',
+                      second: '2-digit',
+                      year: 'numeric'
+                    }).formatToParts(i.soldAt)
+                  );
 
-                return html`<div class="transaction">
-                  <div class="header" @click="${this.toggleDetail}">
-                    <div class="stock">
-                      <img src="${i.image}" />
-                      <span>${i.name}</span>
+                  return html`<div class="transaction">
+                    <div class="header" @click="${this.toggleDetail}">
+                      <div class="stock">
+                        <img src="${i.image}" />
+                        <span>${i.name}</span>
+                      </div>
+                      <span class="profit" style="--color:${color}">${prefix + ' ' + profit}€</span>
+                      <span class="date">${this.timeDiff(i.createdAt)} ago</span>
                     </div>
-                    <span class="profit" style="--color:${color}">${prefix + ' ' + profit}€</span>
-                    <span class="date">${this.timeDiff(i.createdAt)} ago</span>
-                  </div>
-                  <div class="detail">
-                    <div class="transaction-data">
-                      <fieldset>
-                        <legend>Bought</legend>
-                        <p>${this.timeDiff(i.createdAt)} ago for <b>${i.bPrice}€</b></p>
-                        <hr />
-                        <p>${this.formatDate(boughtAt, false)} at ${this.formatTime(boughtAt)}</p>
-                      </fieldset>
-                      <fieldset>
-                        <legend>Sold</legend>
-                        ${i.soldAt
-                          ? html`<p>${this.timeDiff(i.soldAt)} ago for <b>${i.sPrice}€</b></p>
-                              <hr />
-                              <p>${this.formatDate(soldAt, false)} at ${this.formatTime(soldAt)}</p>`
-                          : html`<p>Not yet sold.</p>`}
-                      </fieldset>
+                    <div class="detail">
+                      <div class="transaction-data">
+                        <fieldset>
+                          <legend>Bought</legend>
+                          <p>${this.timeDiff(i.createdAt)} ago for <b>${i.bPrice}€</b></p>
+                          <hr />
+                          <p>${this.formatDate(boughtAt, false)} at ${this.formatTime(boughtAt)}</p>
+                        </fieldset>
+                        <fieldset>
+                          <legend>Sold</legend>
+                          ${i.soldAt
+                            ? html`<p>${this.timeDiff(i.soldAt)} ago for <b>${i.sPrice}€</b></p>
+                                <hr />
+                                <p>${this.formatDate(soldAt, false)} at ${this.formatTime(soldAt)}</p>`
+                            : html`<p>Not yet sold.</p>`}
+                        </fieldset>
+                      </div>
+                      <div class="transaction-summary">
+                        <p class="profit" style="--color:${color}">${prefix + ' ' + profit}€</p>
+                        <p>Held for ${this.timeDiff(i.createdAt, i.soldAt)}.</p>
+                      </div>
                     </div>
-                    <div class="transaction-summary">
-                      <p class="profit" style="--color:${color}">${prefix + ' ' + profit}€</p>
-                      <p>Held for ${this.timeDiff(i.createdAt, i.soldAt)}.</p>
-                    </div>
-                  </div>
-                </div>`;
-              })}
-            </div>`;
+                  </div>`;
+                }
+              )}
+              <div class="page ${this.maxPage === 0 ? 'hidden' : ''}">
+                <div @click="${() => this.changePageDir('b')}">⏴</div>
+
+                <div
+                  class="${this.pageNumber === this.maxPage && this.maxPage > 1 ? '' : 'hidden'}"
+                  @click="${() => this.changePageNum(this.pageDisplay - 2)}"
+                >
+                  ${this.pageDisplay - 2}
+                </div>
+                <div
+                  class="${this.pageNumber === this.minPage ? 'hidden' : ''}"
+                  @click="${() => this.changePageNum(this.pageDisplay - 1)}"
+                >
+                  ${this.pageDisplay - 1}
+                </div>
+                <div class="selected">${this.pageDisplay}</div>
+                <div
+                  class="${this.pageNumber === this.maxPage ? 'hidden' : ''}"
+                  @click="${() => this.changePageNum(this.pageDisplay + 1)}"
+                >
+                  ${this.pageDisplay + 1}
+                </div>
+                <div
+                  class="${this.pageNumber === this.minPage && this.maxPage > 1 ? '' : 'hidden'}"
+                  @click="${() => this.changePageNum(this.pageDisplay + 2)}"
+                >
+                  ${this.pageDisplay + 2}
+                </div>
+
+                <div @click="${() => this.changePageDir('f')}">⏵</div>
+              </div>`;
           })
           .catch(() => {
             this.showNotification('Failed to load transactions. Please try again.');
           }),
         html`<is-loading></is-loading>`
       )}
-    `;
+    </div>`;
   }
-
-  // TODO: make this not break the browser tab
-  // firstUpdated() {
-  //   setInterval(() => this.requestUpdate(), 1000);
-  // }
 
   calculateProfit(boughtFor: number, soldFor: number): number {
     if (soldFor === 0) return -boughtFor;
     return Number(((soldFor * 100 - boughtFor * 100) / 100).toFixed(2));
+  }
+
+  changePageDir(direction: 'b' | 'f') {
+    switch (direction) {
+      case 'b':
+        this.pageNumber = Math.max(this.minPage, --this.pageNumber);
+        break;
+      case 'f':
+        this.pageNumber = Math.min(this.maxPage, ++this.pageNumber);
+        break;
+    }
+  }
+
+  changePageNum(number: number) {
+    this.pageNumber = number - 1;
   }
 
   formatPartsToObj(parts: Intl.DateTimeFormatPart[]): Date {
@@ -133,6 +184,15 @@ class TransactionHistory extends PageMixin(LitElement) {
     });
 
     return obj;
+  }
+
+  formatDate(date: Date, short: boolean): string {
+    if (short && date.month !== 'May') date.month = date.month.substring(0, 3) + '.';
+    return `${date.day}. ${date.month} ${short && date.year === this.year ? '' : date.year}`;
+  }
+
+  formatTime(date: Date): string {
+    return `${date.hour}:${date.minute}:${date.second}`;
   }
 
   timeDiff(t1: number, t2?: number): string {
@@ -151,15 +211,6 @@ class TransactionHistory extends PageMixin(LitElement) {
     }
 
     return `${Math.floor(diff)} ${unit}${diff !== 1 ? 's' : ''}`;
-  }
-
-  formatDate(date: Date, short: boolean): string {
-    if (short && date.month !== 'May') date.month = date.month.substring(0, 3) + '.';
-    return `${date.day}. ${date.month} ${short && date.year === this.year ? '' : date.year}`;
-  }
-
-  formatTime(date: Date): string {
-    return `${date.hour}:${date.minute}:${date.second}`;
   }
 
   toggleDetail(e: Event) {
