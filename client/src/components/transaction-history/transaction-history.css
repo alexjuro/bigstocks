@@ -83,7 +83,7 @@
 
 .top-navigation {
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
   width: clamp(320px, 70vw, 800px);
   margin: -1.3rem auto;
 }
