@@ -61,7 +61,8 @@ class TransactionHistory extends PageMixin(LitElement) {
                 json.slice(0 + this.pageNumber * this.pageSize, this.pageSize + this.pageNumber * this.pageSize),
                 i => {
                   const profit = this.calculateProfit(i.bPrice, i.sPrice);
-                  const color = profit === 0 ? 'gray' : profit < 0 ? '#ff0d0d' : '#0d942b';
+                  const detailColour = profit < 0 ? '#ff0d0d' : '#0d942b';
+                  const headerColour = i.sPrice === 0 ? 'gray' : detailColour;
                   const prefix = profit === 0 ? '±' : profit < 0 ? '↓' : '↑';
                   const boughtAt = this.formatPartsToObj(
                     new Intl.DateTimeFormat([], {
@@ -90,7 +91,7 @@ class TransactionHistory extends PageMixin(LitElement) {
                         <img src="${i.image}" />
                         <span>${i.name}</span>
                       </div>
-                      <span class="profit" style="--color:${color}">${prefix + ' ' + profit}€</span>
+                      <span class="profit" style="--color:${headerColour}">${prefix + ' ' + profit}€</span>
                       <span class="date">${this.timeDiff(i.createdAt)} ago</span>
                     </div>
                     <div class="detail">
@@ -111,7 +112,7 @@ class TransactionHistory extends PageMixin(LitElement) {
                         </fieldset>
                       </div>
                       <div class="transaction-summary">
-                        <p class="profit" style="--color:${color}">${prefix + ' ' + profit}€</p>
+                        <p class="profit" style="--color:${detailColour}">${prefix + ' ' + profit}€</p>
                         <p>Held for ${this.timeDiff(i.createdAt, i.soldAt)}.</p>
                       </div>
                     </div>
