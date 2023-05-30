@@ -16,7 +16,7 @@ class SignUpComponent extends PageMixin(LitElement) {
 
   @query('form') private form!: HTMLFormElement;
 
-  @query('#name') private nameElement!: HTMLInputElement;
+  @query('#username') private usernameElement!: HTMLInputElement;
 
   @query('#email') private emailElement!: HTMLInputElement;
 
@@ -34,30 +34,18 @@ class SignUpComponent extends PageMixin(LitElement) {
           <h1>Sign-Up</h1>
           <form novalidate>
             <div>
-              <label for="name">Name</label>
-              <input type="text" autofocus required id="name" placeholder="Name" />
-              <div class="invalid-feedback">Name is required</div>
+              <label for="username">Username</label>
+              <input type="text" autofocus required id="username" placeholder="Username" />
+              <div class="invalid-feedback">Username is required</div>
             </div>
             <div>
               <label for="email">E-Mail</label>
               <input type="email" required id="email" placeholder="Email" />
-              <div class="invalid-feedback">>Email is required and must be valid</div>
+              <div class="invalid-feedback">Email is required and must be valid</div>
             </div>
-            <!-- <div>
-              <label for="password">Password</label>
-              <input type="password" required minlength="10" id="password" placeholder="Password" autocomplete="off"/>
-              <div class="invalid-feedback">Passwort ist erforderlich und muss mind. 10 Zeichen lang sein</div>
-            </div>
-            <div>
-              <label for="password-check">Enter password again</label>
-              <input type="password" required minlength="10" id="password-check" placeholder="Password again" autocomplete="off"/>
-              <div class="invalid-feedback">
-                Re-entering the password is required and must match the first password entered
-              </div>
-            </div> -->
-            <button type="button" @click="${this.submit}">Create account</button>
             <p class="message">
               Already registered? <button @click="${this.signIn}">Sign-In</button>
+               <button type="button" @click="${this.submit}">Create account</button>
           </form>
             </p>
            
@@ -69,10 +57,8 @@ class SignUpComponent extends PageMixin(LitElement) {
   async submit() {
     if (this.isFormValid()) {
       const accountData = {
-        name: this.nameElement.value,
+        username: this.usernameElement.value,
         email: this.emailElement.value
-        // ,password: this.passwordElement.value,
-        // passwordCheck: this.passwordCheckElement.value
       };
       try {
         await httpClient.post('users/sign-up', accountData);

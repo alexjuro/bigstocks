@@ -26,6 +26,7 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
   minId = 0;
   articles: Article[] = [];
   error = '';
+  pagenName = 'News';
 
   static get properties() {
     return {
@@ -37,6 +38,9 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
     };
   }
   async firstUpdated() {
+    const appHeader = this.dispatchEvent(
+      new CustomEvent('update-pagename', { detail: this.pagenName, bubbles: true, composed: true })
+    );
     try {
       this.startAsyncInit();
       const newStatusJSON = await httpClient.get('/users/new' + location.search);
@@ -100,7 +104,6 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
 
   render() {
     return html`
-      <h1 class="market-news-header">Market News</h1>
       <div class="market-news">
         ${this.error ? html`<p>Error: ${this.error}</p>` : ''}
         ${this.articles.map(

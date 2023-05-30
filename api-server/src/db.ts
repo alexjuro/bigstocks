@@ -31,6 +31,7 @@ async function startInMemoryDB(app: Express) {
 async function startMongoDB(app: Express) {
   const client = await connectToMongoDB();
   const db = client.db('bigstocks');
+  //app.locals.userDAO = new MongoGenericDAO<User>(db, 'users');
   app.locals.userDAO = new MongoGenericDAO<User>(db, 'users');
   app.locals.commentDAO = new MongoGenericDAO<Comment>(db, 'comments');
 

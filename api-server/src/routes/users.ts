@@ -1,10 +1,10 @@
+/* Autor: Lakzan Nathan */
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import { GenericDAO } from '../models/generic.dao.js';
 import { User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
 import nodemailer from 'nodemailer';
-import { json } from 'stream/consumers';
 
 const router = express.Router();
 const transporter = nodemailer.createTransport({
@@ -12,17 +12,26 @@ const transporter = nodemailer.createTransport({
   port: 25
 });
 
-router.post('/activation', authService.authenticationMiddleware, async (req, res) => {
+router.post('/activation', authService.authenticationMiddlewareActivation, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const errors: string[] = [];
   if (!res.locals.user) {
     // Token nicht gesetzt oder ungültig
-    res.status(401).json({ message: 'Please log in!' });
+    res.status(401).json({ message: 'Unauthorized!' });
+    return;
+  }
+  console.log('post /activation');
+  console.log(res.locals.user);
+  console.log(Math.floor(Date.now() / 1000) - res.locals.user.exp);
+  if (res.locals.user.exp < Math.floor(Date.now() / 1000)) {
+    const result = await userDAO.delete(req.body.id);
+    console.log(result);
+    authService.removeToken(res);
+    res.status(401).json({ message: 'Token expired!' });
     return;
   }
 
   const sendErrMsg = (message: string) => {
-    authService.removeToken(res);
     res.status(400).json({ message });
   };
   if (hasNotRequiredFields(req.body, ['code', 'password', 'passwordCheck'], errors)) {
@@ -32,6 +41,7 @@ router.post('/activation', authService.authenticationMiddleware, async (req, res
     console.log(req.body.password + ' ' + req.body.passwordCheck);
     return sendErrMsg('The two passwords do not match.');
   }
+
   const filter: Partial<User> = { id: res.locals.user.id };
   const user = await userDAO.findOne(filter);
   if (parseInt(req.body.code) !== user?.code) {
@@ -43,6 +53,7 @@ router.post('/activation', authService.authenticationMiddleware, async (req, res
   filter.code = 0;
   filter.password = await bcrypt.hash(req.body.password, 10);
   await userDAO.update(filter);
+  // '  authService.removeToken(res); // delete Temp-Token'
   authService.createAndSetToken({ id: res.locals.user.id }, res);
 
   res.status(201).json(user);
@@ -57,27 +68,25 @@ router.post('/sign-up', async (req, res) => {
     res.status(400).json({ message });
   };
 
-  if (hasNotRequiredFields(req.body, ['email', 'name'], errors)) {
+  if (hasNotRequiredFields(req.body, ['email', 'username'], errors)) {
     return sendErrMsg(errors.join('\n'));
   }
-
-  // if (req.body.password !== req.body.passwordCheck) {
-  //   return sendErrMsg('The two passwords do not match.');
-  // }
-
   const filter: Partial<User> = { email: req.body.email };
+  filter.email = filter.email?.toUpperCase();
   if (await userDAO.findOne(filter)) {
-    return sendErrMsg('There is already an account with the specified email address.');
+    return sendErrMsg('Invalid Input TMP: EMAIL');
   }
 
   const filter2: Partial<User> = { username: req.body.username };
-  if (await userDAO.findOne(filter)) {
-    return sendErrMsg('There is already an account with the specified name.');
+  filter.username = filter.username?.toUpperCase();
+  if (await userDAO.findOne(filter2)) {
+    return sendErrMsg('Invalid Input');
   }
+
   const newCode = createNumber();
   const newUser = await userDAO.create({
-    username: req.body.name,
-    email: req.body.email,
+    username: req.body.username.toUpperCase(),
+    email: req.body.email.toUpperCase(),
     password: 'wait for activation',
     activation: false,
     code: newCode,
@@ -85,7 +94,7 @@ router.post('/sign-up', async (req, res) => {
     rating: false
   });
   await sendCode(newUser.email, newCode);
-  authService.createAndSetToken({ id: newUser.id }, res);
+  authService.createAndSetshortToken({ id: newUser.id }, res);
   res.status(201).json(newUser);
 });
 
@@ -102,6 +111,8 @@ router.post('/sign-in', async (req, res) => {
     res.status(400).json({ message: errors.join('\n') });
     return;
   }
+
+  filter.username = filter.username?.toUpperCase();
 
   const user = await userDAO.findOne(filter);
   console.log(user);

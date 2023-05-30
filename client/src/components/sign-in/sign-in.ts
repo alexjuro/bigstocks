@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, eventOptions, query, state } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import { PageMixin } from '../page.mixin.js';
 import { router } from '../../router/router.js';
@@ -26,6 +26,15 @@ class SignInComponent extends PageMixin(LitElement) {
 
   private username = '';
   private password = '';
+
+  @eventOptions({ capture: true })
+  handleKeyDown(event: KeyboardEvent) {
+    console.log('Key down event:', event);
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Verhindert das Absenden des Formulars durch Drücken der Eingabetaste
+      this.submit();
+    }
+  }
 
   async firstUpdated() {
     const appHeader = this.dispatchEvent(
@@ -59,7 +68,7 @@ class SignInComponent extends PageMixin(LitElement) {
           />
           <div class="invalid-feedback">Username is required and must be valid</div>
         </div>
-        <button type="button" @click=${this.nextStep}>Next</button>
+        <button type="button" @keydown=${this.handleKeyDown} @click=${this.nextStep}>Next</button>
         <p class="message">
           Not registered?
           <button @click=${this.signUp}>Create an account</button>
@@ -86,7 +95,7 @@ class SignInComponent extends PageMixin(LitElement) {
           <div class="invalid-feedback">Password is required</div>
         </div>
         <button type="button" @click=${this.backStep}>Back</button>
-        <button type="button" @click=${this.submit}>Sign-In</button>
+        <button type="button" @keydown=${this.handleKeyDown} @click=${this.submit}>Sign-In</button>
         <p class="message">
           Not registered?
           <button @click=${this.signUp}>Create an account</button>

@@ -71,6 +71,7 @@ class ActivationComponent extends PageMixin(LitElement) {
         router.navigate('/news');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
+        router.navigate('/sign-up');
       }
     } else {
       this.form.classList.add('was-validated');
