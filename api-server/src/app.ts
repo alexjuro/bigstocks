@@ -14,6 +14,7 @@ import users from './routes/users.js';
 import account from './routes/account-management.js';
 import mainPage from './routes/mainPage.js';
 import trading from './routes/trading.js';
+import transaction from './routes/transaction.js';
 import config from '../config.json' assert { type: 'json' };
 
 function configureApp(app: Express) {
@@ -26,6 +27,7 @@ function configureApp(app: Express) {
   app.use('/api/trading', trading);
   app.use('/api/users', users);
   app.use('/api/users/account', account);
+  app.use('/api/users/transactions', transaction);
 }
 
 export async function start() {
