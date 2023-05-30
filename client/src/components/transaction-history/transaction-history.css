@@ -24,6 +24,9 @@
 
 .date {
   display: none;
+  margin-left: 0;
+  min-width: 14ch;
+  text-align: end;
   font-size: 0.9rem;
 }
 
