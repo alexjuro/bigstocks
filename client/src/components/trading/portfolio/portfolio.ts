@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/member-ordering */
 /* Autor: Alexander Schellenberg */
 
 import { customElement, state } from 'lit/decorators.js';
@@ -46,9 +45,9 @@ export class PortfolioComponent extends TradingComponent {
   @property({ type: Object })
   stockService = new StockService();
   @property({ type: Object })
-  private ChartDoughnut = {};
+  private ChartDoughnut: any = {};
   @property({ type: Object })
-  private ChartGraph = {};
+  private ChartGraph: any = {};
 
   constructor() {
     super();

@@ -22,7 +22,8 @@ class AppComponent extends LitElement {
   renderSelect() {
     return router.select(
       {
-        'trading/details/:id': params => html`<app-trading-details .tradingId=${params.id}></app-trading-details>`,
+        'trading/details': params =>
+          html`<app-trading-details .symbol=${params.symbol} .name=${params.name}></app-trading-details>`,
         'trading/portfolio': () => html`<app-portfolio></app-portfolio>`,
         'trading/market': () => html`<app-market></app-market>`,
         'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,

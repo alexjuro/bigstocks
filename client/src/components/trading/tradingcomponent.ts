@@ -9,11 +9,11 @@ import { httpClient } from '../../http-client';
 import { PortfolioComponent } from './portfolio/portfolio';
 
 export abstract class TradingComponent extends PageMixin(LitElement) {
-  protected userStocks: UserStock[] = [];
-  protected stockService: StockService | null = null;
-  protected stockCandle: object | null = null;
-  protected money = 0;
-  protected publicUrl = './../../../../public/';
+  public userStocks: UserStock[] = [];
+  public stockService: StockService | null = null;
+  public stockCandle: object | null = null;
+  public money = 0;
+  public publicUrl = './../../../../public/';
 
   getMoney(): number {
     return this.money;
@@ -151,9 +151,10 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         stockDetailsButton.classList.add('stockdetails');
         stockDetailsButton.addEventListener('click', event => {
           event.stopPropagation();
-          const symbol = stockDiv.id;
+          const symbol = stock.symbol;
+          const name = stock.name;
           // Navigiere zur Route "/trading/stockdetails/:id"
-          router.navigate(`trading/details/${symbol}`);
+          router.navigate(`trading/details?symbol=${symbol}&name=${name}`);
         });
         infoDiv.appendChild(stockDetailsButton);
 
@@ -179,14 +180,13 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     this.stockCandle = new Chart(element, {
       type: 'line',
       data: {
-        labels: ['NOV', 'DEC', 'JAN', 'FEB', 'MAR', 'APR'],
+        labels: ['DEC', 'JAN', 'FEB', 'MAR', 'APR', 'MAY'],
         datasets: [
           {
             data: data,
             borderColor: '#9370DB',
             backgroundColor: 'rgba(230, 230, 250,0.5)',
             borderWidth: 3,
-            borderDash: [5, 5],
             tension: 0.3,
             fill: true,
             pointBackgroundColor: '#411080',
@@ -209,7 +209,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
           subtitle: {
             display: true,
             text: percentage.toFixed(1) + '% ',
-            font: { weight: 'bold' },
+            font: { weight: 'bolder' },
             position: 'right'
           },
           legend: {
