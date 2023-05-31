@@ -45,8 +45,9 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
       this.startAsyncInit();
       const newStatusJSON = await httpClient.get('/users/new' + location.search);
       const newStatus = (await newStatusJSON.json()).new;
+      console.log(newStatus);
       if (newStatus) {
-        this.showNotification('new user was created successfully', 'info');
+        this.showNotification('New user was created successfully', 'info');
       }
     } catch (e) {
       if ((e as { statusCode: number }).statusCode === 401) {
@@ -104,6 +105,7 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
 
   render() {
     return html`
+      ${this.renderNotification()}
       <div class="market-news">
         ${this.error ? html`<p>Error: ${this.error}</p>` : ''}
         ${this.articles.map(

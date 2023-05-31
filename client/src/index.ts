@@ -14,3 +14,5 @@ import './components/main/main.ts';
 import './components/header/header.ts';
 import './components/leaderboard/leaderboard.ts';
 import './components/widgets/rating/my-rating.js';
+import './components/sign-up/forgotPassword.js';
+import './components/sign-up/resetPassword.js';

@@ -9,16 +9,13 @@ const SECRET = 'mysecret' + new Date().getTime();
 class AuthService {
   authenticationMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (res.locals.user) {
-      console.log(res.locals.user);
       next();
     } else {
-      console.log(req.cookies);
       const token = req.cookies['jwt-token'] || '';
       try {
         res.locals.user = jwt.verify(token, SECRET);
         next();
       } catch {
-        console.log(res.locals.user);
         res.status(401).json({ message: 'Unauthorized!' });
       }
     }
@@ -29,7 +26,7 @@ class AuthService {
     res.cookie('jwt-token', token);
   }
 
-  createAndSetshortToken(userClaimSet: Record<string, unknown>, res: Response) {
+  createAndSetShortToken(userClaimSet: Record<string, unknown>, res: Response) {
     const token = jwt.sign(userClaimSet, SECRET, { algorithm: 'HS256', expiresIn: '180s' });
     res.cookie('jwt-token', token);
   }

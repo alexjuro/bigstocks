@@ -32,9 +32,12 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
   }
 
   const sendErrMsg = (message: string) => {
+    console.log(message);
     res.status(400).json({ message });
   };
-  if (hasNotRequiredFields(req.body, ['code', 'password', 'passwordCheck'], errors)) {
+  if (
+    hasNotRequiredFields(req.body, ['code', 'password', 'passwordCheck', 'safetyAnswerOne', 'safetyAnswerTwo'], errors)
+  ) {
     return sendErrMsg(errors.join('\n'));
   }
   if (req.body.password !== req.body.passwordCheck) {
@@ -51,9 +54,93 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
   }
   filter.activation = true;
   filter.code = 0;
+  console.log(req.body.password);
   filter.password = await bcrypt.hash(req.body.password, 10);
+  console.log(req.body.safeteyAnswerOne);
+  filter.safetyAnswerOne = await bcrypt.hash(req.body.safetyAnswerOne, 10);
+  filter.safetyAnswerTwo = await bcrypt.hash(req.body.safetyAnswerTwo, 10);
+
   await userDAO.update(filter);
-  // '  authService.removeToken(res); // delete Temp-Token'
+  authService.createAndSetToken({ id: res.locals.user.id }, res);
+  res.status(201).json(user);
+});
+
+router.post('/forgotPassword', async (req, res) => {
+  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const errors: string[] = [];
+
+  const sendErrMsg = (message: string) => {
+    authService.removeToken(res);
+    res.status(400).json({ message });
+  };
+
+  if (hasNotRequiredFields(req.body, ['username', 'safetyAnswerOne'], errors)) {
+    return sendErrMsg(errors.join('\n'));
+  }
+  const filter: Partial<User> = { username: req.body.username };
+  filter.username = filter.username?.toUpperCase();
+  const user = await userDAO.findOne(filter);
+  if (user && (await bcrypt.compare(req.body.safetyAnswerOne, user.safetyAnswerOne))) {
+    authService.createAndSetShortToken({ id: user.id }, res);
+    const code = createNumber();
+    user.code = code;
+    await userDAO.update(user);
+    await sendCode(user.email, code);
+    res.status(201).json(user);
+  } else {
+    authService.removeToken(res);
+    res.status(401).json({ message: 'Invalid input!' });
+  }
+});
+
+router.post('/resetPassword', authService.authenticationMiddlewareActivation, async (req, res) => {
+  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const errors: string[] = [];
+  const sendErrMsg = (message: string) => {
+    authService.removeToken(res);
+    res.status(400).json({ message });
+  };
+  if (!res.locals.user) {
+    // Token nicht gesetzt oder ungültig
+    res.status(401).json({ message: 'Unauthorized!' });
+    return;
+  }
+
+  console.log('post /resetPasswrd');
+  console.log(res.locals.user);
+  console.log(Math.floor(Date.now() / 1000) - res.locals.user.exp);
+  if (res.locals.user.exp < Math.floor(Date.now() / 1000)) {
+    const result = await userDAO.delete(req.body.id);
+    console.log(result);
+    authService.removeToken(res);
+    res.status(401).json({ message: 'Token has expired!' });
+    return;
+  }
+  const filter: Partial<User> = { id: res.locals.user.id };
+  const user = await userDAO.findOne(filter);
+  if (hasNotRequiredFields(req.body, ['code', 'password', 'passwordCheck', 'safetyAnswerTwo'], errors)) {
+    return sendErrMsg(errors.join('\n'));
+  }
+  if (req.body.password !== req.body.passwordCheck) {
+    console.log(req.body.password + ' ' + req.body.passwordCheck);
+    return sendErrMsg('The two passwords do not match.');
+  }
+
+  if (parseInt(req.body.code) !== user?.code) {
+    console.log(req.body.code);
+    console.log(user?.code);
+    return sendErrMsg('invalid code!');
+  }
+  if (!(await bcrypt.compare(req.body.safetyAnswerTwo, user.safetyAnswerTwo))) {
+    // authService.removeToken(res);
+    return sendErrMsg('Invalid Input!');
+  }
+
+  filter.code = 0;
+  filter.password = await bcrypt.hash(req.body.password, 10);
+  filter.safetyAnswerTwo = await bcrypt.hash(req.body.safetyAnswerTwo, 10);
+
+  await userDAO.update(filter);
   authService.createAndSetToken({ id: res.locals.user.id }, res);
 
   res.status(201).json(user);
@@ -74,11 +161,11 @@ router.post('/sign-up', async (req, res) => {
   const filter: Partial<User> = { email: req.body.email };
   filter.email = filter.email?.toUpperCase();
   if (await userDAO.findOne(filter)) {
-    return sendErrMsg('Invalid Input TMP: EMAIL');
+    return sendErrMsg('Invalid Input');
   }
 
   const filter2: Partial<User> = { username: req.body.username };
-  filter.username = filter.username?.toUpperCase();
+  filter2.username = filter2.username?.toUpperCase();
   if (await userDAO.findOne(filter2)) {
     return sendErrMsg('Invalid Input');
   }
@@ -88,13 +175,15 @@ router.post('/sign-up', async (req, res) => {
     username: req.body.username.toUpperCase(),
     email: req.body.email.toUpperCase(),
     password: 'wait for activation',
+    safetyAnswerOne: 'wait for activation',
+    safetyAnswerTwo: 'wait for activation',
     activation: false,
     code: newCode,
     new: true,
     rating: false
   });
-  await sendCode(newUser.email, newCode);
-  authService.createAndSetshortToken({ id: newUser.id }, res);
+  await sendCodeActivation(newUser.email, newCode);
+  authService.createAndSetShortToken({ id: newUser.id }, res);
   res.status(201).json(newUser);
 });
 
@@ -115,13 +204,12 @@ router.post('/sign-in', async (req, res) => {
   filter.username = filter.username?.toUpperCase();
 
   const user = await userDAO.findOne(filter);
-  console.log(user);
   if (user && (await bcrypt.compare(req.body.password, user.password))) {
     authService.createAndSetToken({ id: user.id }, res);
     res.status(201).json(user);
   } else {
     authService.removeToken(res);
-    res.status(401).json({ message: 'username or passwor invalid!' });
+    res.status(401).json({ message: 'Invalid Input!' });
   }
 });
 
@@ -143,9 +231,11 @@ router.get('/new', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const filter: Partial<User> = { id: res.locals.user.id };
   const newUser = await userDAO.findOne(filter);
+  const status = newUser?.new;
   filter.new = false;
   await userDAO.update(filter);
-  res.json({ new: newUser?.new });
+  console.log('User status:' + newUser?.new);
+  res.json({ new: status });
 });
 
 router.get('/rating', authService.authenticationMiddleware, async (req, res) => {
@@ -183,6 +273,27 @@ async function sendCode(userEmail: string, code: number) {
       from: 'donotreply@fh-muenster.de',
       to: userEmail,
       subject: 'Reset your BigStocks password',
+      text: `Dear user,
+
+Please enter this code: ${code} to activate your account.
+
+Best regards,
+The FH Muenster Sweng Team`
+    })
+    .then(() => {
+      console.log('Email sent');
+    })
+    .catch(error => {
+      console.error('Error sending email:', error);
+    });
+}
+
+async function sendCodeActivation(userEmail: string, code: number) {
+  transporter
+    .sendMail({
+      from: 'donotreply@fh-muenster.de',
+      to: userEmail,
+      subject: 'Activate your BigStocks account',
       text: `Dear user,
 
 Please enter this code: ${code} to activate your account.

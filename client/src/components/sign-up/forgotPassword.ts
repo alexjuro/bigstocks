@@ -9,29 +9,23 @@ import { PageMixin } from '../page.mixin.js';
 import sharedStyle from '../shared.css?inline';
 import componentStyle from '../sign-in/style.css?inline';
 
-@customElement('sign-up')
+@customElement('app-forgotpassword')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class SignUpComponent extends PageMixin(LitElement) {
+class forgotPasswordOne extends PageMixin(LitElement) {
   static styles = [componentStyle, sharedStyle];
 
   @query('form') private form!: HTMLFormElement;
+  @query('#username') private username!: HTMLInputElement;
+  @query('#safetyAnswerOne') private safetyAnswerOne!: HTMLInputElement;
 
-  @query('#username') private usernameElement!: HTMLInputElement;
-
-  @query('#email') private emailElement!: HTMLInputElement;
-
-  // @query('#password') private passwordElement!: HTMLInputElement;
-
-  // @query('#password-check') private passwordCheckElement!: HTMLInputElement;
-
-  private pageName = 'Sign-Up';
+  private pageName = 'Forgot Password';
 
   render() {
     return html`
       ${this.renderNotification()}
       <div class="Login-page">
         <div class="form ">
-          <h1>Sign-Up</h1>
+          <h1>Forgot Password</h1>
           <form novalidate>
             <div>
               <label for="username">Username</label>
@@ -39,15 +33,13 @@ class SignUpComponent extends PageMixin(LitElement) {
               <div class="invalid-feedback">Username is required</div>
             </div>
             <div>
-              <label for="email">E-Mail</label>
-              <input type="email" required id="email" placeholder="Email" />
-              <div class="invalid-feedback">Email is required and must be valid</div>
-            </div>
-            <p class="message">
-              Already registered? <button @click="${this.signIn}">Sign-In</button>  </p>
-              <button type="button" @click="${this.submit}">Create account</button>
-            </p>
+              <label for="safetyAnswerOne">What is your favorite food?</label>
+              <input type="password" id="safetyAnswerOne" placeholder="Please enter here" autocomplete="off" required/>
+              <div class="invalid-feedback">Entering a answer is mandatory</div> 
+            </div>      
+            <button type="button" @click="${this.submit}">Reset Password</button>
           </form>
+            </p>          
         </div>
       </div>
     `;
@@ -55,15 +47,19 @@ class SignUpComponent extends PageMixin(LitElement) {
 
   async submit() {
     if (this.isFormValid()) {
+      console.log('submit');
       const accountData = {
-        username: this.usernameElement.value,
-        email: this.emailElement.value
+        username: this.username.value,
+        safetyAnswerOne: this.safetyAnswerOne.value
       };
+      console.log(accountData);
       try {
-        await httpClient.post('users/sign-up', accountData);
-        router.navigate('/users/activation');
+        await httpClient.post('users/forgotPassword', accountData);
+        console.log('after post');
+        router.navigate('/users/resetPassword');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
+        // router.navigate('/sign-up');
       }
     } else {
       this.form.classList.add('was-validated');
@@ -71,16 +67,7 @@ class SignUpComponent extends PageMixin(LitElement) {
   }
 
   isFormValid() {
-    // if (this.passwordElement.value !== this.passwordCheckElement.value) {
-    //   this.passwordCheckElement.setCustomValidity('Please ensure that your passwords are identical');
-    // } else {
-    //   this.passwordCheckElement.setCustomValidity('');
-    // }
     return this.form.checkValidity();
-  }
-
-  async signIn() {
-    router.navigate('users/sign-in');
   }
 
   async firstUpdated() {

@@ -9,12 +9,14 @@ import { PageMixin } from '../page.mixin.js';
 import sharedStyle from '../shared.css?inline';
 import componentStyle from '../sign-in/style.css?inline';
 
-@customElement('app-activation')
+@customElement('app-resetpassword')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ActivationComponent extends PageMixin(LitElement) {
   static styles = [componentStyle, sharedStyle];
 
   @query('form') private form!: HTMLFormElement;
+
+  @query('#safetyAnswerTwo') private safetyAnswerTwo!: HTMLInputElement;
 
   @query('#code') private codeElement!: HTMLFormElement;
 
@@ -22,24 +24,24 @@ class ActivationComponent extends PageMixin(LitElement) {
 
   @query('#password-check') private passwordCheckElement!: HTMLInputElement;
 
-  @query('#safetyAnswerOne') private safetyAnswerOne!: HTMLInputElement;
-
-  @query('#safetyAnswerTwo') private safetyAnswerTwo!: HTMLInputElement;
-
-  private pageName = 'Activation';
+  private pageName = 'Reset your Password';
 
   render() {
     return html`
       ${this.renderNotification()}
       <div class="Login-page">
         <div class="form ">
-          <h1>Sign-Up</h1>
           <form novalidate>
             <div>
               <label for="Code">Code</label>
               <input type="number" required id="code" placeholder="Code" min="99999" max="999999"/>
               <div class="invalid-feedback">Code is required and must be valid</div>
             </div>
+              <div>
+              <label for="safetyAnswerTwo">What is your favorite animal?</label>
+              <input type="password" id="safetyAnswerTwo" placeholder="Please enter here" autocomplete="off" required/>
+              <div class="invalid-feedback">Entering a answer is mandatory</div>
+            </div> 
             <div>
               <label for="password">Password</label>
               <input type="password" required minlength="10" id="password" placeholder="Password" autocomplete="off"/>
@@ -51,17 +53,7 @@ class ActivationComponent extends PageMixin(LitElement) {
               <div class="invalid-feedback">
                 Re-entering the password is required and must match the first password entered
               </div>
-            </div>
-               <div>
-              <label for="safetyAnswerOne">What is your favorite food?</label>
-              <input type="password" id="safetyAnswerOne" placeholder="Please enter here" autocomplete="off" required/>
-              <div class="invalid-feedback">Entering a answer is mandatory</div>
-            </div> 
-               <div>
-              <label for="safetyAnswerTwo">What is your favorite animal?</label>
-              <input type="password" id="safetyAnswerTwo" placeholder="Please enter here" autocomplete="off" required/>
-              <div class="invalid-feedback">Entering a answer is mandatory</div>
-            </div>         
+            </div>       
             <button type="button" @click="${this.submit}">Create account</button>
           </form>
             </p>
@@ -78,16 +70,15 @@ class ActivationComponent extends PageMixin(LitElement) {
         code: this.codeElement.value,
         password: this.passwordElement.value,
         passwordCheck: this.passwordCheckElement.value,
-        safetyAnswerOne: this.safetyAnswerOne.value,
         safetyAnswerTwo: this.safetyAnswerTwo.value
       };
-      console.log(accountData);
       try {
-        await httpClient.post('users/activation', accountData);
+        await httpClient.post('users/resetPassword', accountData);
         console.log('after post');
         router.navigate('/news');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
+        router.navigate('/sign-up');
       }
     } else {
       this.form.classList.add('was-validated');

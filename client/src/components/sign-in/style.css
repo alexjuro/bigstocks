@@ -62,7 +62,6 @@ h1 {
 } */
 
 .form .message {
-  margin: 4% 0 0;
   color: var(--background);
   font-size: smaller;
 }
@@ -70,4 +69,8 @@ h1 {
 label {
   color: var(--background);
   max-width: 100%;
+}
+
+.message button {
+  margin-top: 2%;
 }

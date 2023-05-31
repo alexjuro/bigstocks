@@ -68,13 +68,18 @@ class SignInComponent extends PageMixin(LitElement) {
           />
           <div class="invalid-feedback">Username is required and must be valid</div>
         </div>
-        <button type="button" @keydown=${this.handleKeyDown} @click=${this.nextStep}>Next</button>
+        <p class="message">Forgot you password? <button @click="${this.forgotPassword}">Reset password!</button></p>
         <p class="message">
           Not registered?
           <button @click=${this.signUp}>Create an account</button>
         </p>
+        <button type="button" @keydown=${this.handleKeyDown} @click=${this.nextStep}>Next</button>
       </form>
     `;
+  }
+
+  async forgotPassword() {
+    router.navigate('users/forgotPassword');
   }
 
   renderPasswordStep() {
@@ -94,12 +99,13 @@ class SignInComponent extends PageMixin(LitElement) {
           />
           <div class="invalid-feedback">Password is required</div>
         </div>
-        <button type="button" @click=${this.backStep}>Back</button>
-        <button type="button" @keydown=${this.handleKeyDown} @click=${this.submit}>Sign-In</button>
+        <p class="message">Forgot you password? <button @click="${this.forgotPassword}">Reset password!</button></p>
         <p class="message">
           Not registered?
           <button @click=${this.signUp}>Create an account</button>
         </p>
+        <button type="button" @click=${this.backStep}>Back</button>
+        <button type="button" @keydown=${this.handleKeyDown} @click=${this.submit}>Sign-In</button>
       </form>
     `;
   }
