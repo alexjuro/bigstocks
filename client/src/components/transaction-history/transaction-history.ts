@@ -35,6 +35,11 @@ type Transaction = {
   createdAt: number;
 };
 
+type Json = {
+  total: number;
+  entities: Transaction[];
+};
+
 @customElement('transaction-history')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class TransactionHistory extends PageMixin(LitElement) {
@@ -42,10 +47,13 @@ class TransactionHistory extends PageMixin(LitElement) {
 
   @property() pageNumber = 0;
 
-  @state() transactions = httpClient.get('/users/transactions').then(async res => (await res.json()) as Transaction[]);
+  @state() pageSize = 20;
+  @state() total = 0;
 
   private readonly year = new Date().getFullYear().toString();
-  private readonly pageSize = 20;
+  private transactions = httpClient
+    .get(`/users/transactions?limit=${this.pageSize}`)
+    .then(async res => (await res.json()) as Json);
 
   render() {
     return html`<div class="container">
@@ -53,84 +61,81 @@ class TransactionHistory extends PageMixin(LitElement) {
       ${until(
         this.transactions
           .then(json => {
-            if (json.length === 0) return html`<p>There's nothing here...</p>`;
+            if (json.entities.length === 0) return html`<p>There's nothing here...</p>`;
+            if (json.total !== this.total) this.total = json.total;
 
             return html`<div class="top-navigation">
                 <page-navigator
-                  .length="${json.length}"
+                  .length="${this.total}"
                   .pageSize="${this.pageSize}"
                   .pageNumber="${this.pageNumber}"
                   .scrollOnChange="${false}"
-                  @page-change="${(e: CustomEvent) => (this.pageNumber = e.detail)}"
+                  @page-change="${this.pageChange}"
                 ></page-navigator>
               </div>
-              ${map(
-                json.slice(0 + this.pageNumber * this.pageSize, this.pageSize + this.pageNumber * this.pageSize),
-                i => {
-                  const profit = this.getProfitDetails(i.bPrice, i.sPrice);
-                  const boughtAt = this.formatPartsToObj(
-                    new Intl.DateTimeFormat([], {
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      month: 'long',
-                      second: '2-digit',
-                      year: 'numeric'
-                    }).formatToParts(i.createdAt)
-                  );
-                  const soldAt = this.formatPartsToObj(
-                    new Intl.DateTimeFormat([], {
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      month: 'long',
-                      second: '2-digit',
-                      year: 'numeric'
-                    }).formatToParts(i.soldAt)
-                  );
+              ${map(json.entities, i => {
+                const profit = this.getProfitDetails(i.bPrice, i.sPrice);
+                const boughtAt = this.formatPartsToObj(
+                  new Intl.DateTimeFormat([], {
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    month: 'long',
+                    second: '2-digit',
+                    year: 'numeric'
+                  }).formatToParts(i.createdAt)
+                );
+                const soldAt = this.formatPartsToObj(
+                  new Intl.DateTimeFormat([], {
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    month: 'long',
+                    second: '2-digit',
+                    year: 'numeric'
+                  }).formatToParts(i.soldAt)
+                );
 
-                  return html`<div class="transaction">
-                    <div class="header" @click="${this.toggleDetail}">
-                      <div class="stock">
-                        <img src="${i.image}" />
-                        <span>${i.name}</span>
-                      </div>
-                      <span class="profit" style="--color:${profit.header}"
-                        >${`${profit.prefix} ${profit.profit}`}€</span
-                      >
-                      <span class="date">${this.timeDiff(i.createdAt)} ago</span>
+                return html`<div class="transaction">
+                  <div class="header" @click="${this.toggleDetail}">
+                    <div class="stock">
+                      <img src="${i.image}" />
+                      <span>${i.name}</span>
                     </div>
-                    <div class="detail">
-                      <div class="transaction-data">
-                        <fieldset>
-                          <legend>Bought</legend>
-                          <p>${this.timeDiff(i.createdAt)} ago for <b>${i.bPrice}€</b></p>
-                          <hr />
-                          <p>${this.formatDate(boughtAt, false)} at ${this.formatTime(boughtAt)}</p>
-                        </fieldset>
-                        <fieldset>
-                          <legend>Sold</legend>
-                          ${i.soldAt
-                            ? html`<p>${this.timeDiff(i.soldAt)} ago for <b>${i.sPrice}€</b></p>
-                                <hr />
-                                <p>${this.formatDate(soldAt, false)} at ${this.formatTime(soldAt)}</p>`
-                            : html`<p>Not yet sold.</p>`}
-                        </fieldset>
-                      </div>
-                      <div class="transaction-summary">
-                        <p class="profit" style="--color:${profit.detail}">${`${profit.prefix} ${profit.profit}`}€</p>
-                        <p>Held for ${this.timeDiff(i.createdAt, i.soldAt)}.</p>
-                      </div>
+                    <span class="profit" style="--color:${profit.header}">${`${profit.prefix} ${profit.profit}`}€</span>
+                    <span class="date">${this.timeDiff(i.createdAt)} ago</span>
+                  </div>
+                  <div class="detail">
+                    <div class="transaction-data">
+                      <fieldset>
+                        <legend>Bought</legend>
+                        <p>${this.timeDiff(i.createdAt)} ago for <b>${i.bPrice}€</b></p>
+                        <hr />
+                        <p>${this.formatDate(boughtAt, false)} at ${this.formatTime(boughtAt)}</p>
+                      </fieldset>
+                      <fieldset>
+                        <legend>Sold</legend>
+                        ${i.soldAt
+                          ? html`<p>${this.timeDiff(i.soldAt)} ago for <b>${i.sPrice}€</b></p>
+                              <hr />
+                              <p>${this.formatDate(soldAt, false)} at ${this.formatTime(soldAt)}</p>`
+                          : html`<p>Not yet sold.</p>`}
+                      </fieldset>
                     </div>
-                  </div>`;
-                }
-              )}
+                    <div class="transaction-summary">
+                      <p class="profit" style="--color:${profit.detail}">${`${profit.prefix} ${profit.profit}`}€</p>
+                      <p>Held for ${this.timeDiff(i.createdAt, i.soldAt)}.</p>
+                    </div>
+                  </div>
+                </div>`;
+              })}
+
               <page-navigator
                 style="margin: auto"
-                .length="${json.length}"
+                .length="${this.total}"
                 .pageSize="${this.pageSize}"
                 .pageNumber="${this.pageNumber}"
-                @page-change="${(e: CustomEvent) => (this.pageNumber = e.detail)}"
+                @page-change="${this.pageChange}"
               ></page-navigator>`;
           })
           .catch(() => {
@@ -171,6 +176,17 @@ class TransactionHistory extends PageMixin(LitElement) {
 
   formatTime(date: Date): string {
     return `${date.hour}:${date.minute}:${date.second}`;
+  }
+
+  pageChange(e: CustomEvent) {
+    const newPage = e.detail;
+    this.transactions = httpClient
+      .get(`/users/transactions?limit=${this.pageSize}&offset=${newPage * this.pageSize}`)
+      .then(async res => (await res.json()) as Json)
+      .then(json => {
+        this.pageNumber = newPage;
+        return json;
+      });
   }
 
   timeDiff(t1: number, t2?: number): string {
