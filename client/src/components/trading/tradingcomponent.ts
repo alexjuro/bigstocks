@@ -103,14 +103,12 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         newEmptyDiv.classList.add('candle-div');
         stockDiv.appendChild(newEmptyDiv);
 
-        // Erstellung Canvas
         const canvasElement = document.createElement('canvas');
         canvasElement.width = 200;
         canvasElement.height = 300;
         newEmptyDiv.appendChild(canvasElement);
         this.createStockCandles(canvasElement, stockDiv.id, 'M');
 
-        // Erstellung der infoDiv für zusätzliche Informationen und Buttons
         const infoDiv = document.createElement('div');
         infoDiv.classList.add('info-div');
         stockDiv.appendChild(infoDiv);
@@ -121,7 +119,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         buyButton.classList.add('buy');
         buyButton.addEventListener('click', event => {
           event.stopPropagation();
-          console.log('Buy'); // Hier muss die entsprechende Methode für den Kauf der Aktie implementiert werden
+          console.log('Buy');
           this.buyStock(event, stock);
         });
         infoDiv.appendChild(buyButton);
@@ -130,7 +128,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         buyImg.src = './../../../../buy.png';
         buyButton.appendChild(buyImg);
 
-        // Erstellung des Verkaufen-Buttons
         const sellButton = document.createElement('button');
         sellButton.textContent = 'Sell';
         sellButton.classList.add('sell');
@@ -145,7 +142,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         sellImg.src = './../../../../sell.png';
         sellButton.appendChild(sellImg);
 
-        // Erstellung des StockDetails-Buttons
         const stockDetailsButton = document.createElement('button');
         stockDetailsButton.textContent = 'Details';
         stockDetailsButton.classList.add('stockdetails');
@@ -153,7 +149,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
           event.stopPropagation();
           const symbol = stock.symbol;
           const name = stock.name;
-          // Navigiere zur Route "/trading/stockdetails/:id"
           router.navigate(`trading/details?symbol=${symbol}&name=${name}`);
         });
         infoDiv.appendChild(stockDetailsButton);

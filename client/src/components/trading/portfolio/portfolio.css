@@ -119,6 +119,7 @@ h1 {
 }
 
 .stock:hover {
+  box-shadow: 0 0 20px 0 rgba(173, 168, 168, 0.2), 0 10px 10px 0 rgba(186, 183, 183, 0.24);
   box-shadow: inset 800px 0 0 0 #f4f2f5d4;
 }
 

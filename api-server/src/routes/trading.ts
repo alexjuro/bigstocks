@@ -100,6 +100,10 @@ router.get('/details/:symbol', authService.authenticationMiddleware, async (req,
     const stock = await stockDAO.findOne({ symbol });
     const note = await noteDAO.findOne({ symbol });
 
+    if (note) {
+      note.note = cryptoService.decrypt(note.note);
+    }
+
     if (!stock) {
       res.status(404).json({ error: 'Stock not found' });
       return;
@@ -165,20 +169,24 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
 
   const { symbol, note } = req.body;
 
+  const cryptNote = cryptoService.encrypt(note);
+
   try {
     const exNote = await noteDAO.findOne({ symbol });
     if (exNote) {
-      exNote.note = note;
+      exNote.note = cryptNote;
       await noteDAO.update(exNote);
       res.status(200).json({ message: 'Note saved successfully' });
       return;
     }
     const newNote = await noteDAO.create({
       symbol,
-      note
+      note: cryptNote
     });
 
-    res.status(201).json({ message: 'Note saved successfully', note: newNote.note || exNote!.note });
+    res
+      .status(201)
+      .json({ message: 'Note saved successfully', note: cryptoService.encrypt(newNote.note || exNote!.note) });
   } catch (error) {
     res.status(500).json({ error: `An error occurred while saving the note ${noteDAO}` });
   }

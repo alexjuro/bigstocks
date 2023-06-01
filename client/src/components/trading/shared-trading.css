@@ -95,15 +95,18 @@ img {
 }
 
 .info-div button {
+  position: relative;
   margin-top: 10px;
   width: 100%;
   font-size: 12px;
-  text-align: center;
+  text-align: justify;
 }
 
 .info-div button img {
-  width: 30px;
-  height: 30px;
+  position: absolute;
+  right: 10%;
+  width: 20px;
+  height: 20px;
   opacity: 80%;
 }
 
