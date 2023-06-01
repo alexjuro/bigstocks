@@ -1,4 +1,4 @@
-/* Author Alexander Schellenberg */
+/* Autor Alexander Schellenberg */
 
 import { expect } from 'chai';
 import sinon from 'sinon';

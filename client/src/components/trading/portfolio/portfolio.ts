@@ -45,9 +45,9 @@ export class PortfolioComponent extends TradingComponent {
   @property({ type: Object })
   stockService = new StockService();
   @property({ type: Object })
-  private ChartDoughnut: any = {};
+  ChartDoughnut: any = {};
   @property({ type: Object })
-  private ChartGraph: any = {};
+  ChartGraph: any = {};
 
   constructor() {
     super();
@@ -63,10 +63,10 @@ export class PortfolioComponent extends TradingComponent {
       this.userStocks = userTransactions.map((transaction: UserStock) => ({
         name: transaction.name,
         symbol: transaction.symbol,
-        price: 0,
+        price: transaction.price || 0,
         image: transaction.image,
         shares: transaction.shares,
-        dailyPercentage: 0
+        dailyPercentage: transaction.dailyPercentage || 0
       }));
 
       this.stockService.setObserver(this);
@@ -166,11 +166,9 @@ export class PortfolioComponent extends TradingComponent {
 
     stockNames.unshift('CASH');
     cumulatedPrices.unshift(totalMoney);
-    if (this.ChartDoughnut instanceof Chart) {
-      this.ChartDoughnut.data.labels = stockNames;
-      this.ChartDoughnut.data.datasets[0].data = cumulatedPrices;
-      this.ChartDoughnut.update();
-    }
+    this.ChartDoughnut.data.labels = stockNames;
+    this.ChartDoughnut.data.datasets[0].data = cumulatedPrices;
+    this.ChartDoughnut.update();
   }
 
   createGraph(performance: { date: string; value: number }[]) {
@@ -225,19 +223,23 @@ export class PortfolioComponent extends TradingComponent {
   }
 
   updateGraph() {
-    if (this.ChartGraph instanceof Chart) {
-      const labels = this.ChartGraph.data.labels ?? [];
-      const lastLabel = labels[labels?.length - 1];
-      const data = this.ChartGraph.data.datasets[0].data;
-      const day = new Date().toLocaleDateString().slice(0, lastLabel.length);
-      if (day == lastLabel) {
-        labels?.pop();
-        labels?.push(day);
-        data.pop();
-        data.push(this.money + this.calculateTotalValue());
-        this.ChartGraph.update();
+    const labels = this.ChartGraph.data.labels ?? [];
+    const lastLabel = labels[labels?.length - 1];
+    const data = this.ChartGraph.data.datasets[0].data;
+    const day = new Date().toLocaleDateString().slice(0, lastLabel.length);
+    if (day == lastLabel) {
+      data.pop();
+      data.push(this.money + this.calculateTotalValue());
+    } else {
+      if (!(labels.length < 20)) {
+        labels.shift();
+        data.shift();
       }
+      labels?.push(day);
+      data.push(this.money + this.calculateTotalValue());
     }
+    this.ChartGraph.update();
+    this.requestUpdate();
   }
 
   render() {

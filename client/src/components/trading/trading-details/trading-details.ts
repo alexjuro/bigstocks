@@ -1,3 +1,5 @@
+/* Autor: Alexander Schellenberg */
+
 import { LitElement, html } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import sharedStyle from '../../shared.css?inline';
@@ -9,6 +11,11 @@ import { router } from '../../../router/router';
 import { Chart, ChartData, ChartOptions } from 'chart.js/auto';
 import { StockService } from '../../../stock-service';
 import { PageMixin } from '../../page.mixin';
+
+export interface Note {
+  symbol: string;
+  note: string;
+}
 
 @customElement('app-trading-details')
 class TradingDetailsComponent extends PageMixin(LitElement) {
@@ -29,11 +36,16 @@ class TradingDetailsComponent extends PageMixin(LitElement) {
   @property({ type: Object })
   private companyData: any = {};
 
-  @property({ type: Object })
+  @property()
   private stock: any = {};
 
-  @property({ type: Object })
-  private note: any = {};
+  @property()
+  private note: Note = {
+    symbol: '',
+    note: ''
+  };
+
+  @query('form') private form!: HTMLFormElement;
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   @query('#bar') bar!: HTMLCanvasElement;
@@ -103,11 +115,28 @@ class TradingDetailsComponent extends PageMixin(LitElement) {
 
   async handleSubmit(event: Event) {
     event.preventDefault();
-    const form = this.shadowRoot?.querySelector('form') as HTMLFormElement;
-    const formData = new FormData(form);
-    const note = formData.get('ftext') as string;
-    const response = await httpClient.post('trading/details/', { symbol: this.symbol, note });
-    console.log('Form submitted!', note);
+    const formData = new FormData(this.form);
+    const noteText = formData.get('ftext') as string;
+    if (this.isFormValid()) {
+      const note: Note = {
+        ...this.note,
+        symbol: this.symbol,
+        note: noteText
+      };
+      try {
+        const response = await httpClient.post('trading/details/', { note });
+        console.log('Form submitted!', noteText);
+        router.navigate('/trading/market');
+      } catch (e) {
+        this.showNotification((e as Error).message, 'error');
+      }
+    } else {
+      this.form.classList.add('was-validated');
+    }
+  }
+
+  isFormValid() {
+    return this.form.checkValidity();
   }
 
   render() {
@@ -131,9 +160,11 @@ class TradingDetailsComponent extends PageMixin(LitElement) {
             <p>WebUrl: ${this.companyData.weburl}</p>
             <p>Industry: ${this.companyData.finnhubIndustry}</p>
             <p>IPO: ${this.companyData.ipo}</p>
-            <form @submit=${this.handleSubmit}>
+            <form @submit=${this.handleSubmit} novalidate>
               <label for="ftext">Your notes:</label><br>
-              <textarea id="ftext" name="ftext" rows="1" cols="50">${this.note ? this.note.note : ''}</textarea>
+              <textarea id="ftext" name="ftext" rows="1" cols="50" placeholder="Enter your notes here">${
+                this.note ? this.note.note : ''
+              }</textarea>
               <button type="submit">Submit</button>
             </form>
           </div>

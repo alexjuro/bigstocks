@@ -95,10 +95,11 @@ router.get('/details/:symbol', authService.authenticationMiddleware, async (req,
   const stockDAO: GenericDAO<Stock> = req.app.locals.stockDAO;
   const noteDAO: GenericDAO<Note> = req.app.locals.noteDAO;
   const symbol = req.params.symbol;
+  const userId = res.locals.user.id;
 
   try {
     const stock = await stockDAO.findOne({ symbol });
-    const note = await noteDAO.findOne({ symbol });
+    const note = await noteDAO.findOne({ symbol, userId });
 
     if (note) {
       note.note = cryptoService.decrypt(note.note);
@@ -167,12 +168,12 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
 router.post('/details', authService.authenticationMiddleware, async (req, res) => {
   const noteDAO: GenericDAO<Note> = req.app.locals.noteDAO;
 
-  const { symbol, note } = req.body;
-
-  const cryptNote = cryptoService.encrypt(note);
+  const { note } = req.body;
+  const userId = res.locals.user.id;
+  const cryptNote = cryptoService.encrypt(note.note);
 
   try {
-    const exNote = await noteDAO.findOne({ symbol });
+    const exNote = await noteDAO.findOne({ userId, symbol: note.symbol });
     if (exNote) {
       exNote.note = cryptNote;
       await noteDAO.update(exNote);
@@ -180,7 +181,8 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
       return;
     }
     const newNote = await noteDAO.create({
-      symbol,
+      symbol: note.symbol,
+      userId,
       note: cryptNote
     });
 

@@ -1,3 +1,5 @@
+/* Autor: Alexander Schellenberg */
+
 import { expect } from 'chai';
 import sinon, { SinonStubbedInstance } from 'sinon';
 import { LitElement } from 'lit';
@@ -7,8 +9,18 @@ import { StockService } from '../../../stock-service';
 import './portfolio';
 import { httpClient } from '../../../http-client';
 import { PortfolioComponent } from './portfolio';
+import { UserStock } from '../../../interfaces/stock-interface';
+import { Chart } from 'chart.js';
 
 describe('app-portfolio', () => {
+  let stocks: UserStock[];
+
+  beforeEach(() => {
+    stocks = [
+      { symbol: 'AAPL', name: 'Apple', image: 'aplimage', shares: 4, price: 150, dailyPercentage: 2.5 },
+      { symbol: 'MSFT', name: 'Microsoft', image: 'msftimage', shares: 2, price: 300, dailyPercentage: -1.8 }
+    ];
+  });
   afterEach(() => {
     sinon.restore();
   });
@@ -22,12 +34,7 @@ describe('app-portfolio', () => {
     expect(stub.calledOnce).to.be.true;
   });
 
-  it('should render the fetched stocks', async () => {
-    const stocks = [
-      { symbol: 'AAPL', name: 'Apple', image: 'aplimage', shares: 4 },
-      { symbol: 'MSFT', name: 'Microsoft', image: 'msftimage', shares: 2 }
-    ];
-
+  it('should render the fetched stocks with correct values', async () => {
     sinon.stub(httpClient, 'get').returns(
       Promise.resolve({
         json() {
@@ -36,13 +43,120 @@ describe('app-portfolio', () => {
       } as Response)
     );
 
-    const fixtureElement = (await fixture('<app-portfolio></app-portfolio>')) as LitElement;
-    element = fixtureElement as PortfolioComponent;
-    await element.updateComplete;
-    element.requestUpdate();
-    await element.updateComplete;
+    const fixtureElement = (await fixture('<app-portfolio></app-portfolio>')) as PortfolioComponent;
+    await fixtureElement.updateComplete;
 
-    const portElems = element.shadowRoot!.querySelectorAll('app-stock');
-    expect(portElems.length).to.equal(2);
+    fixtureElement.requestUpdate();
+    await fixtureElement.updateComplete;
+
+    const stockElements = fixtureElement.shadowRoot!.querySelectorAll('app-stock');
+    expect(stockElements.length).to.equal(2);
+
+    for (let i = 0; i < stocks.length; i++) {
+      const stock = stocks[i];
+      const stockElement = stockElements[i] as HTMLElement;
+
+      const stockSymbol = stockElement.getAttribute('id');
+      expect(stockSymbol).to.equal(stock.symbol);
+
+      const stockNameElement = stockElement.querySelector('h2');
+      const stockName = stockNameElement?.textContent;
+      expect(stockName).to.equal(stock.name);
+
+      const stockSharesElement = stockElement.querySelector('.shares');
+      const stockShares = stockSharesElement?.textContent?.trim();
+      expect(stockShares).to.equal(`${stock.shares}x`);
+
+      const stockPriceElement = stockElement.querySelector('.prices');
+      const stockPrice = stockPriceElement?.textContent?.trim();
+      expect(stockPrice).to.equal('Price: ' + (stock.price ? stock.price + '$' : 'N/A'));
+
+      const stockPercentageElement = stockElement.querySelector('.percentages');
+      const stockPercentage = stockPercentageElement?.textContent?.trim();
+      expect(stockPercentage).to.equal(stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A');
+    }
+  });
+
+  it('should update the graph when calling updateGraph method', async () => {
+    const fixtureElement = (await fixture('<app-portfolio></app-portfolio>')) as PortfolioComponent;
+    await fixtureElement.updateComplete;
+
+    const d1 = new Date(Date.now() - 86400000).toLocaleDateString();
+    const d2 = new Date(Date.now() - 86400000 * 2).toLocaleDateString();
+    const d3 = new Date().toLocaleDateString();
+
+    const chartData = {
+      labels: [d1, d2],
+      datasets: [
+        {
+          data: [1000, 2000]
+        }
+      ]
+    };
+    const fakeChart = {
+      data: chartData,
+      update: sinon.stub()
+    };
+
+    fixtureElement.ChartGraph = fakeChart as unknown as Chart;
+
+    fixtureElement.money = 1500;
+    fixtureElement.calculateTotalValue = () => 2500;
+
+    fixtureElement.updateGraph();
+
+    expect(chartData.labels).to.deep.equal([d1, d2, d3]);
+    expect(chartData.datasets[0].data).to.deep.equal([1000, 2000, 4000]);
+
+    expect(fakeChart.update.calledOnce).to.be.true;
+  });
+
+  it('should calculate cumulative prices correctly', () => {
+    const component = new PortfolioComponent();
+    component.userStocks = stocks;
+
+    const result = component.getCumulatedPrices();
+
+    expect(result[0]).equal(600);
+    expect(result[1]).equal(600);
+  });
+
+  it('calculates total value correctly', () => {
+    const component = new PortfolioComponent();
+    component.userStocks = stocks;
+
+    const totalValue = component.calculateTotalValue();
+
+    expect(totalValue).equal(1200);
+  });
+
+  it('updates doughnut chart correctly', () => {
+    const component = new PortfolioComponent();
+    component.ChartDoughnut = {
+      data: {
+        labels: ['Stock A', 'Stock B'],
+        datasets: [
+          {
+            data: [100, 200],
+            backgroundColor: ['#E58400', '#663399']
+          }
+        ]
+      },
+      update: sinon.stub()
+    };
+    component.money = 300;
+    component.calculateTotalValue = function () {
+      return 150;
+    };
+
+    const getStockNamesStub = sinon.stub(component, 'getStockNames').returns(['Stock A', 'Stock B']);
+
+    const getCumulatedPricesStub = sinon.stub(component, 'getCumulatedPrices').returns([100, 200]);
+
+    component.updateDoughnut();
+
+    expect(component.ChartDoughnut.data.labels).to.deep.equal(['CASH', 'Stock A', 'Stock B']);
+    expect(component.ChartDoughnut.data.datasets[0].data).to.deep.equal([300, 100, 200]);
+    expect(component.ChartDoughnut.update.calledOnce).to.be.true;
   });
 });
