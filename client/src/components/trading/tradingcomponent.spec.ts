@@ -1,6 +1,6 @@
 /* Autor: Alexander Schellenberg */
 import { TradingComponent } from './tradingcomponent';
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import { fake, SinonFakeTimers } from 'sinon';
 import sinon, { SinonStubbedInstance } from 'sinon';
 import { LitElement } from 'lit';
@@ -274,5 +274,88 @@ describe('TradingComponent', () => {
 
     getFirstDataMock.restore();
     postStub.restore();
+  });
+
+  it('should throw an error for insufficient funds', async () => {
+    marketComponent = (await fixture('<app-market></app-market>')) as MarketComponent;
+    const getFirstDataMock = sinon
+      .stub(marketComponent.stockService!, 'getFirstData')
+      .resolves({ price: 200, percentage: 3 });
+
+    const responseMock = {
+      status: 201,
+      json: () => Promise.resolve({ money: 100 })
+    };
+    const postStub = sinon.stub(httpClient, 'post').resolves(responseMock as Response);
+
+    const stock: UserStock = {
+      symbol: 'AAPL',
+      name: 'Apple Inc.',
+      image: 'apple.png',
+      shares: 0,
+      price: 250,
+      dailyPercentage: 5
+    };
+
+    marketComponent.money = 100;
+
+    try {
+      await marketComponent.buyStock(new Event('click'), stock);
+      console.log('läuft ');
+    } catch (error: any) {
+      console.log('error ' + error);
+      expect(error).to.be.an.instanceOf(Error);
+      expect(error.message).to.include('Insufficient funds');
+    }
+
+    expect(getFirstDataMock.calledOnceWithExactly(stock.symbol)).to.be.true;
+    expect(postStub.notCalled).to.be.true;
+    expect(stock.shares).to.equal(0);
+    expect(marketComponent.money).to.equal(100);
+
+    getFirstDataMock.restore();
+    postStub.restore();
+  });
+
+  it('should sell stock and update state correctly', async () => {
+    marketComponent = (await fixture('<app-market></app-market>')) as MarketComponent;
+    const getFirstDataMock = sinon
+      .stub(marketComponent.stockService!, 'getFirstData')
+      .resolves({ price: 250, percentage: 3 });
+
+    const responseMock = {
+      status: 200,
+      json: () => Promise.resolve({ money: 5250 })
+    };
+    const patchStub = sinon.stub(httpClient, 'patch').resolves(responseMock as Response);
+
+    const stock: UserStock = {
+      symbol: 'AAPL',
+      name: 'Apple Inc.',
+      image: 'apple.png',
+      shares: 2,
+      price: 250,
+      dailyPercentage: 5
+    };
+
+    marketComponent.money = 5250;
+
+    await marketComponent.sellStock(new Event('click'), stock);
+
+    expect(getFirstDataMock.calledOnceWithExactly(stock.symbol)).to.be.true;
+    expect(
+      patchStub.calledOnceWithExactly('/trading/', {
+        symbol: stock.symbol,
+        name: stock.name,
+        image: stock.image,
+        sPrice: 250,
+        pValue: 5250
+      })
+    ).to.be.true;
+    expect(stock.shares).to.equal(1);
+    expect(marketComponent.money).to.equal(5250);
+
+    getFirstDataMock.restore();
+    patchStub.restore();
   });
 });

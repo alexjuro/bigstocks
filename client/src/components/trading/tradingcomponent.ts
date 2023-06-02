@@ -7,7 +7,7 @@ import Chart from 'chart.js/auto';
 import { router } from '../../router/router.js';
 import { httpClient } from '../../http-client';
 import { PortfolioComponent } from './portfolio/portfolio';
-import { CandleComponent } from './trading-widgtes/candlecomponent';
+import { CandleComponent } from './trading-widgets/candlecomponent';
 
 export abstract class TradingComponent extends PageMixin(LitElement) {
   public userStocks: UserStock[] = [];
@@ -15,6 +15,8 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
   public stockCandle: object | null = null;
   public money = 0;
   public publicUrl = './../../../../public/';
+  private tradeLock = false;
+  private notificationTimeout: NodeJS.Timeout | undefined;
 
   getMoney(): number {
     return this.money;
@@ -165,6 +167,27 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     }
   }
 
+  showTradeNotification(message: string, type: 'success' | 'warning' | 'error'): void {
+    console.log('test');
+    const notificationHost = this.shadowRoot?.querySelector('app-trading-notification');
+    if (notificationHost) {
+      const notification = notificationHost.shadowRoot?.getElementById('noti');
+      if (notification) {
+        clearTimeout(this.notificationTimeout);
+        notification.textContent = message;
+        notification.classList.add(type);
+        notification.style.opacity = '1';
+
+        // Timeout, um die Benachrichtigung nach einer gewissen Zeit auszublenden
+        this.notificationTimeout = setTimeout(() => {
+          notification.style.opacity = '0';
+          notification.classList.remove(type);
+          notification.textContent = '';
+        }, 3000);
+      }
+    }
+  }
+
   async createStockCandles(element: HTMLCanvasElement, symbol: string, intervall: string) {
     const a = this.unixTimestamp(intervall);
     const data = await this.stockService!.getStockCandles(symbol, intervall, a!.timestamp, a!.now)
@@ -263,21 +286,26 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
   }
 
   async buyStock(event: Event, stock: UserStock) {
-    console.log(stock);
+    if (this.tradeLock) {
+      return;
+    }
+
+    this.tradeLock = true;
     try {
       if (!this.stockService) {
         throw new Error('StockService not active!');
       }
-      const bPrice = (await this.stockService.getFirstData(stock.symbol)).price;
+      const bPrice: number = (await this.stockService.getFirstData(stock.symbol)).price;
       if (!bPrice || isNaN(bPrice)) {
-        // Überprüfen, ob bPrice leer oder ungültig ist
         this.showNotification('Failed to retrieve stock price', 'error');
         return;
       }
       if (this.money < bPrice) {
-        throw new Error('Insufficient funds');
+        this.showTradeNotification('Insufficient funds', 'error');
+        return;
       }
-      const pValue = this.money + this.calculateTotalValue();
+      const pValue: number = parseFloat((this.money + this.calculateTotalValue()).toFixed(2));
+      console.log(pValue);
       const response = await httpClient.post('/trading/', {
         symbol: stock.symbol,
         name: stock.name,
@@ -293,16 +321,24 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
           this.updateDoughnut();
           this.updateGraph();
         }
+        this.showTradeNotification(`Successful purchase of ${stock.name} for ${bPrice}`, 'success');
         this.requestUpdate();
       } else {
         throw new Error('Failed to purchase stock');
       }
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
+    } finally {
+      this.tradeLock = false;
     }
   }
 
   async sellStock(event: Event, stock: UserStock) {
+    if (this.tradeLock) {
+      return;
+    }
+
+    this.tradeLock = true;
     try {
       if (stock.shares == 0) {
         throw new Error('No Share in Stock!');
@@ -310,13 +346,12 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
       if (!this.stockService) {
         throw new Error('StockService not active!');
       }
-      const sPrice = (await this.stockService.getFirstData(stock.symbol)).price;
+      const sPrice: number = (await this.stockService.getFirstData(stock.symbol)).price;
       if (!sPrice || isNaN(sPrice)) {
-        // Überprüfen, ob bPrice leer oder ungültig ist
         this.showNotification('Failed to retrieve stock price', 'error');
         return;
       }
-      const pValue = this.money + this.calculateTotalValue();
+      const pValue: number = parseFloat((this.money + this.calculateTotalValue()).toFixed(2));
       const response = await httpClient.patch('/trading/', {
         symbol: stock.symbol,
         name: stock.name,
@@ -331,13 +366,19 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         this.updateGraph();
         if (stock.shares === 0) {
           this.userStocks = this.userStocks.filter(s => s.symbol !== stock.symbol);
-          this.showNotification(`Last stock of ${stock.name} was sold`, 'info');
         }
+      }
+      if (stock.shares === 0) {
+        this.showTradeNotification(`Sold last stock of ${stock.name} for ${sPrice}`, 'warning');
+      } else {
+        this.showTradeNotification(`Sold ${stock.name} for ${sPrice}`, 'warning');
       }
       this.money = data.money;
       this.requestUpdate();
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
+    } finally {
+      this.tradeLock = false;
     }
   }
 }

@@ -61,6 +61,7 @@ export class MarketComponent extends TradingComponent {
     return html`
       ${this.renderNotification()}
       <div class="container">
+        <app-trading-notification></app-trading-notification>
         <h1 id="upp">Marketplace</h1>
         <div>
           <p class="account" style="color: #E58400">
