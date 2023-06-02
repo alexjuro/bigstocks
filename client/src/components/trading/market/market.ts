@@ -8,7 +8,7 @@ import componentStyle from './market.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
 import { StockService } from '../../../stock-service.js';
 import { TradingComponent } from '../tradingcomponent.js';
-import { stocks, Stock, UserStock } from '../../../interfaces/stock-interface.js';
+import { Stock, UserStock } from '../../../interfaces/stock-interface.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
 
@@ -16,7 +16,7 @@ import { router } from '../../../router/router';
 export class MarketComponent extends TradingComponent {
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
   static publicUrl = './../../../../public/';
-  @state() userStocks: UserStock[] = stocks;
+  @state() userStocks!: UserStock[];
   @property({ type: Object })
   stockService = new StockService();
   constructor() {
