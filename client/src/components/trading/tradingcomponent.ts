@@ -7,6 +7,7 @@ import Chart from 'chart.js/auto';
 import { router } from '../../router/router.js';
 import { httpClient } from '../../http-client';
 import { PortfolioComponent } from './portfolio/portfolio';
+import { CandleComponent } from './trading-widgtes/candlecomponent';
 
 export abstract class TradingComponent extends PageMixin(LitElement) {
   public userStocks: UserStock[] = [];
@@ -125,9 +126,10 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         infoDiv.appendChild(buyButton);
 
         const buyImg = document.createElement('img');
-        buyImg.src = './../../../../buy.png';
+        buyImg.src = `${this.publicUrl}buy.png`;
         buyButton.appendChild(buyImg);
 
+        // Erstellung des Verkaufen-Buttons
         const sellButton = document.createElement('button');
         sellButton.textContent = 'Sell';
         sellButton.classList.add('sell');
@@ -139,9 +141,10 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         infoDiv.appendChild(sellButton);
 
         const sellImg = document.createElement('img');
-        sellImg.src = './../../../../sell.png';
+        sellImg.src = `${this.publicUrl}sell.png`;
         sellButton.appendChild(sellImg);
 
+        // Erstellung des Details-Buttons
         const stockDetailsButton = document.createElement('button');
         stockDetailsButton.textContent = 'Details';
         stockDetailsButton.classList.add('stockdetails');
@@ -154,7 +157,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         infoDiv.appendChild(stockDetailsButton);
 
         const detailImg = document.createElement('img');
-        detailImg.src = './../../../../details.png';
+        detailImg.src = `${this.publicUrl}details.png`;
         stockDetailsButton.appendChild(detailImg);
 
         // To:Do Hinzufügen der Informationen zur Aktie...
@@ -245,12 +248,10 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     }
   }
 
-  // Funktion zur Berechnung des Wertes einer einzelnen Aktie
   calculateStockValue(stock: UserStock): number {
     return stock.price * stock.shares;
   }
 
-  // Funktion zur Berechnung des Gesamtwertes aller Aktien
   calculateTotalValue(): number {
     let totalValue = 0;
     for (const stock of this.userStocks) {
