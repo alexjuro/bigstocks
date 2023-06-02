@@ -33,9 +33,9 @@ class AppComponent extends LitElement {
         'trading/market': () => html`<app-market></app-market>`,
         'users/market': () => html`<app-market></app-market>`,
         'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
-        'users/sign-in': () => html`<sign-in></sing-in>`,
-        'users/sign-out': () => html`<sign-out></sign-out>`
-        'users/sign-up': () => html`<sign-up></sing-up>`,
+        'users/sign-in': () => html`<sign-in></sign-in>`,
+        'users/sign-out': () => html`<sign-out></sign-out>`,
+        'users/sign-up': () => html`<sign-up></sign-up>`
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;

@@ -11,8 +11,7 @@ import { UserData } from '../types';
 import { Constraint } from '../constraints/constraints';
 
 @customElement('user-profile-details')
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-class ProfileMain extends PageMixin(LitElement) {
+export class ProfileMain extends PageMixin(LitElement) {
   static styles = [sharedStyle, sharedLocalStyle, componentStyle];
 
   @query('form') form!: HTMLFormElement;
