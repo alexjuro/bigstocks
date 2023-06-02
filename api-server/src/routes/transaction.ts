@@ -20,7 +20,14 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
         });
       });
 
-      res.status(200).json(entities);
+      const limit = Number(req.query.limit) || 10;
+      const offset = Number(req.query.offset) || 0;
+      res.status(200).json({
+        total: entities.length,
+        entities: entities.slice(offset, limit + offset),
+        limit,
+        offset
+      });
     })
     .catch(() => res.status(404).json({ status: 'failed to fetch transactions' }));
 });

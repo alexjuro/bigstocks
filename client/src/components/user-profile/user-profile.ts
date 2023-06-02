@@ -25,6 +25,7 @@ class Profile extends PageMixin(LitElement) {
   private user!: UserData;
 
   async connectedCallback() {
+    super.connectedCallback();
     // TODO: change to /users/auth once merged
     await httpClient.get('/users/account').catch((e: { statusCode: number }) => {
       if (e.statusCode === 401) router.navigate('/users/sign-in');

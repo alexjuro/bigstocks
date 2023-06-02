@@ -71,7 +71,8 @@ class PageNavigator extends LitElement {
           break;
       }
     }
-    if (newPage !== this.pageNumber && this.scrollOnChange) window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (newPage === this.pageNumber) return;
+    if (this.scrollOnChange) window.scrollTo({ top: 0, behavior: 'smooth' });
     this.pageNumber = newPage;
     this.dispatchEvent(new CustomEvent('page-change', { bubbles: true, detail: this.pageNumber }));
   }
