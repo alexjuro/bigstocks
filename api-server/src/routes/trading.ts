@@ -8,6 +8,7 @@ import { User } from '../models/user.js';
 
 import { authService } from '../services/auth.service.js';
 import { cryptoService } from '../services/crypto.service.js';
+import { Note } from '../models/note.js';
 
 const router = express.Router();
 
@@ -90,6 +91,31 @@ router.get('/market', authService.authenticationMiddleware, async (req, res) => 
   }
 });
 
+router.get('/details/:symbol', authService.authenticationMiddleware, async (req, res) => {
+  const stockDAO: GenericDAO<Stock> = req.app.locals.stockDAO;
+  const noteDAO: GenericDAO<Note> = req.app.locals.noteDAO;
+  const symbol = req.params.symbol;
+  const userId = res.locals.user.id;
+
+  try {
+    const stock = await stockDAO.findOne({ symbol });
+    const note = await noteDAO.findOne({ symbol, userId });
+
+    if (note) {
+      note.note = cryptoService.decrypt(note.note);
+    }
+
+    if (!stock) {
+      res.status(404).json({ error: 'Stock not found' });
+      return;
+    }
+
+    res.json({ stock, note });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while retrieving stock details' });
+  }
+});
+
 router.post('/', authService.authenticationMiddleware, async (req, res) => {
   const stockDAO: GenericDAO<Stock> = req.app.locals.stockDAO;
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
@@ -136,6 +162,35 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
     res.status(201).json({ transaction, money: user.money, performance: user.performance });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while purchasing the stock' });
+  }
+});
+
+router.post('/details', authService.authenticationMiddleware, async (req, res) => {
+  const noteDAO: GenericDAO<Note> = req.app.locals.noteDAO;
+
+  const { note } = req.body;
+  const userId = res.locals.user.id;
+  const cryptNote = cryptoService.encrypt(note.note);
+
+  try {
+    const exNote = await noteDAO.findOne({ userId, symbol: note.symbol });
+    if (exNote) {
+      exNote.note = cryptNote;
+      await noteDAO.update(exNote);
+      res.status(200).json({ message: 'Note saved successfully' });
+      return;
+    }
+    const newNote = await noteDAO.create({
+      symbol: note.symbol,
+      userId,
+      note: cryptNote
+    });
+
+    res
+      .status(201)
+      .json({ message: 'Note saved successfully', note: cryptoService.encrypt(newNote.note || exNote!.note) });
+  } catch (error) {
+    res.status(500).json({ error: `An error occurred while saving the note ${noteDAO}` });
   }
 });
 

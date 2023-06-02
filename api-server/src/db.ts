@@ -10,6 +10,7 @@ import config from '../config.json' assert { type: 'json' };
 import { User } from './models/user.js';
 import { Stock } from './models/stock.js';
 import { Transaction } from './models/transaction.js';
+import { Note } from './models/note.js';
 const { MongoClient } = mongodb;
 const { Client } = pg;
 
@@ -28,6 +29,7 @@ async function startInMemoryDB(app: Express) {
   app.locals.stockDAO = new InMemoryGenericDAO<Stock>();
   app.locals.transactionDAO = new InMemoryGenericDAO<Transaction>();
   app.locals.userDAO = new InMemoryGenericDAO<User>();
+  app.locals.noteDAO = new InMemoryGenericDAO<Note>();
   return async () => Promise.resolve();
 }
 
@@ -37,6 +39,7 @@ async function startMongoDB(app: Express) {
   app.locals.userDAO = new MongoGenericDAO<User>(db, 'users');
   app.locals.stockDAO = new MongoGenericDAO<Stock>(db, 'stocks');
   app.locals.transactionDAO = new MongoGenericDAO<Transaction>(db, 'transactions');
+  app.locals.noteDAO = new MongoGenericDAO<Note>(db, 'notes');
 
   // TODO: DAOs erzeugen
   return async () => await client.close();
@@ -62,6 +65,7 @@ async function startPsql(app: Express) {
   app.locals.transactionDAO = new PsqlGenericDAO<Transaction>(client!, 'transactions');
   app.locals.stockkDAO = new PsqlGenericDAO<Stock>(client!, 'stocks');
   app.locals.userDAO = new PsqlGenericDAO<User>(client, 'users');
+  app.locals.noteDAO = new PsqlGenericDAO<Note>(client, 'notes');
   return async () => await client.end();
 }
 

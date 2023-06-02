@@ -7,13 +7,14 @@ import Chart from 'chart.js/auto';
 import { router } from '../../router/router.js';
 import { httpClient } from '../../http-client';
 import { PortfolioComponent } from './portfolio/portfolio';
+import { CandleComponent } from './trading-widgtes/candlecomponent';
 
 export abstract class TradingComponent extends PageMixin(LitElement) {
-  protected userStocks: UserStock[] = [];
-  protected stockService: StockService | null = null;
-  protected stockCandle: object | null = null;
-  protected money = 0;
-  protected publicUrl = './../../../../public/';
+  public userStocks: UserStock[] = [];
+  public stockService: StockService | null = null;
+  public stockCandle: object | null = null;
+  public money = 0;
+  public publicUrl = './../../../../public/';
 
   getMoney(): number {
     return this.money;
@@ -103,14 +104,12 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         newEmptyDiv.classList.add('candle-div');
         stockDiv.appendChild(newEmptyDiv);
 
-        // Erstellung Canvas
         const canvasElement = document.createElement('canvas');
         canvasElement.width = 200;
         canvasElement.height = 300;
         newEmptyDiv.appendChild(canvasElement);
         this.createStockCandles(canvasElement, stockDiv.id, 'M');
 
-        // Erstellung der infoDiv für zusätzliche Informationen und Buttons
         const infoDiv = document.createElement('div');
         infoDiv.classList.add('info-div');
         stockDiv.appendChild(infoDiv);
@@ -121,13 +120,13 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         buyButton.classList.add('buy');
         buyButton.addEventListener('click', event => {
           event.stopPropagation();
-          console.log('Buy'); // Hier muss die entsprechende Methode für den Kauf der Aktie implementiert werden
+          console.log('Buy');
           this.buyStock(event, stock);
         });
         infoDiv.appendChild(buyButton);
 
         const buyImg = document.createElement('img');
-        buyImg.src = './../../../../buy.png';
+        buyImg.src = `${this.publicUrl}buy.png`;
         buyButton.appendChild(buyImg);
 
         // Erstellung des Verkaufen-Buttons
@@ -142,23 +141,23 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         infoDiv.appendChild(sellButton);
 
         const sellImg = document.createElement('img');
-        sellImg.src = './../../../../sell.png';
+        sellImg.src = `${this.publicUrl}sell.png`;
         sellButton.appendChild(sellImg);
 
-        // Erstellung des StockDetails-Buttons
+        // Erstellung des Details-Buttons
         const stockDetailsButton = document.createElement('button');
         stockDetailsButton.textContent = 'Details';
         stockDetailsButton.classList.add('stockdetails');
         stockDetailsButton.addEventListener('click', event => {
           event.stopPropagation();
-          const symbol = stockDiv.id;
-          // Navigiere zur Route "/trading/stockdetails/:id"
-          router.navigate(`trading/details/${symbol}`);
+          const symbol = stock.symbol;
+          const name = stock.name;
+          router.navigate(`trading/details?symbol=${symbol}&name=${name}`);
         });
         infoDiv.appendChild(stockDetailsButton);
 
         const detailImg = document.createElement('img');
-        detailImg.src = './../../../../details.png';
+        detailImg.src = `${this.publicUrl}details.png`;
         stockDetailsButton.appendChild(detailImg);
 
         // To:Do Hinzufügen der Informationen zur Aktie...
@@ -179,14 +178,13 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     this.stockCandle = new Chart(element, {
       type: 'line',
       data: {
-        labels: ['NOV', 'DEC', 'JAN', 'FEB', 'MAR', 'APR'],
+        labels: ['DEC', 'JAN', 'FEB', 'MAR', 'APR', 'MAY'],
         datasets: [
           {
             data: data,
             borderColor: '#9370DB',
             backgroundColor: 'rgba(230, 230, 250,0.5)',
             borderWidth: 3,
-            borderDash: [5, 5],
             tension: 0.3,
             fill: true,
             pointBackgroundColor: '#411080',
@@ -209,7 +207,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
           subtitle: {
             display: true,
             text: percentage.toFixed(1) + '% ',
-            font: { weight: 'bold' },
+            font: { weight: 'bolder' },
             position: 'right'
           },
           legend: {
@@ -250,12 +248,10 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     }
   }
 
-  // Funktion zur Berechnung des Wertes einer einzelnen Aktie
   calculateStockValue(stock: UserStock): number {
     return stock.price * stock.shares;
   }
 
-  // Funktion zur Berechnung des Gesamtwertes aller Aktien
   calculateTotalValue(): number {
     let totalValue = 0;
     for (const stock of this.userStocks) {
