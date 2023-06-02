@@ -9,7 +9,7 @@ import { httpClient } from '../../../http-client';
 import { PageMixin } from '../../page.mixin';
 import { UserData } from '../types';
 import { Constraint } from '../constraints/constraints';
-import { compare } from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 
 @customElement('user-profile-password')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -128,19 +128,20 @@ class ProfilePassword extends PageMixin(LitElement) {
     this.pass.setCustomValidity(re.test(this.pass.value) ? '' : 'pattern-mismatch');
 
     if (!this.form.checkValidity()) {
-      return this.form.classList.add('was-validated');
+      this.form.classList.add('was-validated');
+      return;
     }
 
     if (this.pass.value !== this.passConfirm.value) {
-      return this.dispatchEvent(
-        new CustomEvent('submit-err', { bubbles: true, detail: new Error("Passwords don't match!") })
-      );
+      this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: new Error("Passwords don't match!") }));
+      return;
     }
 
-    if (await compare(this.pass.value, this.data.password)) {
-      return this.dispatchEvent(
+    if (await bcrypt.compare(this.pass.value, this.data.password)) {
+      this.dispatchEvent(
         new CustomEvent('submit-err', { bubbles: true, detail: new Error('New password must differ from old one.') })
       );
+      return;
     }
 
     this.dispatchEvent(

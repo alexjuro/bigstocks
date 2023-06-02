@@ -7,7 +7,6 @@ import { authService } from '../services/auth.service.js';
 import bcrypt from 'bcryptjs';
 
 const isValid = <T>(properties: Map<string, string>, obj: unknown): obj is T => {
-  console.log(properties.get('regex'));
   return (
     Object.getOwnPropertyNames(obj)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
