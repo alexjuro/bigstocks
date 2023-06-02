@@ -5,6 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { until } from 'lit/directives/until.js';
 import { httpClient } from '../../http-client';
+import { router } from '../../router/router';
 import { PageMixin } from '../page.mixin';
 import sharedStyle from '../shared.css?inline';
 import componentStyle from './transaction-history.css?inline';
@@ -52,8 +53,15 @@ class TransactionHistory extends PageMixin(LitElement) {
 
   private readonly year = new Date().getFullYear().toString();
   private transactions = httpClient
-    .get(`/users/transactions?limit=${this.pageSize}`)
+    .get(`/users/transactions?limit=${this.pageSize}&offset=${this.pageNumber * this.pageSize}`)
     .then(async res => (await res.json()) as Json);
+
+  async connectedCallback() {
+    // TODO: change to /users/auth after merge
+    await httpClient.get('/users/transactions').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
+  }
 
   render() {
     return html`<div class="container">
