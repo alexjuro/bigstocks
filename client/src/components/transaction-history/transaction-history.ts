@@ -57,6 +57,7 @@ class TransactionHistory extends PageMixin(LitElement) {
     .then(async res => (await res.json()) as Json);
 
   async connectedCallback() {
+    super.connectedCallback();
     // TODO: change to /users/auth after merge
     await httpClient.get('/users/transactions').catch((e: { statusCode: number }) => {
       if (e.statusCode === 401) router.navigate('/users/sign-in');
