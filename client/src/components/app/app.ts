@@ -5,11 +5,14 @@ import { customElement } from 'lit/decorators.js';
 import { httpClient } from '../../http-client';
 import { router } from '../../router/router';
 import { StockService } from '../../stock-service';
+import componentStyle from './app.css?inline';
+import sharedStyle from '../shared.css?inline';
 
 @customElement('app-root')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class AppComponent extends LitElement {
   stockService = new StockService();
+  static styles = [componentStyle, sharedStyle];
   constructor() {
     super();
     const port = 3000;
@@ -37,7 +40,10 @@ class AppComponent extends LitElement {
         'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
         'users/sign-in': () => html`<sign-in></sign-in>`,
         'users/sign-out': () => html`<sign-out></sign-out>`,
-        'users/sign-up': () => html`<sign-up></sign-up>`
+        'users/sign-up': () => html`<sign-up></sign-up>`,
+        'users/activation': () => html`<app-activation></app-activation>`,
+        'users/resetPassword': () => html`<app-resetPassword></app-resetPassword>`,
+        'users/forgotPassword': () => html`<app-forgotPassword></app-forgotPassword>`,
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;
@@ -48,5 +54,22 @@ class AppComponent extends LitElement {
   render() {
     return html`<app-header></app-header>
       <div class="main">${this.renderSelect()}</div> `;
+  }
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener('update-pagename', this.handleUpdatePageName);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener('update-pagename', this.handleUpdatePageName);
+  }
+
+  private handleUpdatePageName(event: Event) {
+    const customEvent = event as CustomEvent;
+    const appHeader = this.shadowRoot?.querySelector('app-header');
+    if (appHeader && 'pagename' in appHeader) {
+      appHeader.pagename = customEvent.detail;
+    }
   }
 }

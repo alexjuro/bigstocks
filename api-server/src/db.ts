@@ -11,6 +11,7 @@ import { User } from './models/user.js';
 import { Stock } from './models/stock.js';
 import { Transaction } from './models/transaction.js';
 import { Note } from './models/note.js';
+import { Comment } from './models/comment.js';
 const { MongoClient } = mongodb;
 const { Client } = pg;
 
@@ -36,10 +37,12 @@ async function startInMemoryDB(app: Express) {
 async function startMongoDB(app: Express) {
   const client = await connectToMongoDB();
   const db = client.db('bigstocks');
+  //app.locals.userDAO = new MongoGenericDAO<User>(db, 'users');
   app.locals.userDAO = new MongoGenericDAO<User>(db, 'users');
   app.locals.stockDAO = new MongoGenericDAO<Stock>(db, 'stocks');
   app.locals.transactionDAO = new MongoGenericDAO<Transaction>(db, 'transactions');
   app.locals.noteDAO = new MongoGenericDAO<Note>(db, 'notes');
+  app.locals.commentDAO = new MongoGenericDAO<Comment>(db, 'comments');
 
   // TODO: DAOs erzeugen
   return async () => await client.close();
