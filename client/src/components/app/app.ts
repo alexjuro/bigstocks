@@ -28,9 +28,11 @@ class AppComponent extends LitElement {
         'news': () => html`<finnhub-market-news></finnhub-market-news>`,
         'profile': () => html`<user-profile></user-profile>`,
         'stonks': () => html`<app-stonks></app-stonks>`,
-        'trading/details/:id': params => html`<app-trading-details .tradingId=${params.id}></app-trading-details>`,
+        'trading/details': params =>
+          html`<app-trading-details .symbol=${params.symbol} .name=${params.name}></app-trading-details>`,
         'trading/portfolio': () => html`<app-portfolio></app-portfolio>`,
         'trading/market': () => html`<app-market></app-market>`,
+        'transactions': () => html`<transaction-history></transaction-history>`,
         'users/market': () => html`<app-market></app-market>`,
         'users/portfolio': () => html`<app-portfolio></app-portfolio>`,
         'users/sign-in': () => html`<sign-in></sign-in>`,

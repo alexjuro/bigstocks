@@ -1,0 +1,32 @@
+/* Author: Nico Pareigis */
+
+.page {
+  margin: 1.4rem auto;
+  user-select: none;
+}
+
+.page .hidden {
+  display: none;
+}
+
+.page > div {
+  display: inline-block;
+  padding: 0.4rem 0.6rem;
+  text-align: center;
+  transition: 0.2s;
+  border-radius: 4px;
+}
+
+.selected {
+  color: ghostwhite;
+  background-color: var(--primary);
+}
+
+.page > div:hover {
+  cursor: pointer;
+  background-color: lightgray;
+}
+
+div.selected:hover {
+  background-color: var(--secondary);
+}

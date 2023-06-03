@@ -41,7 +41,7 @@ export class StockService {
           };
         });
       } catch (error) {
-        console.log('WebSocket connection failed. Retrying in 4 seconds...');
+        console.log('WebSocket connection failed. Retrying in 2 seconds...');
         this.socket?.close();
         await new Promise<void>(resolve => setTimeout(resolve, 2000));
       }
@@ -142,6 +142,22 @@ export class StockService {
     const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${this.getApiKey()}`);
     const data = await response.json();
     return { price: data.c, percentage: ((data.c - data.pc) / data.pc) * 100 };
+  }
+
+  public async getRecommendationBySymbol(symbol: string) {
+    const response = await fetch(
+      `https://finnhub.io/api/v1/stock/recommendation?symbol=${symbol}&token=${this.getApiKey()}`
+    );
+    const data = await response.json();
+    return data[0];
+  }
+
+  public async getCompanyProfilBySymbol(symbol: string) {
+    const response = await fetch(
+      `https://finnhub.io/api/v1//stock/profile2?symbol=${symbol}&token=${this.getApiKey()}`
+    );
+    const data = await response.json();
+    return data;
   }
 
   private getApiKey() {
