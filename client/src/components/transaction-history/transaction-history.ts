@@ -1,7 +1,7 @@
 /* Author: Nico Pareigis */
 
 import { html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { until } from 'lit/directives/until.js';
 import { httpClient } from '../../http-client';
@@ -26,28 +26,27 @@ type Profit = {
   profit: string;
 };
 
-type Transaction = {
+export type Transaction = {
   userId: string;
   name: string;
   image: string;
-  bPrice: number;
-  sPrice: number;
+  bPrice: string;
+  sPrice: string;
   soldAt: number;
   createdAt: number;
 };
 
-type Json = {
+export type Json = {
   total: number;
   entities: Transaction[];
 };
 
 @customElement('transaction-history')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class TransactionHistory extends PageMixin(LitElement) {
+export class TransactionHistory extends PageMixin(LitElement) {
   static styles = [sharedStyle, componentStyle];
 
-  @property() pageNumber = 0;
-
+  @state() pageNumber = 0;
   @state() pageSize = 20;
   @state() total = 0;
 
@@ -155,13 +154,15 @@ class TransactionHistory extends PageMixin(LitElement) {
     </div>`;
   }
 
-  getProfitDetails(boughtFor: number, soldFor: number): Profit {
-    const profit = soldFor === 0 ? -boughtFor : (soldFor * 100 - boughtFor * 100) / 100;
+  getProfitDetails(boughtFor: string, soldFor: string): Profit {
+    const nBoughtFor = Number(boughtFor);
+    const nSoldFor = Number(soldFor);
+    const profit = nSoldFor === 0 ? -nBoughtFor : (nSoldFor * 100 - nBoughtFor * 100) / 100;
     const detail = profit < 0 ? '#ff0d0d' : '#0d942b';
 
     return {
       detail,
-      header: soldFor === 0 ? 'gray' : detail,
+      header: nSoldFor === 0 ? 'gray' : detail,
       prefix: profit === 0 ? '±' : profit < 0 ? '↓' : '↑',
       profit: profit.toFixed(profit % 1 === 0 ? 0 : 2)
     };
