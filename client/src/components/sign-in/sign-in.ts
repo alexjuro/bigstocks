@@ -22,58 +22,66 @@ class SignInComponent extends PageMixin(LitElement) {
   @state()
   private step = 1;
 
-  private pagenName = 'Sign-In';
+  private pagenName = 'Log-In';
 
   private username = '';
   private password = '';
+  private pageName = 'Log-In';
 
   @eventOptions({ capture: true })
-  handleKeyDown(event: KeyboardEvent) {
+  async firstUpdated() {
+    const appHeader = this.dispatchEvent(
+      new CustomEvent('update-pagename', { detail: this.pageName, bubbles: true, composed: true })
+    );
+  }
+
+  handleKeyDownPassword(event: KeyboardEvent) {
     console.log('Key down event:', event);
     if (event.key === 'Enter') {
-      event.preventDefault(); // Verhindert das Absenden des Formulars durch Drücken der Eingabetaste
+      event.preventDefault(); // Prevent form submission by Enter key
       this.submit();
     }
   }
 
-  async firstUpdated() {
-    const appHeader = this.dispatchEvent(
-      new CustomEvent('update-pagename', { detail: this.pagenName, bubbles: true, composed: true })
-    );
+  handleKeyDownUsername(event: KeyboardEvent) {
+    console.log('Key down event:', event);
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent form submission by Enter key
+      this.nextStep();
+    }
   }
 
   render() {
     return html`
       ${this.renderNotification()}
       <div class="Login-Page">
-        <div class="form">${this.step === 1 ? this.renderEmailStep() : this.renderPasswordStep()}</div>
+        <div class="form">${this.step === 1 ? this.renderUsernameStep() : this.renderPasswordStep()}</div>
       </div>
     `;
   }
 
-  renderEmailStep() {
+  renderUsernameStep() {
     return html`
-      <h1>Log-In</h1>
-      <form novalidate class="login-form">
+      <form @keydown="${this.handleKeyDownUsername}" novalidate class="login-form">
         <div>
           <label for="username">Username</label>
           <input
             type="text"
             autofocus
             required
-            id="text"
+            id="username"
             placeholder="Username"
             .value=${this.username}
             @input=${this.handleUsernameChange}
           />
-          <div class="invalid-feedback">Username is required and must be valid</div>
+          <div class="invalid-feedback">Invalid Input</div>
         </div>
         <p class="message">Forgot you password? <button @click="${this.forgotPassword}">Reset password!</button></p>
         <p class="message">
           Not registered?
           <button @click=${this.signUp}>Create an account</button>
         </p>
-        <button type="button" @keydown=${this.handleKeyDown} @click=${this.nextStep}>Next</button>
+        <button type="button" @click=${this.nextStep}>Next</button>
       </form>
     `;
   }
@@ -84,20 +92,21 @@ class SignInComponent extends PageMixin(LitElement) {
 
   renderPasswordStep() {
     return html`
-      <h1>Log-In</h1>
-      <form novalidate class="login-form">
+      <form @keydown="${this.handleKeyDownPassword}" novalidate class="login-form">
         <div>
           <label for="password">Password</label>
           <input
             type="password"
             required
+            minlength="8"
+            maxlength="32"
             id="password"
             placeholder="Password"
             autocomplete="off"
             .value=${this.password}
             @input=${this.handlePasswordChange}
           />
-          <div class="invalid-feedback">Password is required</div>
+          <div class="invalid-feedback">Invalid Input</div>
         </div>
         <p class="message">Forgot you password? <button @click="${this.forgotPassword}">Reset password!</button></p>
         <p class="message">
@@ -105,7 +114,7 @@ class SignInComponent extends PageMixin(LitElement) {
           <button @click=${this.signUp}>Create an account</button>
         </p>
         <button type="button" @click=${this.backStep}>Back</button>
-        <button type="button" @keydown=${this.handleKeyDown} @click=${this.submit}>Sign-In</button>
+        <button type="button" @click=${this.submit}>Sign-In</button>
       </form>
     `;
   }
@@ -148,6 +157,12 @@ class SignInComponent extends PageMixin(LitElement) {
   }
 
   isFormValid() {
+    const re = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d).{8,32}$/;
+    if (this.passwordElement !== null)
+      this.passwordElement.setCustomValidity(re.test(this.passwordElement.value) ? '' : 'pattern-mismatch');
+    const reUsername = /^[\w-.]{4,32}$/;
+    if (this.usernameElement !== null)
+      this.usernameElement.setCustomValidity(reUsername.test(this.usernameElement.value) ? '' : 'pattern-missmatch');
     return this.form.checkValidity();
   }
 

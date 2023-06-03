@@ -67,6 +67,8 @@ class forgotPasswordOne extends PageMixin(LitElement) {
   }
 
   isFormValid() {
+    const reUsername = /^[\w-.]{4,32}$/;
+    this.username.setCustomValidity(reUsername.test(this.username.value) ? '' : 'pattern-missmatch');
     return this.form.checkValidity();
   }
 

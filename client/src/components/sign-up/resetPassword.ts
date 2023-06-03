@@ -1,7 +1,7 @@
 /* Autor: Lakzan Nathan (FH Münster) */
 
 import { LitElement, html } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, query, state } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import { router } from '../../router/router.js';
 import { PageMixin } from '../page.mixin.js';
@@ -13,6 +13,9 @@ import componentStyle from '../sign-in/style.css?inline';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ActivationComponent extends PageMixin(LitElement) {
   static styles = [componentStyle, sharedStyle];
+  @state() showConstraints = false;
+  @state() entropy = 0;
+  @state() visibility = 'none';
 
   @query('form') private form!: HTMLFormElement;
 
@@ -25,31 +28,82 @@ class ActivationComponent extends PageMixin(LitElement) {
   @query('#password-check') private passwordCheckElement!: HTMLInputElement;
 
   private pageName = 'Reset your Password';
+  private code = '';
+  private pw = '';
+  private pwCheck = '';
+  private secQueTwo = '';
+
+  private quality = [
+    { minEntropy: 0, color: 'none', class: 'none', strength: '' },
+    { minEntropy: 1, color: '#ff0d0d', class: 'weak', strength: ' Weak!' },
+    { minEntropy: 25, color: '#ff4e11', class: 'mid', strength: ' Mid!' },
+    { minEntropy: 50, color: '#fab733', class: 'sufficient', strength: ' Okay!' },
+    { minEntropy: 75, color: '#acb334', class: 'good', strength: ' Good!' },
+    { minEntropy: 100, color: '#50C878', class: 'secure', strength: ' Secure!' }
+  ];
+  private color = this.quality[0].color;
+  private strength = '';
+  private class = '.none';
 
   render() {
+    return html` ${this.renderNotification()} ${this.showConstraints ? this.renderConstraints() : this.renderForm()} `;
+  }
+
+  renderForm() {
     return html`
-      ${this.renderNotification()}
       <div class="Login-page">
         <div class="form ">
           <form novalidate>
+            <button id="constraintButton" type="button" @click="${this.toggleConstraints}">?</button>
             <div>
               <label for="Code">Code</label>
-              <input type="number" required id="code" placeholder="Code" min="99999" max="999999"/>
+              <input .value="${this.code}"
+                @input="${this.handleCodeChange}" type="number" required id="code" placeholder="Code" min="99999" max="999999"/>
               <div class="invalid-feedback">Code is required and must be valid</div>
             </div>
               <div>
               <label for="safetyAnswerTwo">What is your favorite animal?</label>
-              <input type="password" id="safetyAnswerTwo" placeholder="Please enter here" autocomplete="off" required/>
+              <input type="password" id="safetyAnswerTwo" placeholder="Please enter here" autocomplete="off" required @input=${this.handleSecureQuestionTwoChange}
+                .value=${this.secQueTwo}/>
               <div class="invalid-feedback">Entering a answer is mandatory</div>
             </div> 
-            <div>
+             <div>
               <label for="password">Password</label>
-              <input type="password" required minlength="10" id="password" placeholder="Password" autocomplete="off"/>
-              <div class="invalid-feedback">Password is required and must be at least 10 characters long</div>
+              <input
+                style="--color: ${this.color}"
+                type="password"
+                required
+                minlength="8"
+                maxlength="32"
+                id="password"
+                placeholder="Password"
+                autocomplete="off"
+                @focus=${this.toggleEntropy}
+                @blur=${this.toggleEntropy}
+                @input=${this.updateEntropy}
+                .value=${this.pw}
+              />
+              <div class="invalid-feedback">Password is required and must be valid</div>
+            </div>
+            <div id="pwstrengthContainer" style="--visibility: ${this.visibility}">
+              Password strength =<span style="--color: ${this.color}" id="pwstrength">${this.strength}</span>
+            </div>
+            <div id="indicatorBarContainer" style="--visibility: ${this.visibility}">
+              <div id="indicatorBar" style="--color: ${this.color}" class="${this.class}"></div>
             </div>
             <div>
               <label for="password-check">Enter password again</label>
-              <input type="password" required minlength="10" id="password-check" placeholder="Password again" autocomplete="off"/>
+              <input
+                type="password"
+                required
+                minlength="8"
+                maxlength="32"
+                id="password-check"
+                placeholder="Password again"
+                autocomplete="off"
+                @input=${this.handlePasswordCheckChange}
+                .value=${this.pwCheck}
+              />
               <div class="invalid-feedback">
                 Re-entering the password is required and must match the first password entered
               </div>
@@ -61,6 +115,29 @@ class ActivationComponent extends PageMixin(LitElement) {
         </div>
       </div>
     `;
+  }
+
+  renderConstraints() {
+    return html`
+      <div class="Login-page">
+        <div class="form">
+          <h1>Password Constraints:</h1>
+          <div class="password-constraints">
+            <ul>
+              <li>Password must be between 8 and 32 characters long</li>
+              <li>One lowercase letter [a-z]</li>
+              <li>One uppercase letter [A-Z]</li>
+              <li>One digit [0-9]</li>
+            </ul>
+          </div>
+          <button type="button" @click="${this.toggleConstraints}">Go Back!</button>
+        </div>
+      </div>
+    `;
+  }
+
+  toggleConstraints() {
+    this.showConstraints = !this.showConstraints;
   }
 
   async submit() {
@@ -82,15 +159,18 @@ class ActivationComponent extends PageMixin(LitElement) {
       }
     } else {
       this.form.classList.add('was-validated');
+      this.showNotification('Click on the "?" to view our Constraints', 'info');
     }
   }
 
   isFormValid() {
-    if (this.passwordElement.value !== this.passwordCheckElement.value) {
-      this.passwordCheckElement.setCustomValidity('Please ensure that your passwords are identical');
-    } else {
-      this.passwordCheckElement.setCustomValidity('');
-    }
+    const rePassword = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d).{8,32}$/;
+    this.passwordElement.setCustomValidity(rePassword.test(this.passwordElement.value) ? '' : 'Invalid Input');
+    this.passwordCheckElement.setCustomValidity(
+      this.passwordElement.value === this.passwordCheckElement.value
+        ? ''
+        : 'Please ensure that your passwords are identical'
+    );
     return this.form.checkValidity();
   }
 
@@ -116,5 +196,45 @@ class ActivationComponent extends PageMixin(LitElement) {
     } finally {
       this.finishAsyncInit();
     }
+  }
+  updateEntropy(_event: InputEvent) {
+    const str = this.passwordElement.value;
+
+    const unique = new Set();
+    str.split('').forEach(c => unique.add(c));
+
+    // NOTE: does not account for all possible characters
+    let chr = 0;
+    if (/[a-z]/.test(str)) chr += 26;
+    if (/[A-Z]/.test(str)) chr += 26;
+    if (/\d/.test(str)) chr += 10;
+    // owasp common special password characters (see https://owasp.org/www-community/password-special-characters)
+    if (/[ !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/.test(str)) chr += 33;
+
+    const penalty = Math.max(0.6, unique.size / (str.length || 1));
+    this.entropy = str.length * Math.log2((chr || 1) * penalty);
+
+    this.quality.forEach(l => {
+      if (this.entropy >= l.minEntropy) {
+        this.color = l.color;
+        this.class = l.class;
+        this.strength = l.strength;
+      }
+    });
+    this.pw = (_event.target as HTMLInputElement).value;
+  }
+  handlePasswordCheckChange(event: InputEvent) {
+    this.pwCheck = (event.target as HTMLInputElement).value;
+  }
+  handleCodeChange(event: InputEvent) {
+    this.code = (event.target as HTMLInputElement).value;
+  }
+  handleSecureQuestionTwoChange(event: InputEvent) {
+    this.secQueTwo = (event.target as HTMLInputElement).value;
+  }
+
+  toggleEntropy(e: Event) {
+    if (e.type === 'focus') return (this.visibility = 'block');
+    this.visibility = this.passwordElement.value === '' ? 'none' : 'block';
   }
 }

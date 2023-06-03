@@ -43,6 +43,7 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
     );
     try {
       this.startAsyncInit();
+      await httpClient.get('/users/auth' + location.search);
       const newStatusJSON = await httpClient.get('/users/new' + location.search);
       const newStatus = (await newStatusJSON.json()).new;
       console.log(newStatus);
@@ -73,7 +74,7 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
         throw new Error('No news articles found.');
       }
       //this.articles = data as Article[];
-      this.articles = data.sort((a, b) => b.datetime - a.datetime).slice(0, 12) as Article[];
+      this.articles = data.sort((a, b) => b.datetime - a.datetime).slice(0, 15) as Article[];
     } catch (error) {
       //Damit Error nicht vom Typ Unkown ist
       console.error(error);

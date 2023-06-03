@@ -18,6 +18,7 @@ class SignOutComponent extends PageMixin(LitElement) {
   @query('#valueInput') private valueInput!: HTMLInputElement;
 
   private comment = '';
+  private pageName = 'Sign-Out';
 
   render() {
     return html`
@@ -55,6 +56,9 @@ class SignOutComponent extends PageMixin(LitElement) {
   }
 
   async firstUpdated() {
+    const appHeader = this.dispatchEvent(
+      new CustomEvent('update-pagename', { detail: this.pageName, bubbles: true, composed: true })
+    );
     try {
       this.startAsyncInit();
       const ratingStatusJSON = await httpClient.get('/users/rating' + location.search);
@@ -102,9 +106,10 @@ class SignOutComponent extends PageMixin(LitElement) {
       result = false;
     }
 
-    // Überprüfung auf potenzielle SQL-Injection
-    const sqlInjectionPattern = /[';]|--|\/\*|\*\//gi;
-    if (sqlInjectionPattern.test(comment)) {
+    // Überprüfung auf potenzielle NOSQL-Injection
+    const nosqlInjectionPattern = /[$\\'"]/;
+
+    if (nosqlInjectionPattern.test(comment)) {
       result = false;
     }
 

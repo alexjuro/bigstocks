@@ -20,11 +20,8 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
     res.status(401).json({ message: 'Unauthorized!' });
     return;
   }
-  console.log('post /activation');
-  console.log(res.locals.user);
-  console.log(Math.floor(Date.now() / 1000) - res.locals.user.exp);
   if (res.locals.user.exp < Math.floor(Date.now() / 1000)) {
-    const result = await userDAO.delete(req.body.id);
+    const result = await userDAO.delete(req.body.id); // Warum wird der User nicht gelöscht ?!!!
     console.log(result);
     authService.removeToken(res);
     res.status(401).json({ message: 'Token expired!' });
@@ -40,6 +37,9 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
   ) {
     return sendErrMsg(errors.join('\n'));
   }
+  if (checkPassword(req.body.password)) {
+    return sendErrMsg('Invalid password');
+  }
   if (req.body.password !== req.body.passwordCheck) {
     console.log(req.body.password + ' ' + req.body.passwordCheck);
     return sendErrMsg('The two passwords do not match.');
@@ -48,21 +48,22 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
   const filter: Partial<User> = { id: res.locals.user.id };
   const user = await userDAO.findOne(filter);
   if (parseInt(req.body.code) !== user?.code) {
-    console.log(req.body.code);
-    console.log(user?.code);
     return sendErrMsg('Wrong code');
   }
   filter.activation = true;
   filter.code = 0;
-  console.log(req.body.password);
   filter.password = await bcrypt.hash(req.body.password, 10);
-  console.log(req.body.safeteyAnswerOne);
   filter.safetyAnswerOne = await bcrypt.hash(req.body.safetyAnswerOne, 10);
   filter.safetyAnswerTwo = await bcrypt.hash(req.body.safetyAnswerTwo, 10);
 
-  await userDAO.update(filter);
-  authService.createAndSetToken({ id: res.locals.user.id }, res);
-  res.status(201).json(user);
+  if (await userDAO.update(filter)) {
+    // Sollen wir hier retryen wenn es nicht klappt
+    authService.createAndSetToken({ id: res.locals.user.id }, res);
+    res.status(201).json(user);
+  } else {
+    const message = 'Something went wrong, please try again!';
+    res.status(500).json({ message });
+  }
 });
 
 router.post('/forgotPassword', async (req, res) => {
@@ -77,16 +78,24 @@ router.post('/forgotPassword', async (req, res) => {
   if (hasNotRequiredFields(req.body, ['username', 'safetyAnswerOne'], errors)) {
     return sendErrMsg(errors.join('\n'));
   }
+
+  if (checkUsername(req.body.username)) {
+    return sendErrMsg('Invalid Input!');
+  }
+
   const filter: Partial<User> = { username: req.body.username };
-  filter.username = filter.username?.toUpperCase();
   const user = await userDAO.findOne(filter);
   if (user && (await bcrypt.compare(req.body.safetyAnswerOne, user.safetyAnswerOne))) {
     authService.createAndSetShortToken({ id: user.id }, res);
     const code = createNumber();
     user.code = code;
-    await userDAO.update(user);
-    await sendCode(user.email, code);
-    res.status(201).json(user);
+    if (await userDAO.update(user)) {
+      await sendCode(user.email, code);
+      res.status(201).json(user);
+    } else {
+      const message = 'Something went wrong, please try again!';
+      res.status(500).json({ message });
+    }
   } else {
     authService.removeToken(res);
     res.status(401).json({ message: 'Invalid input!' });
@@ -106,9 +115,6 @@ router.post('/resetPassword', authService.authenticationMiddlewareActivation, as
     return;
   }
 
-  console.log('post /resetPasswrd');
-  console.log(res.locals.user);
-  console.log(Math.floor(Date.now() / 1000) - res.locals.user.exp);
   if (res.locals.user.exp < Math.floor(Date.now() / 1000)) {
     const result = await userDAO.delete(req.body.id);
     console.log(result);
@@ -120,6 +126,9 @@ router.post('/resetPassword', authService.authenticationMiddlewareActivation, as
   const user = await userDAO.findOne(filter);
   if (hasNotRequiredFields(req.body, ['code', 'password', 'passwordCheck', 'safetyAnswerTwo'], errors)) {
     return sendErrMsg(errors.join('\n'));
+  }
+  if (checkPassword(req.body.password)) {
+    return sendErrMsg('Invalid password');
   }
   if (req.body.password !== req.body.passwordCheck) {
     console.log(req.body.password + ' ' + req.body.passwordCheck);
@@ -140,10 +149,13 @@ router.post('/resetPassword', authService.authenticationMiddlewareActivation, as
   filter.password = await bcrypt.hash(req.body.password, 10);
   filter.safetyAnswerTwo = await bcrypt.hash(req.body.safetyAnswerTwo, 10);
 
-  await userDAO.update(filter);
-  authService.createAndSetToken({ id: res.locals.user.id }, res);
-
-  res.status(201).json(user);
+  if (await userDAO.update(filter)) {
+    authService.createAndSetToken({ id: res.locals.user.id }, res);
+    res.status(201).json(user);
+  } else {
+    const message = 'Something went wrong, please try again!';
+    res.status(500).json({ message });
+  }
 });
 
 router.post('/sign-up', async (req, res) => {
@@ -164,15 +176,22 @@ router.post('/sign-up', async (req, res) => {
     return sendErrMsg('Invalid Input');
   }
 
+  if (checkUsername(req.body.username)) {
+    return sendErrMsg('Invalid username');
+  }
+
+  if (checkEmail(req.body.email)) {
+    return sendErrMsg('Invalid input');
+  }
+
   const filter2: Partial<User> = { username: req.body.username };
-  filter2.username = filter2.username?.toUpperCase();
   if (await userDAO.findOne(filter2)) {
     return sendErrMsg('Invalid Input');
   }
 
   const newCode = createNumber();
   const newUser = await userDAO.create({
-    username: req.body.username.toUpperCase(),
+    username: req.body.username,
     email: req.body.email.toUpperCase(),
     password: 'wait for activation',
     safetyAnswerOne: 'wait for activation',
@@ -182,26 +201,52 @@ router.post('/sign-up', async (req, res) => {
     new: true,
     rating: false
   });
-  await sendCodeActivation(newUser.email, newCode);
-  authService.createAndSetShortToken({ id: newUser.id }, res);
-  res.status(201).json(newUser);
+  if (newUser) {
+    await sendCodeActivation(newUser.email, newCode);
+    authService.createAndSetShortToken({ id: newUser.id }, res);
+    res.status(201).json(newUser);
+  } else {
+    const message = 'Something went wrong, please try again!';
+    res.status(500).json({ message });
+  }
 });
 
 router.get('/auth', authService.authenticationMiddleware, async (req, res) => {
-  res.status(200).end();
+  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const filter: Partial<User> = { id: res.locals.user.id };
+  const user = await userDAO.findOne(filter);
+  if (user) {
+    if (user.activation) {
+      res.status(200).json(user);
+    } else {
+      res.status(401).json({ message: 'Unauthorized!' });
+    }
+  } else {
+    const message = 'Something went wrong, please try again!';
+    res.status(500).json({ message });
+  }
 });
 
 router.post('/sign-in', async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const filter: Partial<User> = { username: req.body.username };
   const errors: string[] = [];
+  const sendErrMsg = (message: string) => {
+    authService.removeToken(res);
+    res.status(400).json({ message });
+  };
 
   if (hasNotRequiredFields(req.body, ['username', 'password'], errors)) {
     res.status(400).json({ message: errors.join('\n') });
     return;
   }
+  if (checkPassword(req.body.password)) {
+    return sendErrMsg('Invalid password');
+  }
 
-  filter.username = filter.username?.toUpperCase();
+  if (checkUsername(req.body.username)) {
+    return sendErrMsg('Invalid username');
+  }
 
   const user = await userDAO.findOne(filter);
   if (user && (await bcrypt.compare(req.body.password, user.password))) {
@@ -261,6 +306,22 @@ function hasNotRequiredFields(object: { [key: string]: unknown }, requiredFields
     }
   });
   return hasErrors;
+}
+
+function checkUsername(username: string) {
+  const reUsername = /^[\w-.]{4,32}$/;
+  return !reUsername.test(username);
+}
+function checkPassword(password: string) {
+  const re = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d).{8,32}$/;
+  return !re.test(password);
+}
+
+function checkEmail(email: string) {
+  // equivalent to internal validation for 'input type="email"' (see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/email#basic_validation)
+  const re =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return !re.test(email);
 }
 function createNumber() {
   const randomNumber = Math.floor(100000 + Math.random() * 900000); // Generiert eine Zufallszahl zwischen 100000 und 999999

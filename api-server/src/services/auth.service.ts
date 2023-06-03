@@ -27,7 +27,7 @@ class AuthService {
   }
 
   createAndSetShortToken(userClaimSet: Record<string, unknown>, res: Response) {
-    const token = jwt.sign(userClaimSet, SECRET, { algorithm: 'HS256', expiresIn: '180s' });
+    const token = jwt.sign(userClaimSet, SECRET, { algorithm: 'HS256', expiresIn: '10min' });
     res.cookie('jwt-token', token);
   }
 
