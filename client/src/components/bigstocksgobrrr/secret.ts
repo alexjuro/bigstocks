@@ -8,9 +8,9 @@ class SecretAppComponent extends LitElement {
 
   rows = 8;
   cols = 8;
-  totalMines = 1;
+  totalMines = 2;
 
-  board: { element: HTMLDivElement; hasMine: boolean; revealed: boolean }[][] = [];
+  board: { element: HTMLDivElement; hasMine: boolean; revealed: boolean; marked: boolean }[][] = [];
   gameOver = false;
   successfulGame = false;
   highscore = 0;
@@ -22,6 +22,7 @@ class SecretAppComponent extends LitElement {
   constructor() {
     super();
     this.handleClick = this.handleClick.bind(this);
+    this.handleRightClick = this.handleRightClick.bind(this);
     this.restartGame = this.restartGame.bind(this);
   }
 
@@ -37,8 +38,9 @@ class SecretAppComponent extends LitElement {
         cell.dataset.row = i.toString();
         cell.dataset.col = j.toString();
         boardElement.appendChild(cell);
-        this.board[i][j] = { element: cell, hasMine: false, revealed: false };
+        this.board[i][j] = { element: cell, hasMine: false, revealed: false, marked: false };
         cell.addEventListener('click', this.handleClick);
+        cell.addEventListener('contextmenu', this.handleRightClick);
       }
     }
   }
@@ -75,7 +77,7 @@ class SecretAppComponent extends LitElement {
 
   revealCell(row: number, col: number) {
     const cell = this.board[row][col];
-    if (!cell.revealed) {
+    if (!cell.revealed && !cell.marked) {
       cell.revealed = true;
       cell.element.classList.remove('hidden');
       cell.element.classList.add('revealed');
@@ -84,6 +86,9 @@ class SecretAppComponent extends LitElement {
         this.gameOver = true;
         if (this.messageElement) this.messageElement.textContent = 'Game Over';
         if (this.restartButton) this.restartButton.style.display = 'block';
+        if (!this.successfulGame) {
+          this.showGameOver();
+        }
         if (this.highscoreElement) this.highscoreElement.textContent = `Highscore: ${this.highscore}`;
       } else {
         const count = this.countSurroundingMines(row, col);
@@ -94,12 +99,31 @@ class SecretAppComponent extends LitElement {
     }
   }
 
+  markCell(row: number, col: number) {
+    const cell = this.board[row][col];
+    if (!cell.revealed) {
+      cell.marked = true;
+      cell.element.classList.add('marked');
+    }
+  }
+
   handleClick(event: Event) {
     if (this.gameOver || this.successfulGame) return;
     const target = event.target as HTMLDivElement;
     const row = parseInt(target.dataset.row || '0');
     const col = parseInt(target.dataset.col || '0');
     this.revealCell(row, col);
+    this.checkGameCompleted();
+  }
+
+  handleRightClick(event: Event) {
+    event.preventDefault();
+    if (this.gameOver || this.successfulGame) return;
+    const target = event.target as HTMLDivElement;
+    const row = parseInt(target.dataset.row || '0');
+    const col = parseInt(target.dataset.col || '0');
+    this.markCell(row, col);
+    this.checkGameCompleted();
   }
 
   restartGame() {
@@ -120,12 +144,32 @@ class SecretAppComponent extends LitElement {
     this.placeMines();
   }
 
-  gameCompleted() {
-    this.successfulGame = true;
-    if (this.messageElement) this.messageElement.textContent = 'Congratulations';
-    if (this.restartButton) this.restartButton.style.display = 'block';
-    this.highscore++;
-    if (this.highscoreElement) this.highscoreElement.textContent = `Highscore: ${this.highscore}`;
+  checkGameCompleted() {
+    if (this.gameOver) return;
+    let allMinesMarked = true;
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        const cell = this.board[i][j];
+        if (!cell.revealed && cell.hasMine && !cell.marked) {
+          allMinesMarked = false;
+          break;
+        }
+      }
+      if (!allMinesMarked) {
+        break;
+      }
+    }
+    if (allMinesMarked) {
+      this.showVictory();
+    }
+  }
+
+  showGameOver() {
+    console.log('game over');
+  }
+
+  showVictory() {
+    console.log('great success');
   }
 
   firstUpdated() {

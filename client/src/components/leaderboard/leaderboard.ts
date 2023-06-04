@@ -1,7 +1,8 @@
 /* Autor: Alexander Lesnjak */
+//TODO: redirect to profile of user
 
 import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import componentStyle from './leaderboard.css?inline';
 
@@ -9,6 +10,7 @@ import componentStyle from './leaderboard.css?inline';
 class AppLeaderboardComponent extends LitElement {
   static styles = componentStyle;
 
+  @property({ type: Array })
   scores: any[] = [];
 
   protected async firstUpdated() {
@@ -17,13 +19,17 @@ class AppLeaderboardComponent extends LitElement {
       const data = await response.json();
 
       const scores = data
-        .filter((user: { name?: any; performance?: any }) => user.name && user.performance) // Filtere Benutzer mit Namen und Leistungsdaten
-        .map((user: { name: any; performance: any }) => ({
+        .filter((user: { name: any; performance: any }) => user.name && user.performance)
+        .map((user: { name: any; performance: string | any[] }) => ({
           name: user.name,
-          performance: user.performance[user.performance.length - 1].value
-        }));
+          performance: user.performance[user.performance.length - 1].value.toFixed(2).replace('.', ',')
+        }))
+        .sort((a: { performance: number }, b: { performance: number }) => b.performance - a.performance)
+        .slice(0, 5);
 
-      console.log('scores:', scores);
+      this.scores = scores;
+
+      //console.log('scores:', scores);
     } catch (e) {
       console.log((e as Error).message, 'error');
     }
@@ -50,7 +56,7 @@ class AppLeaderboardComponent extends LitElement {
                   <li>
                     <div class="position">
                       <div><a href="#top">${score.name}</a></div>
-                      <div>${score.score}</div>
+                      <div>${score.performance} €</div>
                     </div>
                   </li>
                 `
