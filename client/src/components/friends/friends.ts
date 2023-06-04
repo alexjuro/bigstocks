@@ -1,8 +1,13 @@
 /* Autor: Alexander Lesnjak */
+//TODO: show the daily/live performance of the user
+//TODO: make the accept and decline buttons work
+//TODO: make the add friend not redirect to another website
+//TODO: stop autofill
+//TODO: find the friend by its username or save friends with email for the performance
 
 import { LitElement, PropertyValueMap, html } from 'lit';
 import { httpClient } from '../../http-client.js';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, query, property } from 'lit/decorators.js';
 import { router } from '../../router/router.js';
 import componentStyle from './friends.css?inline';
 
@@ -17,7 +22,9 @@ class AppFriendsComponent extends LitElement {
     super();
   }
 
+  @property({ type: Array })
   requests: any[] = [];
+  @property({ type: Array })
   friends: any[] = [];
 
   protected async firstUpdated() {
@@ -31,6 +38,22 @@ class AppFriendsComponent extends LitElement {
 
       this.friends = friends;
       this.requests = requests;
+
+      const friendsNew = friends.map((friend: any) => {
+        const newPerformance = friend.performance.map((performance: any) => {
+          const formattedValue = performance.value.toLocaleString('de-DE', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            useGrouping: true
+          });
+
+          return { ...performance, value: formattedValue };
+        });
+
+        return { ...friend, performance: newPerformance };
+      });
+
+      this.friends = friendsNew;
 
       console.log('Friends:', this.friends);
       console.log('Requests:', this.requests);
@@ -100,7 +123,7 @@ class AppFriendsComponent extends LitElement {
                       <div class="frame"></div>
                     </div>
                     <div class="b"><button>${friend.name}</button></div>
-                    <div class="c">${friend.score} €</div>
+                    <div class="c">${friend.performance[0].value} €</div>
                   </div>
                 `
               )}
@@ -121,7 +144,6 @@ class AppFriendsComponent extends LitElement {
 
     try {
       await httpClient.post('friends', friend);
-      router.navigate('/main');
       this._displaySuccess();
     } catch (e) {
       this._displayError((e as Error).message);

@@ -1,10 +1,12 @@
 /* Autor: Alexander Lesnjak */
-//TODO: redirect to profile of user
+//TODO: chnage redirect url to normal url
+//TODO: make the button work
 
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import componentStyle from './leaderboard.css?inline';
+import { router } from '../../router/router.js';
 
 @customElement('app-leaderboard')
 class AppLeaderboardComponent extends LitElement {
@@ -18,16 +20,24 @@ class AppLeaderboardComponent extends LitElement {
       const response = await httpClient.get('leaderboard');
       const data = await response.json();
 
-      const scores = data
-        .filter((user: { name: any; performance: any }) => user.name && user.performance)
-        .map((user: { name: any; performance: string | any[] }) => ({
-          name: user.name,
-          performance: user.performance[user.performance.length - 1].value.toFixed(2).replace('.', ',')
-        }))
-        .sort((a: { performance: number }, b: { performance: number }) => b.performance - a.performance)
-        .slice(0, 5);
+      const scores = data.map((entry: { name: any; money: any; performance: any }) => {
+        const { name, money, performance } = entry;
+        let totalMoney = money + performance[0].value;
+        const formattedMoney = totalMoney.toLocaleString('de-DE', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+          useGrouping: true
+        });
+        return { name, money: formattedMoney };
+      });
 
-      this.scores = scores;
+      scores.sort((a: { money: string }, b: { money: string }) => {
+        const moneyA = parseFloat(a.money.replace(/\./g, '').replace(',', '.'));
+        const moneyB = parseFloat(b.money.replace(/\./g, '').replace(',', '.'));
+        return moneyB - moneyA;
+      });
+
+      this.scores = scores.slice(0, 5);
 
       //console.log('scores:', scores);
     } catch (e) {
@@ -38,7 +48,7 @@ class AppLeaderboardComponent extends LitElement {
   render() {
     return html`
       <div id="content">
-        <div id="pagetitle">leaderboard</div>
+        <div id="pagetitle"><button @click="">show live leaderboard</button></div>
 
         <div id="imagesflex">
           <div id="images">
@@ -55,8 +65,8 @@ class AppLeaderboardComponent extends LitElement {
                 (score, index) => html`
                   <li>
                     <div class="position">
-                      <div><a href="#top">${score.name}</a></div>
-                      <div>${score.performance} €</div>
+                      <div><button @click="${() => this.redirectToProfile(score.name)}">${score.name}</button></div>
+                      <div>${score.money} €</div>
                     </div>
                   </li>
                 `
@@ -70,5 +80,9 @@ class AppLeaderboardComponent extends LitElement {
         </div>
       </div>
     `;
+  }
+
+  redirectToProfile(username: string) {
+    router.navigate(`users/${username}`);
   }
 }

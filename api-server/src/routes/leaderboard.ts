@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     const leaderboard = users.map(user => ({
       name: user.name,
       money: user.money,
-      performance: user.performance
+      performance: user.performance.slice(user.performance.length - 1, user.performance.length)
     }));
     res.json(leaderboard);
   } catch (error) {

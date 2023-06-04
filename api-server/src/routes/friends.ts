@@ -1,4 +1,5 @@
 /* Author: Alexander Lensjak */
+//TODO: return live performance
 
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';
@@ -18,7 +19,26 @@ router.get('/', async (req, res) => {
       return;
     }
 
-    res.json({ friends: user.friends });
+    const friendsWithPerformance = await Promise.all(
+      user.friends.map(async friend => {
+        const friendUser = await userDAO.findOne({ email: 'al568412@fh-muenster.de' });
+        if (!friendUser) {
+          return {
+            name: friend.name,
+            accepted: friend.accepted,
+            performance: null // or any default value if the friend user is not found
+          };
+        }
+
+        return {
+          name: friend.name,
+          accepted: friend.accepted,
+          performance: friendUser.performance.slice(friendUser.performance.length - 1, friendUser.performance.length) // Assuming the performance property exists in the friend user object
+        };
+      })
+    );
+
+    res.json({ friends: friendsWithPerformance });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
   }
