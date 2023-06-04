@@ -13,7 +13,7 @@
 .inner {
   display: inline-flex;
   gap: 2rem;
-  align-items: start;
+  align-items: flex-start;
 }
 
 button {
