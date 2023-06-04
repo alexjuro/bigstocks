@@ -21,12 +21,12 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
   const dao: GenericDAO<User> = req.app.locals.userDAO;
 
   await dao
-    .findOne(req.app.locals.user)
+    .findOne({ id: res.locals.user.id })
     .then(entity => {
       if (!entity) return Promise.reject();
 
-      const { id, avatar, name, email, password } = entity;
-      res.status(200).json({ id, avatar, name, email, password });
+      const { id, avatar, username, email, password } = entity;
+      res.status(200).json({ id, avatar, username, email, password });
     })
     .catch(() => res.status(404).json({ status: 'failed to fetch user information' }));
 });
@@ -57,7 +57,7 @@ router.post('/avatar', authService.authenticationMiddleware, async (req, res) =>
 });
 
 router.post('/details', authService.authenticationMiddleware, async (req, res) => {
-  type Details = Pick<User, 'id' | 'email' | 'name'>;
+  type Details = Pick<User, 'id' | 'email' | 'username'>;
 
   // equivalent to internal validation for 'input type="email"' (see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/email#basic_validation)
   const reEmail =
@@ -71,12 +71,12 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
         new Map([
           ['id', 'number'],
           ['email', 'string'],
-          ['name', 'string']
+          ['username', 'string']
         ]),
         req.body
       ) &&
       reEmail.test(req.body.email) &&
-      reName.test(req.body.name)
+      reName.test(req.body.username)
     )
   )
     return res.status(400).json({ status: 'bad request' });

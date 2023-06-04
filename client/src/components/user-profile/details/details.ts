@@ -18,7 +18,7 @@ export class ProfileMain extends PageMixin(LitElement) {
   @query('#name') name!: HTMLInputElement;
   @query('#email') email!: HTMLInputElement;
 
-  @property() data!: Pick<UserData, 'id' | 'email' | 'name'>;
+  @property() data!: Pick<UserData, 'id' | 'email' | 'username'>;
 
   private constraints: Constraint[] = [
     {
@@ -40,7 +40,13 @@ export class ProfileMain extends PageMixin(LitElement) {
       <form novalidate>
         <div>
           <label for="name">Username</label>
-          <input id="name" type="text" value="${this.data.name}" @input="${() => this.checkValidity(false)}" required />
+          <input
+            id="name"
+            type="text"
+            value="${this.data.username}"
+            @input="${() => this.checkValidity(false)}"
+            required
+          />
           <div class="invalid-feedback">Invalid username.</div>
           <div class="annotation">Your public username.</div>
         </div>
@@ -87,14 +93,14 @@ export class ProfileMain extends PageMixin(LitElement) {
 
     if (!this.form.checkValidity()) return this.form.classList.add('was-validated');
 
-    if (this.email.value === this.data.email && this.name.value === this.data.name) return;
+    if (this.email.value === this.data.email && this.name.value === this.data.username) return;
 
     this.dispatchEvent(
       new CustomEvent('submit-req', {
         bubbles: true,
         detail: async () => {
           this.data.email = this.email.value;
-          this.data.name = this.name.value;
+          this.data.username = this.name.value;
 
           await httpClient
             .post('/users/account/details', this.data)
