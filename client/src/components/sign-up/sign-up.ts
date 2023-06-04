@@ -1,7 +1,7 @@
 /* Autor: Lakzan Nathan (FH Münster) */
 
 import { LitElement, html } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, query, state } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import { router } from '../../router/router.js';
 import { PageMixin } from '../page.mixin.js';
@@ -13,87 +13,116 @@ import componentStyle from '../sign-in/style.css?inline';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class SignUpComponent extends PageMixin(LitElement) {
   static styles = [componentStyle, sharedStyle];
-
+  @state() showConstraints = false;
   @query('form') private form!: HTMLFormElement;
 
-  @query('#name') private nameElement!: HTMLInputElement;
+  @query('#username') private usernameElement!: HTMLInputElement;
 
   @query('#email') private emailElement!: HTMLInputElement;
 
-  @query('#password') private passwordElement!: HTMLInputElement;
-
-  @query('#password-check') private passwordCheckElement!: HTMLInputElement;
+  private pageName = 'Sign-Up';
+  private email = '';
+  private username = '';
 
   render() {
+    return html` ${this.renderNotification()} ${this.showConstraints ? this.renderConstraints() : this.renderForm()} `;
+  }
+  renderForm() {
     return html`
-      ${this.renderNotification()}
       <div class="Login-page">
         <div class="form ">
-          <h1>Sign-Up</h1>
-          <form novalidate>
+          <form @keydown="${this.handleKeyDown}" novalidate>
+            <button id="constraintButton" type="button" @click="${this.toggleConstraints}">?</button>
             <div>
-              <label for="name">Name</label>
-              <input type="text" autofocus required id="name" placeholder="Name" />
-              <div class="invalid-feedback">Name is required</div>
+              <label for="username">Username</label>
+              <input minlength="4" maxlength="32" type="text" autofocus required id="username" placeholder="Username" @input=${this.handleUsernameChange} .value=${this.username} />
+              <div class="invalid-feedback">Username must be valid</div>
             </div>
             <div>
               <label for="email">E-Mail</label>
-              <input type="email" required id="email" placeholder="Email" />
-              <div class="invalid-feedback">>Email is required and must be valid</div>
+              <input type="email" required id="email" placeholder="Email"  @input=${this.handleEmailChange} .value=${this.email}/>
+              <div class="invalid-feedback">Email is required and must be valid</div>
             </div>
-            <div>
-              <label for="password">Password</label>
-              <input type="password" required minlength="10" id="password" placeholder="Password" />
-              <div class="invalid-feedback">Passwort ist erforderlich und muss mind. 10 Zeichen lang sein</div>
-            </div>
-            <div>
-              <label for="password-check">Enter password again</label>
-              <input type="password" required minlength="10" id="password-check" placeholder="Password again" />
-              <div class="invalid-feedback">
-                Re-entering the password is required and must match the first password entered
-              </div>
-            </div>
-            <button type="button" @click="${this.submit}">Create account</button>
             <p class="message">
-              Already registered? <button @click="${this.signIn}">Sign-In</button>
-          </form>
+              Already registered? <button @click="${this.signIn}">Sign-In</button>  </p>
+              <button type="button" @click="${this.submit}">Create account</button>
             </p>
-           
+          </form>
         </div>
       </div>
     `;
   }
 
+  renderConstraints() {
+    return html`
+      <div class="Login-page">
+        <div class="form">
+          <h1>Username Constraints:</h1>
+          <div class="password-constraints">
+            <ul>
+              <li>
+                : It must consist of 4 to 32 characters, which can be alphanumeric (letters and numbers), hyphens, or
+                periods.
+              </li>
+            </ul>
+          </div>
+          <button type="button" @click="${this.toggleConstraints}">Go it!</button>
+        </div>
+      </div>
+    `;
+  }
+
+  handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent form submission by Enter key
+      this.submit();
+    }
+  }
+
   async submit() {
     if (this.isFormValid()) {
       const accountData = {
-        name: this.nameElement.value,
-        email: this.emailElement.value,
-        password: this.passwordElement.value,
-        passwordCheck: this.passwordCheckElement.value
+        username: this.usernameElement.value,
+        email: this.emailElement.value
       };
       try {
         await httpClient.post('users/sign-up', accountData);
-        router.navigate('/main');
+        router.navigate('/users/activation');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
       }
     } else {
       this.form.classList.add('was-validated');
+      this.showNotification('Click on the "?" to view our Constraints', 'info');
     }
   }
 
   isFormValid() {
-    if (this.passwordElement.value !== this.passwordCheckElement.value) {
-      this.passwordCheckElement.setCustomValidity('Please ensure that your passwords are identical');
-    } else {
-      this.passwordCheckElement.setCustomValidity('');
-    }
+    console.log('is Form valid function');
+    const reUsername = /^[\w-.]{4,32}$/;
+    this.usernameElement.setCustomValidity(reUsername.test(this.username) ? '' : 'pattern-missmatch');
+    console.log(reUsername.test(this.usernameElement.value) ? '' : 'pattern-missmatch');
     return this.form.checkValidity();
   }
 
   async signIn() {
-    // window.location.href = 'users/sign-in';
     router.navigate('users/sign-in');
+  }
+
+  async firstUpdated() {
+    const appHeader = this.dispatchEvent(
+      new CustomEvent('update-pagename', { detail: this.pageName, bubbles: true, composed: true })
+    );
+  }
+
+  handleUsernameChange(event: InputEvent) {
+    this.username = (event.target as HTMLInputElement).value;
+  }
+
+  handleEmailChange(event: InputEvent) {
+    this.email = (event.target as HTMLInputElement).value;
+  }
+  toggleConstraints() {
+    this.showConstraints = !this.showConstraints;
   }
 }
