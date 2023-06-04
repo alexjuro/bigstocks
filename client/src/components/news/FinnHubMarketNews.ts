@@ -122,8 +122,9 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
               <div class="article-text-container">
                 <h2 class="article-headline">${this.cleanHeadline(article.headline)}</h2>
                 <p class="article-summary">${article.summary}</p>
-                <a href="${article.url}" target="_blank" rel="noopener">Read more</a>
+                <!-- <a href="${article.url}" target="_blank" rel="noopener">Read more</a> -->
               </div>
+              <a href="${article.url}" target="_blank" rel="noopener" class="article-link">Read more</a>
             </div>
           `
         )}
