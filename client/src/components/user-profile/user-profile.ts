@@ -61,7 +61,7 @@ class Profile extends PageMixin(LitElement) {
               @submit-req="${this.submitRequest}"
               @submit-suc="${this.submitSuccess}"
               @submit-err="${this.submitError}"
-              .data="${{ id: this.user.id, email: this.user.email, name: this.user.name }}"
+              .data="${{ id: this.user.id, email: this.user.email, username: this.user.username }}"
             ></user-profile-details>
             <div class="divider"><hr /></div>
             <user-profile-password
