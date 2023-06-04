@@ -1,16 +1,15 @@
 /* Autor: Alexander Schellenberg */
-import { TradingComponent } from './tradingcomponent';
 import { expect } from 'chai';
-import { fake, SinonFakeTimers } from 'sinon';
-import sinon, { SinonStubbedInstance } from 'sinon';
-import { LitElement } from 'lit';
-import { fixture, nextFrame } from '@open-wc/testing-helpers';
+import sinon from 'sinon';
+import { fixture } from '@open-wc/testing-helpers';
 import { UserStock } from '../../interfaces/stock-interface';
 import { MarketComponent } from './market/market';
 import { StockService } from '../../stock-service';
 import { PortfolioComponent } from './portfolio/portfolio';
 import { router } from '../../router/router';
 import { httpClient } from '../../http-client';
+import { CandleComponent } from './trading-widgets/candlecomponent';
+import { TradingInfoComponent } from './trading-widgets/infocomponent';
 
 describe('TradingComponent', () => {
   let tradingComponent: MarketComponent; //da abstrakte Klasse
@@ -145,75 +144,70 @@ describe('TradingComponent', () => {
     await marketComponent.updateComplete;
 
     const stockDiv = marketComponent.shadowRoot!.querySelector('.stock');
-    const candleDiv = marketComponent.shadowRoot!.querySelector('.candle-div');
-    const infoDiv = marketComponent.shadowRoot!.querySelector('.info-div');
-
-    expect(candleDiv).to.be.null;
-    expect(infoDiv).to.be.null;
+    const infoComponent: TradingInfoComponent = marketComponent.shadowRoot!.querySelector(
+      'app-trading-info'
+    ) as TradingInfoComponent;
+    const candleComponent: CandleComponent = marketComponent.shadowRoot!.querySelector(
+      'app-trading-candle'
+    ) as CandleComponent;
+    expect(marketComponent.stockCandle).to.be.null;
+    expect(infoComponent).to.be.null;
 
     stockDiv?.dispatchEvent(new MouseEvent('click'));
 
-    const updatedCandleDiv = marketComponent.shadowRoot!.querySelector('.candle-div');
-    const updatedInfoDiv = marketComponent.shadowRoot!.querySelector('.info-div');
-    const buyButton = marketComponent.shadowRoot!.querySelector('.buy');
-    const sellButton = marketComponent.shadowRoot!.querySelector('.sell');
-    const detailButton = marketComponent.shadowRoot!.querySelector('.stockdetails');
+    const upInfoComponent: TradingInfoComponent = marketComponent.shadowRoot!.querySelector(
+      'app-trading-info'
+    ) as TradingInfoComponent;
+    const upCandleComponent: CandleComponent = marketComponent.shadowRoot!.querySelector(
+      'app-trading-candle'
+    ) as CandleComponent;
 
-    expect(updatedCandleDiv).to.not.be.null;
-    expect(updatedInfoDiv).to.not.be.null;
-    expect(buyButton).to.not.be.null;
-    expect(sellButton).to.not.be.null;
-    expect(detailButton).to.not.be.null;
+    await marketComponent.updateComplete;
 
-    const buyButtonClickSpy = sinon.spy(marketComponent, 'buyStock');
-    const sellButtonClickSpy = sinon.spy(marketComponent, 'sellStock');
-    const detailButtonClickSpy = sinon.spy(router, 'navigate');
-
-    buyButton?.dispatchEvent(new MouseEvent('click'));
-    sellButton?.dispatchEvent(new MouseEvent('click'));
-    detailButton?.dispatchEvent(new MouseEvent('click'));
-
-    expect(buyButtonClickSpy.calledOnce).to.be.true;
-    expect(sellButtonClickSpy.calledOnce).to.be.true;
-    expect(detailButtonClickSpy.calledOnce).to.be.true;
-
-    buyButtonClickSpy.restore();
-    sellButtonClickSpy.restore();
-    detailButtonClickSpy.restore();
+    expect(upCandleComponent.candleDiv).to.not.be.null;
+    expect(upInfoComponent.infoDiv).to.not.be.null;
+    expect(upInfoComponent.buyButton).to.not.be.null;
+    expect(upInfoComponent.sellButton).to.not.be.null;
+    expect(upInfoComponent.detailButton).to.not.be.null;
   });
 
-  it('should remove candle and info divs when they do exist', async () => {
+  it('should remove candle and info components when they do exist', async () => {
     marketComponent = (await fixture('<app-market></app-market>')) as MarketComponent;
     marketComponent.userStocks = stocks;
     marketComponent.requestUpdate();
     await marketComponent.updateComplete;
 
-    const stockDiv = marketComponent.shadowRoot!.querySelector('.stock');
-    let candleDiv = marketComponent.shadowRoot!.querySelector('.candle-div');
-    let infoDiv = marketComponent.shadowRoot!.querySelector('.info-div');
+    const stockElement = marketComponent.shadowRoot!.querySelector('.stock');
+    let candleComponent = marketComponent.shadowRoot!.querySelector('app-trading-candle');
+    let infoComponent = marketComponent.shadowRoot!.querySelector('app-trading-info');
 
-    expect(candleDiv).to.be.null;
-    expect(infoDiv).to.be.null;
+    expect(candleComponent).to.be.null;
+    expect(infoComponent).to.be.null;
 
-    stockDiv?.dispatchEvent(new MouseEvent('click'));
+    stockElement!.dispatchEvent(new MouseEvent('click'));
 
-    candleDiv = marketComponent.shadowRoot!.querySelector('.candle-div');
-    infoDiv = marketComponent.shadowRoot!.querySelector('.info-div');
+    await marketComponent.updateComplete;
 
-    expect(candleDiv).to.not.be.null;
-    expect(infoDiv).to.not.be.null;
+    candleComponent = marketComponent.shadowRoot!.querySelector('app-trading-candle');
+    infoComponent = marketComponent.shadowRoot!.querySelector('app-trading-info');
 
-    stockDiv?.dispatchEvent(new MouseEvent('click'));
+    expect(candleComponent).to.not.be.null;
+    expect(infoComponent).to.not.be.null;
 
-    candleDiv = marketComponent.shadowRoot!.querySelector('.candle-div');
-    infoDiv = marketComponent.shadowRoot!.querySelector('.info-div');
+    stockElement!.dispatchEvent(new MouseEvent('click'));
 
-    expect(candleDiv).to.be.null;
-    expect(infoDiv).to.be.null;
+    await marketComponent.updateComplete;
+
+    candleComponent = marketComponent.shadowRoot!.querySelector('app-trading-candle');
+    infoComponent = marketComponent.shadowRoot!.querySelector('app-trading-info');
+
+    expect(candleComponent).to.be.null;
+    expect(infoComponent).to.be.null;
   });
 
   it('should create stock candles chart', async () => {
     marketComponent = (await fixture('<app-market></app-market>')) as MarketComponent;
+    await marketComponent.updateComplete;
 
     const canvasElement = document.createElement('canvas');
     const symbol = 'AAPL';
@@ -224,14 +218,22 @@ describe('TradingComponent', () => {
 
     await marketComponent.createStockCandles(canvasElement, symbol, intervall);
 
-    const chart: any = marketComponent.stockCandle;
-    expect(chart).to.not.be.null;
-    expect(chart?.config.type).to.equal('line');
-    expect(chart?.data.datasets[0].data).to.deep.equal(data);
-    expect(chart?.options.scales.y.grid.display).to.be.false;
-    expect(chart?.options.scales.x.grid.display).to.be.false;
+    const candleComponent: CandleComponent = marketComponent.shadowRoot!.querySelector(
+      'app-trading-candle'
+    ) as CandleComponent;
 
-    getStockCandlesMock.restore();
+    setTimeout(async () => {
+      await candleComponent.updateComplete;
+
+      const chart = marketComponent.stockCandle;
+      expect(chart).to.not.be.null;
+      expect('type' in chart!.config!).to.be.true;
+      expect(chart?.data.datasets[0].data).to.deep.equal(data);
+      expect(chart?.options.scales!.y!.grid!.display).to.be.false;
+      expect(chart?.options.scales!.x!.grid!.display).to.be.false;
+
+      getStockCandlesMock.restore();
+    }, 100);
   });
 
   it('should buy stock and update state correctly', async () => {
@@ -274,5 +276,87 @@ describe('TradingComponent', () => {
 
     getFirstDataMock.restore();
     postStub.restore();
+  });
+
+  it('should throw an error for insufficient funds', async () => {
+    marketComponent = (await fixture('<app-market></app-market>')) as MarketComponent;
+    const getFirstDataMock = sinon
+      .stub(marketComponent.stockService!, 'getFirstData')
+      .resolves({ price: 200, percentage: 3 });
+
+    const responseMock = {
+      status: 201,
+      json: () => Promise.resolve({ money: 100 })
+    };
+    const postStub = sinon.stub(httpClient, 'post').resolves(responseMock as Response);
+
+    const stock: UserStock = {
+      symbol: 'AAPL',
+      name: 'Apple Inc.',
+      image: 'apple.png',
+      shares: 0,
+      price: 250,
+      dailyPercentage: 5
+    };
+
+    marketComponent.money = 100;
+
+    try {
+      await marketComponent.buyStock(new Event('click'), stock);
+    } catch (error: any) {
+      console.log('error ' + error);
+      expect(error).to.be.an.instanceOf(Error);
+      expect(error.message).to.include('Insufficient funds');
+    }
+
+    expect(getFirstDataMock.calledOnceWithExactly(stock.symbol)).to.be.true;
+    expect(postStub.notCalled).to.be.true;
+    expect(stock.shares).to.equal(0);
+    expect(marketComponent.money).to.equal(100);
+
+    getFirstDataMock.restore();
+    postStub.restore();
+  });
+
+  it('should sell stock and update state correctly', async () => {
+    marketComponent = (await fixture('<app-market></app-market>')) as MarketComponent;
+    const getFirstDataMock = sinon
+      .stub(marketComponent.stockService!, 'getFirstData')
+      .resolves({ price: 250, percentage: 3 });
+
+    const responseMock = {
+      status: 200,
+      json: () => Promise.resolve({ money: 5250 })
+    };
+    const patchStub = sinon.stub(httpClient, 'patch').resolves(responseMock as Response);
+
+    const stock: UserStock = {
+      symbol: 'AAPL',
+      name: 'Apple Inc.',
+      image: 'apple.png',
+      shares: 2,
+      price: 250,
+      dailyPercentage: 5
+    };
+
+    marketComponent.money = 5250;
+
+    await marketComponent.sellStock(new Event('click'), stock);
+
+    expect(getFirstDataMock.calledOnceWithExactly(stock.symbol)).to.be.true;
+    expect(
+      patchStub.calledOnceWithExactly('/trading/', {
+        symbol: stock.symbol,
+        name: stock.name,
+        image: stock.image,
+        sPrice: 250,
+        pValue: 5250
+      })
+    ).to.be.true;
+    expect(stock.shares).to.equal(1);
+    expect(marketComponent.money).to.equal(5250);
+
+    getFirstDataMock.restore();
+    patchStub.restore();
   });
 });

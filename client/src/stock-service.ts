@@ -88,7 +88,7 @@ export class StockService {
     this.subscriptions.add(symbol);
     this.sendRequest(symbol);
     this.getFirstData(symbol).then(value => {
-      this.notifyPriceObserver(symbol, value.price.toFixed(2)),
+      this.notifyPriceObserver(symbol, Number(value.price.toFixed(2))),
         this.observer!.updateStockDailyPercentage(symbol, Number(value.percentage.toFixed(1)));
     });
   }
@@ -141,7 +141,9 @@ export class StockService {
   public async getFirstData(symbol: string) {
     const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${this.getApiKey()}`);
     const data = await response.json();
-    return { price: data.c, percentage: ((data.c - data.pc) / data.pc) * 100 };
+    const price = Number(data.c.toFixed(2));
+    const percentage = Number((((data.c - data.pc) / data.pc) * 100).toFixed(2));
+    return { price, percentage };
   }
 
   public async getRecommendationBySymbol(symbol: string) {

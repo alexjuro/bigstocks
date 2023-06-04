@@ -168,6 +168,7 @@ export class PortfolioComponent extends TradingComponent {
     cumulatedPrices.unshift(totalMoney);
     this.ChartDoughnut.data.labels = stockNames;
     this.ChartDoughnut.data.datasets[0].data = cumulatedPrices;
+    this.ChartDoughnut.options.plugins.subtitle.text = 'You have ' + this.userStocks.length + ' stocks!';
     this.ChartDoughnut.update();
   }
 
@@ -238,6 +239,12 @@ export class PortfolioComponent extends TradingComponent {
       labels?.push(day);
       data.push(this.money + this.calculateTotalValue());
     }
+    const firstValue = data[0];
+    const lastValue = data[data.length - 1];
+    const percentageChange = ((lastValue - firstValue) / firstValue) * 100;
+    this.ChartGraph.options.plugins.subtitle.text = `${percentageChange.toFixed(2)}% from ${labels[0]} to ${
+      labels[labels.length - 1]
+    }`;
     this.ChartGraph.update();
     this.requestUpdate();
   }
@@ -246,6 +253,7 @@ export class PortfolioComponent extends TradingComponent {
     return html`
       ${this.renderNotification()}
       <div class="container">
+        <app-trading-notification></app-trading-notification>
         <div class="part-container graph-container">
           <h1 id="upp">Portfolio-Graph</h1>
           <div class="graph">
