@@ -95,6 +95,12 @@ a:hover {
   filter: saturate(180%);
 }
 
+.article-link {
+  margin-top: auto;
+  margin-bottom: 0;
+  align-self: flex-start;
+}
+
 /* Responsives Layout für Handys */
 @media (max-width: 980px) {
   .market-news {
