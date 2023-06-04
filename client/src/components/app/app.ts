@@ -11,7 +11,6 @@ import sharedStyle from '../shared.css?inline';
 @customElement('app-root')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class AppComponent extends LitElement {
-  stockService = new StockService();
   static styles = [componentStyle, sharedStyle];
   constructor() {
     super();
@@ -43,7 +42,7 @@ class AppComponent extends LitElement {
         'users/sign-up': () => html`<sign-up></sign-up>`,
         'users/activation': () => html`<app-activation></app-activation>`,
         'users/resetPassword': () => html`<app-resetPassword></app-resetPassword>`,
-        'users/forgotPassword': () => html`<app-forgotPassword></app-forgotPassword>`,
+        'users/forgotPassword': () => html`<app-forgotPassword></app-forgotPassword>`
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;
