@@ -75,13 +75,9 @@ export class MarketComponent extends TradingComponent {
         <div class="market-stocks">
           ${this.userStocks.map(
             stock => html`
-              <app-stock
-                class="stock"
-                id=${stock.symbol}
-                @click="${(event: MouseEvent) => this.handleStockClick(event, stock)}"
-              >
+              <app-stock class="stock" id=${stock.symbol}>
                 <img src="${stock.image}" alt="${stock.name} Logo" />
-                <h2>${stock.name}</h2>
+                <h2 @click=${(event: MouseEvent) => this.handleStockClick(event, stock)}>${stock.name}</h2>
                 <p id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
                 <p class="percentages" id="perc${stock.symbol}">
                   ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
