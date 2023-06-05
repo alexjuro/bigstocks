@@ -57,8 +57,7 @@ export class TransactionHistory extends PageMixin(LitElement) {
 
   async connectedCallback() {
     super.connectedCallback();
-    // TODO: change to /users/auth after merge
-    await httpClient.get('/users/transactions').catch((e: { statusCode: number }) => {
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
       if (e.statusCode === 401) router.navigate('/users/sign-in');
     });
   }
