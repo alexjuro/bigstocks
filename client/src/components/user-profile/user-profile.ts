@@ -1,4 +1,4 @@
-/* Author: Nico Pareigis */
+/* Autor: Nico Pareigis */
 
 import { html, LitElement } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
@@ -31,6 +31,10 @@ class Profile extends PageMixin(LitElement) {
     });
   }
 
+  firstUpdated() {
+    this.dispatchEvent(new CustomEvent('update-pagename', { bubbles: true, composed: true, detail: 'Profile' }));
+  }
+
   render() {
     return html`
       ${until(
@@ -47,7 +51,7 @@ class Profile extends PageMixin(LitElement) {
               </form>
             </dialog>
 
-            <h2>Profile</h2>
+            <h2>Account</h2>
             <user-profile-avatar
               .data=${{ id: this.user.id, avatar: this.user.avatar }}
               @load-err="${this.loadError}"
@@ -68,7 +72,14 @@ class Profile extends PageMixin(LitElement) {
               @submit-suc="${this.submitSuccess}"
               @submit-err="${this.submitError}"
               .data="${{ id: this.user.id, password: this.user.password }}"
-            ></user-profile-password>`;
+            ></user-profile-password>
+
+            <div class="divider"><hr /></div>
+            <h2>Transactions</h2>
+            <p>
+              To view your past transactions, click
+              <a @click="${() => router.navigate('/transactions')}">here</a>.
+            </p>`;
         }),
         html`<is-loading></is-loading>`
       )}
