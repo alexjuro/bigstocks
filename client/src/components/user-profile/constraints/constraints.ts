@@ -18,7 +18,7 @@ export type Constraint = {
 class Constraints extends PageMixin(LitElement) {
   static styles = [sharedStyle, sharedLocalStyle, componentStyle];
 
-  @property() title = 'Contraints';
+  @property() title = 'Constraints';
   @property() constraints!: Constraint[];
 
   @query('.content') content!: HTMLDivElement;
