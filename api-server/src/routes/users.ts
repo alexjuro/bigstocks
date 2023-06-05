@@ -170,8 +170,8 @@ router.post('/sign-up', async (req, res) => {
   if (hasNotRequiredFields(req.body, ['email', 'username'], errors)) {
     return sendErrMsg(errors.join('\n'));
   }
-  const filter: Partial<User> = { email: req.body.email };
-  filter.email = filter.email?.toUpperCase();
+  const filter: Partial<User> = { compareEmail: req.body.compareEmail };
+  filter.compareEmail = filter.compareEmail?.toUpperCase();
   if (await userDAO.findOne(filter)) {
     return sendErrMsg('Invalid Input');
   }
@@ -192,7 +192,7 @@ router.post('/sign-up', async (req, res) => {
   const newCode = createNumber();
   const newUser = await userDAO.create({
     username: req.body.username,
-    email: req.body.email.toUpperCase(),
+    email: req.body.email,
     password: 'wait for activation',
     safetyAnswerOne: 'wait for activation',
     safetyAnswerTwo: 'wait for activation',
@@ -204,7 +204,7 @@ router.post('/sign-up', async (req, res) => {
     performance: [{ date: new Date().toISOString(), value: 5000 }],
     role: Role.USER,
     avatar: '',
-    friends: [{ name: 'blank', accepted: false }]
+    compareEmail: req.body.email.toUpperCase()
   });
   if (newUser) {
     await sendCodeActivation(newUser.email, newCode);
