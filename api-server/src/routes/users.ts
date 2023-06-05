@@ -170,7 +170,7 @@ router.post('/sign-up', async (req, res) => {
   if (hasNotRequiredFields(req.body, ['email', 'username'], errors)) {
     return sendErrMsg(errors.join('\n'));
   }
-  const filter: Partial<User> = { compareEmail: req.body.compareEmail };
+  const filter: Partial<User> = { compareEmail: req.body.email };
   filter.compareEmail = filter.compareEmail?.toUpperCase();
   if (await userDAO.findOne(filter)) {
     return sendErrMsg('Invalid Input');
