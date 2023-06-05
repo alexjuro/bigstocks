@@ -203,7 +203,8 @@ router.post('/sign-up', async (req, res) => {
     money: 5000,
     performance: [{ date: new Date().toISOString(), value: 5000 }],
     role: Role.USER,
-    avatar: ''
+    avatar: '',
+    friends: [{ name: 'blank', accepted: false }]
   });
   if (newUser) {
     await sendCodeActivation(newUser.email, newCode);
