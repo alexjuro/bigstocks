@@ -140,7 +140,6 @@ img {
   max-width: 40px;
   height: auto;
   object-fit: contain;
-  clip-path: inset(94% 0 round 4px);
 }
 
 p.profit {
