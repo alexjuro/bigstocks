@@ -62,9 +62,12 @@ export class TransactionHistory extends PageMixin(LitElement) {
     });
   }
 
+  firstUpdated() {
+    this.dispatchEvent(new CustomEvent('update-pagename', { bubbles: true, composed: true, detail: 'Transactions' }));
+  }
+
   render() {
     return html`<div class="container">
-      <div class="intro">Transaction History</div>
       ${until(
         this.transactions
           .then(json => {

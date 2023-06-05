@@ -31,6 +31,10 @@ class Profile extends PageMixin(LitElement) {
     });
   }
 
+  firstUpdated() {
+    this.dispatchEvent(new CustomEvent('update-pagename', { bubbles: true, composed: true, detail: 'Account' }));
+  }
+
   render() {
     return html`
       ${until(
