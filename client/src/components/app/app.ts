@@ -42,7 +42,8 @@ class AppComponent extends LitElement {
         'users/sign-up': () => html`<sign-up></sign-up>`,
         'users/activation': () => html`<app-activation></app-activation>`,
         'users/resetPassword': () => html`<app-resetPassword></app-resetPassword>`,
-        'users/forgotPassword': () => html`<app-forgotPassword></app-forgotPassword>`
+        'users/forgotPassword': () => html`<app-forgotPassword></app-forgotPassword>`,
+        'cool': () => html`<app-minesweeper></app-minesweeper>`
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;

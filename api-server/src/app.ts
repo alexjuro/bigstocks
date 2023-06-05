@@ -17,6 +17,8 @@ import account from './routes/account-management.js';
 import mainPage from './routes/mainPage.js';
 import trading from './routes/trading.js';
 import transaction from './routes/transaction.js';
+import friends from './routes/friends.js';
+import leaderboard from './routes/leaderboard.js';
 import config from '../config.json' assert { type: 'json' };
 import comment from './routes/comment.js';
 
@@ -36,6 +38,8 @@ function configureApp(app: Express) {
   app.use('/api/users', users);
   app.use('/api/main', mainPage);
   app.use('/api/comment', comment);
+  app.use('/api/friends', friends);
+  app.use('/api/leaderboard', leaderboard);
   // TODO: Routen einbinden
 }
 

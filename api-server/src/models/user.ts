@@ -21,4 +21,5 @@ export interface User extends Entity {
   code: number;
   new: boolean;
   rating: boolean;
+  friends: [{ name: string; accepted: boolean }];
 }
