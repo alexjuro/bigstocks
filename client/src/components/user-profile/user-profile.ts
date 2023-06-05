@@ -32,7 +32,7 @@ class Profile extends PageMixin(LitElement) {
   }
 
   firstUpdated() {
-    this.dispatchEvent(new CustomEvent('update-pagename', { bubbles: true, composed: true, detail: 'Account' }));
+    this.dispatchEvent(new CustomEvent('update-pagename', { bubbles: true, composed: true, detail: 'Profile' }));
   }
 
   render() {
@@ -51,7 +51,7 @@ class Profile extends PageMixin(LitElement) {
               </form>
             </dialog>
 
-            <h2>Profile</h2>
+            <h2>Account</h2>
             <user-profile-avatar
               .data=${{ id: this.user.id, avatar: this.user.avatar }}
               @load-err="${this.loadError}"
