@@ -41,7 +41,7 @@ router.post('/avatar', authService.authenticationMiddleware, async (req, res) =>
     !(
       isValid<Avatar>(
         new Map([
-          ['id', 'number'],
+          ['id', 'string'],
           ['avatar', 'string']
         ]),
         req.body
@@ -69,7 +69,7 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
     !(
       isValid<Details>(
         new Map([
-          ['id', 'number'],
+          ['id', 'string'],
           ['email', 'string'],
           ['username', 'string']
         ]),
@@ -96,7 +96,7 @@ router.post('/password', authService.authenticationMiddleware, async (req, res) 
     !(
       isValid<Password>(
         new Map([
-          ['id', 'number'],
+          ['id', 'string'],
           ['password', 'string']
         ]),
         req.body
