@@ -95,7 +95,14 @@ describe('app-portfolio', () => {
     };
     const fakeChart = {
       data: chartData,
-      update: sinon.stub()
+      update: sinon.stub(),
+      options: {
+        plugins: {
+          subtitle: {
+            text: ''
+          }
+        }
+      }
     };
 
     fixtureElement.ChartGraph = fakeChart as unknown as Chart;
@@ -141,6 +148,13 @@ describe('app-portfolio', () => {
             backgroundColor: ['#E58400', '#663399']
           }
         ]
+      },
+      options: {
+        plugins: {
+          subtitle: {
+            text: ''
+          }
+        }
       },
       update: sinon.stub()
     };
