@@ -147,13 +147,13 @@ describe('TradingComponent', () => {
     const infoComponent: TradingInfoComponent = marketComponent.shadowRoot!.querySelector(
       'app-trading-info'
     ) as TradingInfoComponent;
-    const candleComponent: CandleComponent = marketComponent.shadowRoot!.querySelector(
-      'app-trading-candle'
-    ) as CandleComponent;
     expect(marketComponent.stockCandle).to.be.null;
     expect(infoComponent).to.be.null;
 
-    stockDiv?.dispatchEvent(new MouseEvent('click'));
+    const h2Element = stockDiv?.querySelector('h2');
+    if (h2Element) {
+      h2Element.dispatchEvent(new MouseEvent('click'));
+    }
 
     const upInfoComponent: TradingInfoComponent = marketComponent.shadowRoot!.querySelector(
       'app-trading-info'
@@ -184,7 +184,10 @@ describe('TradingComponent', () => {
     expect(candleComponent).to.be.null;
     expect(infoComponent).to.be.null;
 
-    stockElement!.dispatchEvent(new MouseEvent('click'));
+    let h2Element = stockElement?.querySelector('h2');
+    if (h2Element) {
+      h2Element.dispatchEvent(new MouseEvent('click'));
+    }
 
     await marketComponent.updateComplete;
 
@@ -194,7 +197,10 @@ describe('TradingComponent', () => {
     expect(candleComponent).to.not.be.null;
     expect(infoComponent).to.not.be.null;
 
-    stockElement!.dispatchEvent(new MouseEvent('click'));
+    h2Element = stockElement?.querySelector('h2');
+    if (h2Element) {
+      h2Element.dispatchEvent(new MouseEvent('click'));
+    }
 
     await marketComponent.updateComplete;
 
