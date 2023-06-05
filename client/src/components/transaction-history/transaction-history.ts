@@ -1,4 +1,4 @@
-/* Author: Nico Pareigis */
+/* Autor: Nico Pareigis */
 
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';

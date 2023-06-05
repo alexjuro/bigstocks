@@ -1,4 +1,4 @@
-/* Author: Nico Pareigis */
+/* Autor: Nico Pareigis */
 
 import { fixture, html } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
