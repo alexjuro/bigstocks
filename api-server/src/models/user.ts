@@ -21,4 +21,5 @@ export interface User extends Entity {
   code: number;
   new: boolean;
   rating: boolean;
+  compareEmail: string;
 }
