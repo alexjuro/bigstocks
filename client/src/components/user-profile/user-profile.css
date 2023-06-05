@@ -5,6 +5,15 @@
   margin: 1rem;
 }
 
+a {
+  text-decoration: underline;
+}
+
+a:hover {
+  cursor: pointer;
+  color: var(--secondary);
+}
+
 dialog {
   border: 0.4rem solid var(--secondary);
   border-radius: 6px;

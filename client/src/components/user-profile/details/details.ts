@@ -92,7 +92,6 @@ export class ProfileMain extends PageMixin(LitElement) {
     this.checkValidity(true);
 
     if (!this.form.checkValidity()) return this.form.classList.add('was-validated');
-
     if (this.email.value === this.data.email && this.name.value === this.data.username) return;
 
     this.dispatchEvent(

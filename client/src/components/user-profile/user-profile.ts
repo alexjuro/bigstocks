@@ -72,7 +72,14 @@ class Profile extends PageMixin(LitElement) {
               @submit-suc="${this.submitSuccess}"
               @submit-err="${this.submitError}"
               .data="${{ id: this.user.id, password: this.user.password }}"
-            ></user-profile-password>`;
+            ></user-profile-password>
+
+            <div class="divider"><hr /></div>
+            <h2>Transactions</h2>
+            <p>
+              To view your past transactions, click
+              <a @click="${() => router.navigate('/transactions')}">here</a>.
+            </p>`;
         }),
         html`<is-loading></is-loading>`
       )}
