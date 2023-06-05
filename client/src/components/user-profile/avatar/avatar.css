@@ -28,7 +28,7 @@ h4 {
 img {
   display: inline;
   width: 84px;
-  height: auto;
+  height: 84px;
   object-fit: cover;
   background-color: #f0f0f8;
   border: 2px solid var(--primary);
