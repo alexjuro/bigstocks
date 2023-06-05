@@ -50,7 +50,7 @@ nav ul {
   z-index: 10;
   border-radius: 50%;
   position: relative;
-  left: 60px;
+  left: 90px;
   top: -10px;
   transition: all 0.3s ease-in-out;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 10px;
@@ -138,7 +138,7 @@ img {
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1300px) {
   #left {
     width: 30%;
   }

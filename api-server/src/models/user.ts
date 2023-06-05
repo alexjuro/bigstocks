@@ -22,4 +22,5 @@ export interface User extends Entity {
   new: boolean;
   rating: boolean;
   compareEmail: string;
+  friends: [{ username: string; email: string; accepted: boolean }];
 }

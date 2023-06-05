@@ -1,10 +1,14 @@
 import { LitElement, html, css } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { httpClient } from '../../http-client.js';
+import { customElement, eventOptions, property } from 'lit/decorators.js';
 import componentStyle from './secret.css?inline';
 
 @customElement('app-minesweeper')
 class SecretAppComponent extends LitElement {
   static styles = componentStyle;
+
+  @property({ type: Array })
+  requests: any[] = [];
 
   rows = 8;
   cols = 8;
@@ -172,8 +176,22 @@ class SecretAppComponent extends LitElement {
     console.log('great success');
   }
 
-  firstUpdated() {
+  @eventOptions({ capture: true })
+  async firstUpdated() {
     this.initGame();
+
+    const appHeader = this.dispatchEvent(
+      new CustomEvent('update-pagename', { detail: 'Minesweeper', bubbles: true, composed: true })
+    );
+
+    try {
+      const response = await httpClient.get('minesweeper');
+      const data = await response.json();
+
+      console.log('data:', data);
+    } catch (e) {
+      console.log((e as Error).message, 'error');
+    }
   }
 
   render() {
