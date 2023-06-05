@@ -26,6 +26,7 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
   minId = 0;
   articles: Article[] = [];
   error = '';
+  pagenName = 'News';
 
   static get properties() {
     return {
@@ -37,12 +38,17 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
     };
   }
   async firstUpdated() {
+    const appHeader = this.dispatchEvent(
+      new CustomEvent('update-pagename', { detail: this.pagenName, bubbles: true, composed: true })
+    );
     try {
       this.startAsyncInit();
+      await httpClient.get('/users/auth' + location.search);
       const newStatusJSON = await httpClient.get('/users/new' + location.search);
       const newStatus = (await newStatusJSON.json()).new;
+      console.log(newStatus);
       if (newStatus) {
-        this.showNotification('new user was created successfully', 'info');
+        this.showNotification('New user was created successfully', 'info');
       }
     } catch (e) {
       if ((e as { statusCode: number }).statusCode === 401) {
@@ -68,7 +74,7 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
         throw new Error('No news articles found.');
       }
       //this.articles = data as Article[];
-      this.articles = data.sort((a, b) => b.datetime - a.datetime).slice(0, 12) as Article[];
+      this.articles = data.sort((a, b) => b.datetime - a.datetime).slice(0, 15) as Article[];
     } catch (error) {
       //Damit Error nicht vom Typ Unkown ist
       console.error(error);
@@ -100,7 +106,7 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
 
   render() {
     return html`
-      <h1 class="market-news-header">Market News</h1>
+      ${this.renderNotification()}
       <div class="market-news">
         ${this.error ? html`<p>Error: ${this.error}</p>` : ''}
         ${this.articles.map(
@@ -116,8 +122,9 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
               <div class="article-text-container">
                 <h2 class="article-headline">${this.cleanHeadline(article.headline)}</h2>
                 <p class="article-summary">${article.summary}</p>
-                <a href="${article.url}" target="_blank" rel="noopener">Read more</a>
+                <!-- <a href="${article.url}" target="_blank" rel="noopener">Read more</a> -->
               </div>
+              <a href="${article.url}" target="_blank" rel="noopener" class="article-link">Read more</a>
             </div>
           `
         )}

@@ -7,13 +7,13 @@ import bcrypt from 'bcryptjs';
 import './password';
 import { UserData } from '../types';
 import { LitElement } from 'lit';
+import { ProfilePassword } from './password';
 
-// FIX: dispatchEvent-spies not being called
 describe('user-profile-password', () => {
   let userData: Pick<UserData, 'id' | 'password'>;
   const ctPassword = 'strongPassword1';
 
-  let el: LitElement;
+  let el: ProfilePassword;
   let sr: ShadowRoot;
   let pass1: HTMLInputElement;
   let pass2: HTMLInputElement;
@@ -24,7 +24,7 @@ describe('user-profile-password', () => {
       password: await bcrypt.hash(ctPassword, 10)
     };
 
-    el = (await fixture(html`<user-profile-password .data="${userData}"></user-profile-password>`)) as LitElement;
+    el = (await fixture(html`<user-profile-password .data="${userData}"></user-profile-password>`)) as ProfilePassword;
     sr = el.shadowRoot!;
     pass1 = sr.querySelector('#pass1') as HTMLInputElement;
     pass2 = sr.querySelector('#pass2') as HTMLInputElement;
@@ -89,6 +89,40 @@ describe('user-profile-password', () => {
     expect(checkValidity.returned(true)).to.be.true;
     expect(compare.calledOnceWith(ctPassword, userData.password)).to.be.true;
     expect((await listener).detail).to.be.an('error');
+  });
+
+  it('should toggle password visibility', async () => {
+    expect(pass1.type).to.equal('password');
+    expect(pass2.disabled).to.be.false;
+
+    (sr.querySelector('span') as HTMLSpanElement).click();
+    await el.updateComplete;
+
+    expect(pass1.type).to.equal('text');
+    expect(pass2.disabled).to.be.true;
+  });
+
+  it('should toggle and update password entropy', async () => {
+    // visibility
+    expect(el.visibility).to.equal('hidden');
+
+    pass1.dispatchEvent(new Event('focus'));
+    await el.updateComplete;
+
+    expect(el.visibility).to.equal('visible');
+
+    pass1.dispatchEvent(new Event('blur'));
+    await el.updateComplete;
+
+    expect(el.visibility).to.equal('hidden');
+
+    // entropy
+    pass1.value = 'A';
+
+    pass1.dispatchEvent(new Event('input'));
+    await el.updateComplete;
+
+    expect(el.entropy).to.be.closeTo(4.7, 0.1);
   });
 
   it('should submit successfully', async () => {

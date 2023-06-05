@@ -10,10 +10,16 @@ export enum Role {
 export interface User extends Entity {
   avatar: string;
   email: string;
-  name: string;
+  username: string;
   password: string;
   role: Role;
-  new: boolean;
   money: number;
   performance: [{ date: string; value: number }];
+  safetyAnswerOne: string;
+  safetyAnswerTwo: string;
+  activation: boolean;
+  code: number;
+  new: boolean;
+  rating: boolean;
+  compareEmail: string;
 }

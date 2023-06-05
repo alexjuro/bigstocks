@@ -53,7 +53,7 @@ describe('user-profile-details', () => {
     expect(eventSpy.calledWith(sinon.match.instanceOf(CustomEvent))).to.be.false;
 
     // -------------
-    sinon.restore();
+    sinon.reset();
     // -------------
 
     // invalid name
@@ -66,7 +66,7 @@ describe('user-profile-details', () => {
     expect(eventSpy.calledWith(sinon.match.instanceOf(CustomEvent))).to.be.false;
 
     // -------------
-    sinon.restore();
+    sinon.reset();
     // -------------
 
     // invalid email

@@ -18,7 +18,7 @@ export interface Note {
 }
 
 @customElement('app-trading-details')
-class TradingDetailsComponent extends PageMixin(LitElement) {
+export class TradingDetailsComponent extends PageMixin(LitElement) {
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
 
   @property({ type: Object })

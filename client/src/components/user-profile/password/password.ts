@@ -12,8 +12,7 @@ import { Constraint } from '../constraints/constraints';
 import bcrypt from 'bcryptjs';
 
 @customElement('user-profile-password')
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-class ProfilePassword extends PageMixin(LitElement) {
+export class ProfilePassword extends PageMixin(LitElement) {
   static styles = [sharedStyle, sharedLocalStyle, componentStyle];
 
   @property() data!: Pick<UserData, 'id' | 'password'>;
@@ -68,7 +67,7 @@ class ProfilePassword extends PageMixin(LitElement) {
             required
           />
           <div><span @click="${this.togglePasswordVisibility}"></span></div>
-          <div class="indicator" style="--color:${this.color};--visibility:${this.visibility}"></div>
+          <div class="entropy" style="--color:${this.color};--visibility:${this.visibility}"></div>
           <div class="invalid-feedback">Password does not match constraints.</div>
         </div>
         <div>
