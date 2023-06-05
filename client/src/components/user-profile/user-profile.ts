@@ -1,7 +1,7 @@
 /* Author: Nico Pareigis */
 
 import { html, LitElement } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, query, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 import sharedStyle from '../shared.css?inline';
 import sharedLocalStyle from './shared-local.css?inline';
@@ -21,7 +21,7 @@ class Profile extends PageMixin(LitElement) {
   @query('form') form!: HTMLFormElement;
   @query('input') input!: HTMLInputElement;
 
-  private userInfo = httpClient.get('/users/account');
+  @state() request = httpClient.get('/users/account').then(async res => (await res.json()) as UserData);
   private user!: UserData;
 
   async connectedCallback() {
@@ -35,8 +35,8 @@ class Profile extends PageMixin(LitElement) {
   render() {
     return html`
       ${until(
-        this.userInfo.then(async res => {
-          this.user = await res.json();
+        this.request.then(json => {
+          this.user = json;
 
           return html`${this.renderNotification()}
             <dialog>
@@ -98,6 +98,7 @@ class Profile extends PageMixin(LitElement) {
   }
 
   submitSuccess(e: CustomEvent) {
+    this.request = httpClient.get('/users/account').then(async res => (await res.json()) as UserData);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     this.showNotification(e.detail, 'info');
   }
