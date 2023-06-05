@@ -146,19 +146,22 @@ export class ProfilePassword extends PageMixin(LitElement) {
     this.dispatchEvent(
       new CustomEvent('submit-req', {
         bubbles: true,
-        detail: async () => {
-          this.data.password = this.pass.value;
+        detail: {
+          cb: async () => {
+            this.data.password = this.pass.value;
 
-          await httpClient
-            .post('/users/account/password', this.data)
-            .then(() => httpClient.delete('/users/sign-out'))
-            .then(() => {
-              window.location.assign('/users/sign-in');
-              this.dispatchEvent(
-                new CustomEvent('submit-suc', { bubbles: true, detail: 'Password updated successfully.' })
-              );
-            })
-            .catch(e => this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e })));
+            await httpClient
+              .post('/users/account/password', this.data)
+              .then(() => httpClient.delete('/users/sign-out'))
+              .then(() => {
+                window.location.assign('/users/sign-in');
+                this.dispatchEvent(
+                  new CustomEvent('submit-suc', { bubbles: true, detail: 'Password updated successfully.' })
+                );
+              })
+              .catch(e => this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e })));
+          },
+          confirm: true
         }
       })
     );

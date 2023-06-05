@@ -95,7 +95,7 @@ class Profile extends PageMixin(LitElement) {
     if (!(await compare(this.input.value, this.user.password)))
       return this.showNotification('Incorrect password.', 'error');
 
-    await this.confirmCb();
+    await this.cb();
   }
 
   loadError(e: CustomEvent) {
@@ -103,7 +103,9 @@ class Profile extends PageMixin(LitElement) {
   }
 
   async submitRequest(e: CustomEvent) {
-    this.confirmCb = e.detail;
+    const { cb, confirm } = e.detail;
+    if (!confirm) return cb();
+    this.cb = cb;
     this.modal.showModal();
   }
 
@@ -118,5 +120,5 @@ class Profile extends PageMixin(LitElement) {
     this.showNotification((e.detail as Error).message, 'error');
   }
 
-  private confirmCb = async () => this.showNotification('Error calling internal.', 'error');
+  private cb = async () => this.showNotification('Error calling internal.', 'error');
 }
