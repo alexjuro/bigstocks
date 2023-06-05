@@ -1,4 +1,4 @@
-/* Author: Nico Pareigis */
+/* Autor: Nico Pareigis */
 
 import { html, LitElement } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
@@ -33,7 +33,7 @@ export class ProfileMain extends PageMixin(LitElement) {
   render() {
     return html`<div class="container">
       <div class="description">
-        <h3>Account Information</h3>
+        <h3>General Information</h3>
         <p>General account information.</p>
         <field-constraints .constraints="${this.constraints}"></field-constraints>
       </div>
@@ -92,7 +92,6 @@ export class ProfileMain extends PageMixin(LitElement) {
     this.checkValidity(true);
 
     if (!this.form.checkValidity()) return this.form.classList.add('was-validated');
-
     if (this.email.value === this.data.email && this.name.value === this.data.username) return;
 
     this.dispatchEvent(
