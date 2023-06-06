@@ -70,6 +70,7 @@ class ActivationComponent extends PageMixin(LitElement) {
                 placeholder="Code"
                 min="99999"
                 max="999999"
+                autofocus
               />
               <div class="invalid-feedback">Code is required and must be valid</div>
             </div>

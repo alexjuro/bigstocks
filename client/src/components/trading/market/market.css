@@ -14,8 +14,14 @@
   background-color: white;
   padding: 10px;
   text-align: center;
-  box-shadow: 0 0 15px 0 rgba(173, 168, 168, 0.2), 0 5px 5px 0 rgba(186, 183, 183, 0.24);
   border-radius: 1em;
+  box-shadow: 0 0 10px 0 rgba(173, 168, 168, 0.2), 0 10px 10px 0 rgba(186, 183, 183, 0.24), inset 0 0 0 0 #fbfbfa;
+  transition: 0.2s ease-in-out, 0.3s ease-in-out;
+}
+
+.stock:hover {
+  box-shadow: 0 0 10px 0 rgba(173, 168, 168, 0.2), 0 10px 10px 0 rgba(186, 183, 183, 0.24),
+    inset 600px 0 0 0 rgb(255, 246, 227);
 }
 
 @media screen and (max-width: 1200px) {
@@ -32,8 +38,4 @@
 
 h2 {
   font-size: 18px;
-}
-
-.stock:hover {
-  box-shadow: inset 800px 0 0 0 #f4f2f5d4;
 }

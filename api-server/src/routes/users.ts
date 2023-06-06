@@ -170,7 +170,7 @@ router.post('/sign-up', async (req, res) => {
   if (hasNotRequiredFields(req.body, ['email', 'username'], errors)) {
     return sendErrMsg(errors.join('\n'));
   }
-  const filter: Partial<User> = { compareEmail: req.body.compareEmail };
+  const filter: Partial<User> = { compareEmail: req.body.email };
   filter.compareEmail = filter.compareEmail?.toUpperCase();
   if (await userDAO.findOne(filter)) {
     return sendErrMsg('Invalid Input');
@@ -181,7 +181,7 @@ router.post('/sign-up', async (req, res) => {
   }
 
   if (checkEmail(req.body.email)) {
-    return sendErrMsg('Invalid input');
+    return sendErrMsg('Invalid Input');
   }
 
   const filter2: Partial<User> = { username: req.body.username };
@@ -204,7 +204,9 @@ router.post('/sign-up', async (req, res) => {
     performance: [{ date: new Date().toISOString(), value: 5000 }],
     role: Role.USER,
     avatar: '',
-    compareEmail: req.body.email.toUpperCase()
+    compareEmail: req.body.email.toUpperCase(),
+    friends: [{ username: 'blank', email: 'blank', accepted: false }],
+    trials: { date: new Date().toISOString(), value: 3 }
   });
   if (newUser) {
     await sendCodeActivation(newUser.email, newCode);

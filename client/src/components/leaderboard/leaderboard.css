@@ -20,7 +20,8 @@ body {
 
 #pagetitle {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 0px 20px;
   align-items: center;
   height: 8vh;
   width: 100%;
@@ -32,6 +33,14 @@ body {
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
   font-size: 30px;
+}
+
+#pagetitle button {
+  background-color: var(--primary);
+  border: 1px solid black;
+  padding: 0px 10px;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 #imagesflex {
@@ -91,7 +100,7 @@ body {
 }
 
 button {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0);
   font-size: 25px;
   border: none;
   cursor: pointer;

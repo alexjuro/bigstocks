@@ -1,5 +1,5 @@
 /* Autor: Alexander Lesnjak */
-//TODO: show the daily/live performance of the user
+//TODO: show the picture of the user
 //TODO: make the accept and decline buttons work
 //TODO: make the add friend not redirect to another website
 //TODO: stop autofill
@@ -7,7 +7,7 @@
 
 import { LitElement, PropertyValueMap, html } from 'lit';
 import { httpClient } from '../../http-client.js';
-import { customElement, query, property } from 'lit/decorators.js';
+import { customElement, query, property, eventOptions } from 'lit/decorators.js';
 import { router } from '../../router/router.js';
 import componentStyle from './friends.css?inline';
 
@@ -27,10 +27,17 @@ class AppFriendsComponent extends LitElement {
   @property({ type: Array })
   friends: any[] = [];
 
+  @eventOptions({ capture: true })
   protected async firstUpdated() {
+    const appHeader = this.dispatchEvent(
+      new CustomEvent('update-pagename', { detail: 'Friends', bubbles: true, composed: true })
+    );
+
     try {
       const response = await httpClient.get('friends');
       const data = await response.json();
+
+      //filters the data by accepted state
       const friendsArray = data.friends;
 
       const friends = friendsArray.filter((friend: any) => friend.accepted === true);
@@ -44,7 +51,7 @@ class AppFriendsComponent extends LitElement {
           const formattedValue = performance.value.toLocaleString('de-DE', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-            useGrouping: true
+            useGrouping: false
           });
 
           return { ...performance, value: formattedValue };
@@ -54,11 +61,12 @@ class AppFriendsComponent extends LitElement {
       });
 
       this.friends = friendsNew;
-
-      console.log('Friends:', this.friends);
-      console.log('Requests:', this.requests);
     } catch (e) {
-      console.log((e as Error).message, 'error');
+      if ((e as Error).message == 'Unauthorized!') {
+        router.navigate('/user/sign-in');
+      } else {
+        console.log((e as Error).message);
+      }
     }
   }
 
@@ -102,7 +110,7 @@ class AppFriendsComponent extends LitElement {
                     <div class="a">
                       <div class="frame"></div>
                     </div>
-                    <div class="b"><button>${request.name}</button></div>
+                    <div class="b"><button>${request.username}</button></div>
                     <div class="c">
                       <button @click="${this.accept(request.name)}">accept</button>
                       <button>decline</button>
@@ -122,7 +130,7 @@ class AppFriendsComponent extends LitElement {
                     <div class="a">
                       <div class="frame"></div>
                     </div>
-                    <div class="b"><button>${friend.name}</button></div>
+                    <div class="b"><button>${friend.username}</button></div>
                     <div class="c">${friend.performance[0].value} €</div>
                   </div>
                 `
@@ -141,10 +149,15 @@ class AppFriendsComponent extends LitElement {
 
   async _addFriend() {
     const friend = this.nameElement.value;
-
     try {
-      await httpClient.post('friends', friend);
-      this._displaySuccess();
+      const response = await httpClient.post('friends', { username: friend });
+      console.log(friend);
+
+      if (response.ok) {
+        this._displaySuccess();
+      } else {
+        // Handle error response
+      }
     } catch (e) {
       this._displayError((e as Error).message);
       console.log((e as Error).message);
