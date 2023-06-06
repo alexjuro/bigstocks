@@ -74,9 +74,9 @@ class AppHeader extends PageMixin(LitElement) {
           <ul>
             <li><button type="button" @click="${this.getNews}">news</button></li>
             <li><button type="button" @click="${this.getPortfolio}">portfolio</button></li>
-            <li><button type="button" @click="${this.getPortfolio}">market</button></li>
-            <li><button type="button" @click="${this.getMarket}">profile</button></li>
-            <li><button type="button" @click="${this.getProfile}">sign-in</button></li>
+            <li><button type="button" @click="${this.getMarket}">market</button></li>
+            <li><button type="button" @click="${this.getProfile}">profile</button></li>
+            <li><button type="button" @click="${this.getSignIn}">sign-in</button></li>
           </ul>
         </nav>
       </div>
@@ -91,7 +91,7 @@ class AppHeader extends PageMixin(LitElement) {
             <button type="button" @click="${this.getPortfolio}">portfolio</button>
             <button type="button" @click="${this.getMarket}">market</button>
             <button type="button" @click="${this.getProfile}">profile</button>
-            <button type="button" @click="${this.getProfile}">sign-in</button>
+            <button type="button" @click="${this.getSignIn}">sign-in</button>
           </nav>
           <button id="btn" @click="${this.toggle}">
             <img src="/list.svg" alt="" height="27px" />
@@ -172,6 +172,23 @@ class AppHeader extends PageMixin(LitElement) {
   async getProfile() {
     try {
       router.navigate('/profile');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
+  }
+
+  async getSignIn() {
+    try {
+      router.navigate('/user/sign-in');
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }
