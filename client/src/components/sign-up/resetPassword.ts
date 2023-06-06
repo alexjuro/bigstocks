@@ -58,7 +58,7 @@ class ActivationComponent extends PageMixin(LitElement) {
             <div>
               <label for="Code">Code</label>
               <input .value="${this.code}"
-                @input="${this.handleCodeChange}" type="number" required id="code" placeholder="Code" min="99999" max="999999"/>
+                @input="${this.handleCodeChange}" type="number" required id="code" placeholder="Code" min="99999" max="999999" autofocus/>
               <div class="invalid-feedback">Code is required and must be valid</div>
             </div>
               <div>

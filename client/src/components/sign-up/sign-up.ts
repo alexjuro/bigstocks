@@ -35,7 +35,7 @@ class SignUpComponent extends PageMixin(LitElement) {
             <button id="constraintButton" type="button" @click="${this.toggleConstraints}">?</button>
             <div>
               <label for="username">Username</label>
-              <input minlength="4" maxlength="32" type="text" autofocus required id="username" placeholder="Username" @input=${this.handleUsernameChange} .value=${this.username} />
+              <input autofocus minlength="4" maxlength="32" type="text" autofocus required id="username" placeholder="Username" @input=${this.handleUsernameChange} .value=${this.username} />
               <div class="invalid-feedback">Username must be valid</div>
             </div>
             <div>
