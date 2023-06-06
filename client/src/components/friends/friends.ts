@@ -1,6 +1,7 @@
 /* Autor: Alexander Lesnjak */
 //TODO: show the picture of the user
 //TODO: show success
+//TODO: reload after eg. accept friend
 
 import { LitElement, PropertyValueMap, html } from 'lit';
 import { httpClient } from '../../http-client.js';
@@ -166,7 +167,9 @@ class AppFriendsComponent extends LitElement {
                       request => html`
                         <div class="friendelem">
                           <div class="a">
-                            <div class="frame"></div>
+                            <div class="frame">
+                              <img src="${request.avatar}" />
+                            </div>
                           </div>
                           <div class="b"><button>${request.username}</button></div>
                           <div class="c">
@@ -186,7 +189,9 @@ class AppFriendsComponent extends LitElement {
                       friend => html`
                         <div class="friendelem">
                           <div class="a">
-                            <div class="frame"></div>
+                            <div class="frame">
+                              <img src="${friend.avatar}" />
+                            </div>
                           </div>
                           <div class="b"><button>${friend.username}</button></div>
                           <div class="c">${friend.performance[0].value} €</div>

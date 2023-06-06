@@ -159,12 +159,18 @@ button {
 }
 
 .frame {
-  height: 85%;
+  height: 80px;
   aspect-ratio: 1;
   border-radius: 50%;
   outline: 1px solid rgba(0, 0, 0, 0.5);
   outline-offset: 3px;
   background-color: rgba(0, 0, 0, 0.7);
+}
+
+.frame img {
+  width: inherit;
+  height: inherit;
+  border-radius: 50%;
 }
 
 .b {
@@ -256,6 +262,12 @@ button {
   position: relative;
 }
 
+@media (max-width: 1600px) {
+  .frame {
+    height: 60px;
+  }
+}
+
 @media (max-width: 1024px) {
   #background {
     height: 800px;
@@ -326,6 +338,10 @@ button {
   .friendelem {
     height: 70px;
     width: 100%;
+  }
+
+  .frame {
+    height: 50px;
   }
 
   .b {
