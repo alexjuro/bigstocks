@@ -1,5 +1,4 @@
 /* Author: Alexander Lensjak */
-//TODO: return live performance
 
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';
@@ -8,12 +7,21 @@ import { authService } from '../services/auth.service.js';
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+/*router.get('/', authService.authenticationMiddleware, async (req, res) => {
+  const dao: GenericDAO<User> = req.app.locals.userDAO;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const filter: Partial<User> = { id: res.locals.user.id };
+  const user = await dao.findOne(filter);
+
+  res.status(200).json(user);
+});*/
+
+router.get('/', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-  const email = 'al568412@fh-muenster.de';
+  const filter: Partial<User> = { id: res.locals.user.id };
 
   try {
-    const user = await userDAO.findOne({ email: email });
+    const user = await userDAO.findOne(filter);
     if (!user) {
       res.status(404).json({ error: 'User not found' });
       return;
@@ -21,18 +29,20 @@ router.get('/', async (req, res) => {
 
     const friendsWithPerformance = await Promise.all(
       user.friends.map(async friend => {
-        const friendUser = await userDAO.findOne({ email: 'al568412@fh-muenster.de' });
+        const friendUser = await userDAO.findOne({ email: friend.email });
         if (!friendUser) {
           return {
-            name: friend.name,
+            username: friend.username,
             accepted: friend.accepted,
+            avatar: null,
             performance: null // or any default value if the friend user is not found
           };
         }
 
         return {
-          name: friend.name,
+          username: friend.username,
           accepted: friend.accepted,
+          avatar: friendUser.avatar,
           performance: friendUser.performance.slice(friendUser.performance.length - 1, friendUser.performance.length) // Assuming the performance property exists in the friend user object
         };
       })
@@ -44,6 +54,32 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.post('/', authService.authenticationMiddleware, async (req, res) => {
+  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const filter: Partial<User> = { id: res.locals.user.id };
+  const friendfilter: Partial<User> = { username: req.body.user.username };
+
+  const user = await userDAO.findOne(filter);
+  const friend = await userDAO.findOne(friendfilter);
+
+  if (user && friend) {
+    const newFriendObject = {
+      username: friend.username,
+      email: friend.email,
+      accepted: false
+    };
+
+    user.friends.push(newFriendObject); // Add the new friend object to the friends array
+
+    await userDAO.update(user); // Update the user object in the database
+
+    res.sendStatus(200);
+  } else {
+    res.status(500);
+  }
+});
+
+/*
 router.post('/', async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const email = 'al568412@fh-muenster.de';
@@ -56,7 +92,7 @@ router.post('/', async (req, res) => {
       res.status(400).json({ error: "The friend couldn't be found" });
     } else {
       //wenn sie bereits freunde sind
-      if (user?.friends.some(friend => friend.name === req.body.friend)) {
+      if (user?.friends.some(friend => friend.username === req.body.friend)) {
         res.status(401).json({ error: 'You are already friends' });
       } else {
         const newFriend = { name: 'Alex', accepted: false };
@@ -72,6 +108,6 @@ router.post('/', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
   }
-});
+});*/
 
 export default router;

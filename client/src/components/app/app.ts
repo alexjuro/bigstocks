@@ -25,7 +25,7 @@ class AppComponent extends LitElement {
   renderSelect() {
     return router.select(
       {
-        'friends': () => html`<app-friends></app-friends>`,
+        'users/friends': () => html`<app-friends></app-friends>`,
         'leaderboard': () => html`<app-leaderboard></app-leaderboard>`,
         'news': () => html`<finnhub-market-news></finnhub-market-news>`,
         'profile': () => html`<user-profile></user-profile>`,
@@ -43,7 +43,7 @@ class AppComponent extends LitElement {
         'users/activation': () => html`<app-activation></app-activation>`,
         'users/resetPassword': () => html`<app-resetPassword></app-resetPassword>`,
         'users/forgotPassword': () => html`<app-forgotPassword></app-forgotPassword>`,
-        'cool': () => html`<app-minesweeper></app-minesweeper>`
+        'minesweeper': () => html`<app-minesweeper></app-minesweeper>`
       },
       () => {
         return html`<app-portfolio></app-portfolio>`;

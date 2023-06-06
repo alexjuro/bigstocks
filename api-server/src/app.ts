@@ -19,6 +19,7 @@ import trading from './routes/trading.js';
 import transaction from './routes/transaction.js';
 import friends from './routes/friends.js';
 import leaderboard from './routes/leaderboard.js';
+import minesweeper from './routes/minesweeper.js';
 import config from '../config.json' assert { type: 'json' };
 import comment from './routes/comment.js';
 
@@ -40,6 +41,7 @@ function configureApp(app: Express) {
   app.use('/api/comment', comment);
   app.use('/api/friends', friends);
   app.use('/api/leaderboard', leaderboard);
+  app.use('/api/minesweeper', minesweeper);
   // TODO: Routen einbinden
 }
 

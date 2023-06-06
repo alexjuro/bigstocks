@@ -30,8 +30,8 @@ class AppHeader extends PageMixin(LitElement) {
         this.visable = false;
       }, 150);
     } else {
-      circle!.style.width = '255px';
-      circle!.style.height = '255px';
+      circle!.style.width = '300px';
+      circle!.style.height = '300px';
       setTimeout(() => {
         mnav!.style.visibility = 'visible';
       }, 280);
@@ -74,8 +74,9 @@ class AppHeader extends PageMixin(LitElement) {
           <ul>
             <li><button type="button" @click="${this.getNews}">news</button></li>
             <li><button type="button" @click="${this.getPortfolio}">portfolio</button></li>
-            <li><button type="button" @click="${this.getProfile}">profile</button></li>
-            <li><button type="button" @click="${this.getProfile}">anmelden</button></li>
+            <li><button type="button" @click="${this.getPortfolio}">market</button></li>
+            <li><button type="button" @click="${this.getMarket}">profile</button></li>
+            <li><button type="button" @click="${this.getProfile}">sign-in</button></li>
           </ul>
         </nav>
       </div>
@@ -88,8 +89,9 @@ class AppHeader extends PageMixin(LitElement) {
           <nav id="dnav">
             <button type="button" @click="${this.getNews}">news</button>
             <button type="button" @click="${this.getPortfolio}">portfolio</button>
+            <button type="button" @click="${this.getMarket}">market</button>
             <button type="button" @click="${this.getProfile}">profile</button>
-            <button type="button" @click="${this.getProfile}">anmelden</button>
+            <button type="button" @click="${this.getProfile}">sign-in</button>
           </nav>
           <button id="btn" @click="${this.toggle}">
             <img src="/list.svg" alt="" height="27px" />
@@ -150,9 +152,26 @@ class AppHeader extends PageMixin(LitElement) {
     }, 100);
   }
 
+  async getMarket() {
+    try {
+      router.navigate('/users/market');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
+  }
+
   async getProfile() {
     try {
-      router.navigate('/friends');
+      router.navigate('/profile');
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }
