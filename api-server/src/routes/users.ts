@@ -205,7 +205,7 @@ router.post('/sign-up', async (req, res) => {
     role: Role.USER,
     avatar: '',
     compareEmail: req.body.email.toUpperCase(),
-    friends: [{ username: 'PatrickBateman', email: 'ALEXANDER.LESNJAK@GMAIL.COM', accepted: false }],
+    friends: [{ username: 'PatrickBateman', accepted: false }],
     trials: { date: new Date().toLocaleDateString(), value: 3 }
   });
   if (newUser) {

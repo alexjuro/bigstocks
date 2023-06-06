@@ -68,6 +68,18 @@ class AppFriendsComponent extends LitElement {
         console.log((e as Error).message);
       }
     }
+
+    try {
+      const response = await httpClient.post('friends', '');
+      const data = await response.json();
+      console.log(data);
+    } catch (e) {
+      if ((e as Error).message == 'Unauthorized!') {
+        router.navigate('/user/sign-in');
+      } else {
+        console.log((e as Error).message);
+      }
+    }
   }
 
   render() {
@@ -85,17 +97,15 @@ class AppFriendsComponent extends LitElement {
             <div id="textFreunde" class="textone">Freund hinzufügen:</div>
             <!--Das Fenster zum absenden-->
             <div id="addwindow" class="window">
-              <form autocomplete="off">
-                <input
-                  type="text"
-                  name="username"
-                  placeholder="Username"
-                  onfocus="this.value=''"
-                  id="input"
-                  autocomplete="off"
-                />
-                <button type="submit" @click="${this._addFriend}">Senden</button>
-              </form>
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                onfocus="this.value=''"
+                id="input"
+                autocomplete="off"
+              />
+              <button type="submit" @click="${this._addFriend}">Senden</button>
             </div>
 
             <!--Feedback ob das senden funktioniert hat oder nicht-->
@@ -148,18 +158,24 @@ class AppFriendsComponent extends LitElement {
   }
 
   async _addFriend() {
-    const friend = this.nameElement.value;
+    const friendname = this.nameElement.value;
+    if (friendname == '') {
+      this._displayError('You must type in a Username');
+      return;
+    }
     try {
-      const response = await httpClient.post('friends', { username: friend });
-      console.log(friend);
+      const response = await httpClient.post('friends', friendname);
 
       if (response.ok) {
         this._displaySuccess();
-      } else {
-        // Handle error response
+      } else if (response.status === 409) {
+        this._displayError('You already added that friend');
+      } else if (response.status === 400) {
+        this._displayError('The given Username is yours');
+      } else if (response.status === 400) {
+        this._displayError('The given Username is yours');
       }
     } catch (e) {
-      this._displayError((e as Error).message);
       console.log((e as Error).message);
     }
   }

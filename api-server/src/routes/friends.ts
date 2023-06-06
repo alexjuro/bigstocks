@@ -1,4 +1,5 @@
 /* Author: Alexander Lensjak */
+//TODO: username hardcoded
 
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';
@@ -6,15 +7,6 @@ import { User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
 
 const router = express.Router();
-
-/*router.get('/', authService.authenticationMiddleware, async (req, res) => {
-  const dao: GenericDAO<User> = req.app.locals.userDAO;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const filter: Partial<User> = { id: res.locals.user.id };
-  const user = await dao.findOne(filter);
-
-  res.status(200).json(user);
-});*/
 
 router.get('/', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
@@ -29,7 +21,7 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
 
     const friendsWithPerformance = await Promise.all(
       user.friends.map(async friend => {
-        const friendUser = await userDAO.findOne({ email: friend.email });
+        const friendUser = await userDAO.findOne({ username: friend.username });
         if (!friendUser) {
           return {
             username: friend.username,
@@ -56,58 +48,40 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
 
 router.post('/', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-  const filter: Partial<User> = { id: res.locals.user.id };
-  const friendfilter: Partial<User> = { username: req.body.user.username };
+  const userId = res.locals.user.id;
+  const friendname = 'axel';
 
-  const user = await userDAO.findOne(filter);
-  const friend = await userDAO.findOne(friendfilter);
+  const user = await userDAO.findOne({ id: userId });
+  const friend = await userDAO.findOne({ username: friendname });
 
-  if (user && friend) {
-    const newFriendObject = {
-      username: friend.username,
-      email: friend.email,
-      accepted: false
-    };
+  if (friend && user) {
+    const newFriend = { username: friend.username, accepted: false };
 
-    user.friends.push(newFriendObject); // Add the new friend object to the friends array
+    if (user.username == friend.username) {
+      const dontTryToAddYourself = 'Error: The given Username is yours';
+      res.status(400).json(dontTryToAddYourself);
+      return;
+    }
 
-    await userDAO.update(user); // Update the user object in the database
+    if (user.friends.some(f => f.username === friend.username)) {
+      const alreadyAddedError = 'Error: You already added that friend';
+      res.status(409).json(alreadyAddedError);
+      return;
+    }
 
-    res.sendStatus(200);
+    const newUser = { username: user.username, accepted: false };
+
+    user.friends.push(newFriend);
+    friend.friends.push(newUser);
+
+    await userDAO.update(user);
+    await userDAO.update(friend);
+
+    res.status(200);
   } else {
-    res.status(500);
+    const error = 'user not found';
+    res.status(404).json(error);
   }
 });
-
-/*
-router.post('/', async (req, res) => {
-  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-  const email = 'al568412@fh-muenster.de';
-
-  try {
-    const user = await userDAO.findOne({ email: email });
-
-    //wenn der freund nicht gefunden wurde
-    if (!(await userDAO.findOne({ name: req.body.friend }))) {
-      res.status(400).json({ error: "The friend couldn't be found" });
-    } else {
-      //wenn sie bereits freunde sind
-      if (user?.friends.some(friend => friend.username === req.body.friend)) {
-        res.status(401).json({ error: 'You are already friends' });
-      } else {
-        const newFriend = { name: 'Alex', accepted: false };
-        user?.friends.push(newFriend);
-
-        // Benutzer aktualisieren
-        if (user) {
-          await userDAO.update(user);
-        }
-        res.send(200);
-      }
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
-  }
-});*/
 
 export default router;
