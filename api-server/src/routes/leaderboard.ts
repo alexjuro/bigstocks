@@ -13,8 +13,7 @@ router.get('/', async (req, res) => {
     const users = await userDAO.findAll();
 
     const leaderboard = users.map(user => ({
-      name: user.name,
-      money: user.money,
+      name: user.username,
       performance: user.performance.slice(user.performance.length - 1, user.performance.length)
     }));
     res.json(leaderboard);
