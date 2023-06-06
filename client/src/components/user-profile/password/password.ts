@@ -10,6 +10,7 @@ import { PageMixin } from '../../page.mixin';
 import { UserData } from '../types';
 import { Constraint } from '../constraints/constraints';
 import bcrypt from 'bcryptjs';
+import { router } from '../../../router/router';
 
 @customElement('user-profile-password')
 export class ProfilePassword extends PageMixin(LitElement) {
@@ -154,7 +155,7 @@ export class ProfilePassword extends PageMixin(LitElement) {
               .post('/users/account/password', this.data)
               .then(() => httpClient.delete('/users/sign-out'))
               .then(() => {
-                window.location.assign('/users/sign-in');
+                router.navigate('/users/sign-in');
                 this.dispatchEvent(
                   new CustomEvent('submit-suc', { bubbles: true, detail: 'Password updated successfully.' })
                 );
