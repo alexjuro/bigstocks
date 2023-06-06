@@ -4,6 +4,12 @@ import { Browser, BrowserContext, Page, chromium, Locator } from 'playwright';
 import { expect } from 'chai';
 import config from './config.js';
 
+const user = {
+  name: 'admin',
+  email: 'admin@bigstocks.com',
+  password: 'Password1'
+};
+
 describe('/profile', () => {
   let browser: Browser;
   let context: BrowserContext;
@@ -25,9 +31,9 @@ describe('/profile', () => {
     page = await context.newPage();
 
     await page.goto(config.clientUrl('/app/sign-in'));
-    await page.fill('#username', 'admin');
+    await page.fill('#username', user.name);
     await page.getByRole('button', { name: 'Next' }).click();
-    await page.fill('#password', 'Password1');
+    await page.fill('#password', user.password);
     await page.getByRole('button', { name: 'Sign-In', exact: true }).click();
     await page.waitForURL(config.clientUrl('/news'));
 
@@ -54,7 +60,7 @@ describe('/profile', () => {
     it('should fail given an invalid password', async () => {
       await details.locator('#name').fill('abcd');
       await details.getByRole('button', { name: 'Save' }).click();
-      await page.fill('dialog input', 'password');
+      await page.fill('dialog input', `${user.password}!`);
       await page.getByText('Confirm', { exact: true }).click();
 
       await page.waitForSelector('app-notification');
@@ -66,7 +72,7 @@ describe('/profile', () => {
 
       await details.locator('#name').fill('abcd');
       await details.getByRole('button', { name: 'Save' }).click();
-      await page.fill('dialog input', 'Password1');
+      await page.fill('dialog input', user.password);
       await page.getByText('Confirm', { exact: true }).click();
 
       await page.waitForSelector('app-notification');
@@ -122,13 +128,13 @@ describe('/profile', () => {
     it('should succeed given valid details', async () => {
       await page.route(config.serverUrl('/users/account/details'), route => route.fulfill({ status: 200 }));
 
-      await details.locator('input').nth(0).fill('validname');
-      await details.locator('input').nth(1).fill('valid@email');
+      await details.locator('input').nth(0).fill(`new${user.name}`);
+      await details.locator('input').nth(1).fill(`new${user.email}`);
       await details.getByRole('button', { name: 'Save' }).click();
       expect(await details.locator('.invalid-feedback').nth(0).isVisible()).to.be.false;
       expect(await details.locator('.invalid-feedback').nth(1).isVisible()).to.be.false;
 
-      await page.fill('dialog input', 'Password1');
+      await page.fill('dialog input', user.password);
       await page.getByText('Confirm', { exact: true }).click();
 
       await page.waitForSelector('app-notification');
@@ -146,8 +152,8 @@ describe('/profile', () => {
     });
 
     it('should fail given mismatched password', async () => {
-      await password.locator('input').nth(0).fill('ValidPassword1');
-      await password.locator('input').nth(1).fill('ValidPassword2');
+      await password.locator('input').nth(0).fill(`${user.password}1`);
+      await password.locator('input').nth(1).fill(`${user.password}2`);
       await password.getByRole('button', { name: 'Save' }).click();
 
       await page.waitForSelector('app-notification');
@@ -157,12 +163,12 @@ describe('/profile', () => {
       await page.route(config.clientUrl('/users/sign-in'), route => route.fulfill({ status: 200 }));
       await page.route(config.serverUrl('/users/account/password'), route => route.fulfill({ status: 200 }));
 
-      await password.locator('input').nth(0).fill('ValidPassword1');
-      await password.locator('input').nth(1).fill('ValidPassword1');
+      await password.locator('input').nth(0).fill(`${user.password}1`);
+      await password.locator('input').nth(1).fill(`${user.password}1`);
       await password.getByRole('button', { name: 'Save' }).click();
       expect(await password.locator('.invalid-feedback').isVisible()).to.be.false;
 
-      await page.fill('dialog input', 'Password1');
+      await page.fill('dialog input', user.password);
       await page.getByText('Confirm', { exact: true }).click();
 
       await page.waitForURL(config.clientUrl('/users/sign-in'));
