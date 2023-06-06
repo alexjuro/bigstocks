@@ -4,9 +4,10 @@
 
 import { LitElement, PropertyValueMap, html } from 'lit';
 import { httpClient } from '../../http-client.js';
-import { customElement, query, property, eventOptions } from 'lit/decorators.js';
+import { customElement, query, property, eventOptions, state } from 'lit/decorators.js';
 import { router } from '../../router/router.js';
 import componentStyle from './friends.css?inline';
+import { until } from 'lit/directives/until.js';
 
 @customElement('app-friends')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -19,6 +20,8 @@ class AppFriendsComponent extends LitElement {
     super();
   }
 
+  @state() request = httpClient.get('friends').then(async res => (await res.json()) as any);
+
   @property({ type: Array })
   requests: any[] = [];
   @property({ type: Array })
@@ -30,6 +33,7 @@ class AppFriendsComponent extends LitElement {
       new CustomEvent('update-pagename', { detail: 'Friends', bubbles: true, composed: true })
     );
 
+    /*
     try {
       const response = await httpClient.get('friends');
       const data = await response.json();
@@ -42,22 +46,9 @@ class AppFriendsComponent extends LitElement {
       } else {
         console.log((e as Error).message);
       }
-    }
-
-    /*
-    try {
-      const response = await httpClient.post('friends', { username: 'axel' });
-      const data = await response.json();
-      console.log(data);
-    } catch (e) {
-      if ((e as Error).message == 'Unauthorized!') {
-        router.navigate('/users/sign-in');
-      } else {
-        console.log((e as Error).message);
-      }
     }*/
   }
-
+  /*
   render() {
     return html`
       <div id="background">
@@ -130,6 +121,90 @@ class AppFriendsComponent extends LitElement {
           </div>
         </div>
       </div>
+    `;
+  }*/
+
+  render() {
+    return html`
+      ${until(
+        this.request.then(json => {
+          const data = json;
+          this.friends = json.friends;
+          this.requests = json.requests;
+
+          return html`<div id="background">
+              <div id="kreis"></div>
+            </div>
+
+            <div id="main">
+              <div id="addFriend">
+                <button @click="${this._scrollToFriendForm}">Freund hinzufügen</button>
+              </div>
+              <div id="friendsContainer">
+                <div id="addMethod" class="containerelem">
+                  <div id="textFreunde" class="textone">Freund hinzufügen:</div>
+                  <!--Das Fenster zum absenden-->
+                  <div id="addwindow" class="window">
+                    <input
+                      type="text"
+                      name="username"
+                      placeholder="Username"
+                      onfocus="this.value=''"
+                      id="input"
+                      autocomplete="off"
+                    />
+                    <button type="submit" @click="${() => this._addFriend()}">Senden</button>
+                  </div>
+
+                  <!--Feedback ob das senden funktioniert hat oder nicht-->
+                  <div id="feedback" class="clear"></div>
+
+                  <div id="textFreunde">Freundschaftsanfragen:</div>
+                  <div id="requestwindow" class="window">
+                    <!--Beispiel fuer eine Anfrage-->
+                    ${this.requests.map(
+                      request => html`
+                        <div class="friendelem">
+                          <div class="a">
+                            <div class="frame"></div>
+                          </div>
+                          <div class="b"><button>${request.username}</button></div>
+                          <div class="c">
+                            <button @click="${() => this._accept(request.username)}">accept</button>
+                            <button @click="${() => this._decline(request.username)}">decline</button>
+                          </div>
+                        </div>
+                      `
+                    )}
+                  </div>
+                </div>
+
+                <div id="friendsList" class="containerelem">
+                  <div id="textFreunde">Freunde:</div>
+                  <div id="friendswindow" class="window">
+                    ${this.friends.map(
+                      friend => html`
+                        <div class="friendelem">
+                          <div class="a">
+                            <div class="frame"></div>
+                          </div>
+                          <div class="b"><button>${friend.username}</button></div>
+                          <div class="c">${friend.performance[0].value} €</div>
+                          <div class="d">
+                            <button @click="${() => this._delete(friend.username)}">
+                              <img src="/trash-red.svg" alt="" height="30px" />
+                            </button>
+                          </div>
+                        </div>
+                      `
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>`;
+        }),
+        html`<is-loading></is-loading>`
+      )}
     `;
   }
 
