@@ -304,8 +304,14 @@ class AppFriendsComponent extends LitElement {
   }
 
   async _delete(name: string) {
+    const confirmed = confirm('Möchten Sie diesen Freund wirklich löschen?');
+    if (!confirmed) {
+      return; // Abbruch, wenn nicht bestätigt
+    }
+
     try {
       const response = await httpClient.post('friends/delete', { username: name });
+      // Weiterer Code für den Erfolgsfall hier
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
