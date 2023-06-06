@@ -6,8 +6,8 @@ import config from './config.js';
 import fetch from 'node-fetch';
 
 const user = {
-  name: 'admin',
-  email: 'admin@bigstocks.com',
+  name: 'test',
+  email: 'test@bigstocks.com',
   password: 'Password1'
 };
 
