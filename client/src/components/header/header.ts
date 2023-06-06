@@ -76,7 +76,7 @@ class AppHeader extends PageMixin(LitElement) {
             <li><button type="button" @click="${this.getPortfolio}">portfolio</button></li>
             <li><button type="button" @click="${this.getMarket}">market</button></li>
             <li><button type="button" @click="${this.getProfile}">profile</button></li>
-            <li><button type="button" @click="${this.getSignIn}">sign-in</button></li>
+            <li><button type="button" @click="${this.getSignOut}">sign-out</button></li>
           </ul>
         </nav>
       </div>
@@ -91,7 +91,7 @@ class AppHeader extends PageMixin(LitElement) {
             <button type="button" @click="${this.getPortfolio}">portfolio</button>
             <button type="button" @click="${this.getMarket}">market</button>
             <button type="button" @click="${this.getProfile}">profile</button>
-            <button type="button" @click="${this.getSignIn}">sign-in</button>
+            <button type="button" @click="${this.getSignOut}">sign-out</button>
           </nav>
           <button id="btn" @click="${this.toggle}">
             <img src="/list.svg" alt="" height="27px" />
@@ -186,9 +186,9 @@ class AppHeader extends PageMixin(LitElement) {
     }, 100);
   }
 
-  async getSignIn() {
+  async getSignOut() {
     try {
-      router.navigate('/user/sign-in');
+      router.navigate('/users/sign-out');
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }
