@@ -8,6 +8,7 @@ describe('/profile', () => {
   let browser: Browser;
   let context: BrowserContext;
   let page: Page;
+  let avatar: Locator;
   let details: Locator;
   let password: Locator;
 
@@ -27,10 +28,11 @@ describe('/profile', () => {
     await page.fill('#username', 'admin');
     await page.getByRole('button', { name: 'Next' }).click();
     await page.fill('#password', 'Password1');
-    await page.getByRole('button', { name: 'Sign-In' }).click();
+    await page.getByRole('button', { name: 'Sign-In', exact: true }).click();
     await page.waitForURL(config.clientUrl('/news'));
 
     await page.goto(config.clientUrl('/profile'));
+    avatar = page.locator('user-profile-avatar');
     details = page.locator('user-profile-details');
     password = page.locator('user-profile-password');
   });
@@ -49,15 +51,14 @@ describe('/profile', () => {
       expect(await page.textContent('user-profile-password h3')).to.equal('Password');
     });
 
-    // FIX:
-    xit('should fail given an invalid password', async () => {
+    it('should fail given an invalid password', async () => {
       await details.locator('#name').fill('abcd');
       await details.getByRole('button', { name: 'Save' }).click();
       await page.fill('dialog input', 'password');
       await page.getByText('Confirm', { exact: true }).click();
 
       await page.waitForSelector('app-notification');
-      expect(await page.getByText("Passwords don't match.").textContent()).to.not.be.null;
+      expect(await page.getByText('Incorrect Password.').textContent()).to.not.be.null;
     });
 
     it('should succeed given valid password', async () => {
@@ -77,11 +78,11 @@ describe('/profile', () => {
     const sig = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 
     it('should fail given an invalid file', async () => {
-      const promise = page.waitForEvent('filechooser');
-      await page.getByText('Choose file...').click();
-      await (await promise).setFiles({ name: 'index.html', mimeType: 'text/html', buffer: Buffer.from(sig) });
+      await avatar
+        .locator('input[type=file]')
+        .setInputFiles({ name: 'index.html', mimeType: 'text/html', buffer: Buffer.from(sig) });
 
-      const upload = await page.waitForSelector('user-profile-avatar button');
+      const upload = await page.waitForSelector('user-profile-avatar #upload');
       expect(await upload.isVisible()).to.be.true;
       await upload.click();
 
@@ -92,11 +93,11 @@ describe('/profile', () => {
     it('should succeed given a valid file', async () => {
       await page.route(config.serverUrl('/users/account/avatar'), route => route.fulfill({ status: 200 }));
 
-      const promise = page.waitForEvent('filechooser');
-      await page.getByText('Choose file...').click();
-      await (await promise).setFiles({ name: 'image.png', mimeType: 'image/png', buffer: Buffer.from(sig) });
+      await avatar
+        .locator('input[type=file]')
+        .setInputFiles({ name: 'image.png', mimeType: 'image/png', buffer: Buffer.from(sig) });
 
-      const upload = await page.waitForSelector('user-profile-avatar button');
+      const upload = await page.waitForSelector('user-profile-avatar #upload');
       expect(await upload.isVisible()).to.be.true;
       await upload.click();
 
