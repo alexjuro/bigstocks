@@ -3,11 +3,28 @@
 import { Browser, BrowserContext, Page, chromium, Locator } from 'playwright';
 import { expect } from 'chai';
 import config from './config.js';
+import fetch from 'node-fetch';
 
 const user = {
   name: 'admin',
   email: 'admin@bigstocks.com',
   password: 'Password1'
+};
+
+const signIn = async (context: BrowserContext, username: string, password: string) => {
+  const res = await fetch(config.serverUrl('/users/sign-in'), {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  const cookie = res.headers.raw()['set-cookie'].find(cookie => cookie.startsWith('jwt-token'));
+  if (!cookie) throw new Error('Failed to extract jwt-token');
+  const token = cookie.split('=')[1].split(';')[0];
+
+  await context.addCookies([
+    { name: 'jwt-token', value: token!, domain: new URL(config.serverUrl('')).hostname, path: '/' }
+  ]);
 };
 
 describe('/profile', () => {
@@ -20,22 +37,10 @@ describe('/profile', () => {
 
   before(async () => {
     browser = await chromium.launch(config.launchOptions);
-  });
-
-  after(async () => {
-    await browser.close();
-  });
-
-  beforeEach(async () => {
     context = await browser.newContext();
     page = await context.newPage();
 
-    await page.goto(config.clientUrl('/app/sign-in'));
-    await page.fill('#username', user.name);
-    await page.getByRole('button', { name: 'Next' }).click();
-    await page.fill('#password', user.password);
-    await page.getByRole('button', { name: 'Sign-In', exact: true }).click();
-    await page.waitForURL(config.clientUrl('/news'));
+    await signIn(context, user.name, user.password);
 
     await page.goto(config.clientUrl('/profile'));
     avatar = page.locator('user-profile-avatar');
@@ -43,8 +48,9 @@ describe('/profile', () => {
     password = page.locator('user-profile-password');
   });
 
-  afterEach(async () => {
+  after(async () => {
     await context.close();
+    await browser.close();
   });
 
   describe('page', () => {
@@ -57,7 +63,7 @@ describe('/profile', () => {
       expect(await page.textContent('user-profile-password h3')).to.equal('Password');
     });
 
-    it('should fail given an invalid password', async () => {
+    it('should fail given invalid password', async () => {
       await details.locator('#name').fill('abcd');
       await details.getByRole('button', { name: 'Save' }).click();
       await page.fill('dialog input', `${user.password}!`);
@@ -151,7 +157,7 @@ describe('/profile', () => {
       expect(await password.locator('.invalid-feedback').isVisible()).to.be.true;
     });
 
-    it('should fail given mismatched password', async () => {
+    it('should fail given mismatched passwords', async () => {
       await password.locator('input').nth(0).fill(`${user.password}1`);
       await password.locator('input').nth(1).fill(`${user.password}2`);
       await password.getByRole('button', { name: 'Save' }).click();
