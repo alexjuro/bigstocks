@@ -73,19 +73,22 @@ class ProfileAvatar extends LitElement {
     this.dispatchEvent(
       new CustomEvent('submit-req', {
         bubbles: true,
-        detail: async () => {
-          try {
-            await this.base64enc(file!).then(base64 => (this.data.avatar = base64));
-            await httpClient
-              .post('/users/account/avatar', this.data)
-              .then(() =>
-                this.dispatchEvent(
-                  new CustomEvent('submit-suc', { bubbles: true, detail: 'Avatar update successful.' })
-                )
-              );
-          } catch (e) {
-            this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
-          }
+        detail: {
+          cb: async () => {
+            try {
+              await this.base64enc(file!).then(base64 => (this.data.avatar = base64));
+              await httpClient
+                .post('/users/account/avatar', this.data)
+                .then(() =>
+                  this.dispatchEvent(
+                    new CustomEvent('submit-suc', { bubbles: true, detail: 'Avatar update successful.' })
+                  )
+                );
+            } catch (e) {
+              this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e }));
+            }
+          },
+          confirm: false
         }
       })
     );

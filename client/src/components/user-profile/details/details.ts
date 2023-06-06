@@ -97,16 +97,21 @@ export class ProfileMain extends PageMixin(LitElement) {
     this.dispatchEvent(
       new CustomEvent('submit-req', {
         bubbles: true,
-        detail: async () => {
-          this.data.email = this.email.value;
-          this.data.username = this.name.value;
+        detail: {
+          cb: async () => {
+            this.data.email = this.email.value;
+            this.data.username = this.name.value;
 
-          await httpClient
-            .post('/users/account/details', this.data)
-            .then(() =>
-              this.dispatchEvent(new CustomEvent('submit-suc', { bubbles: true, detail: 'Profile update successful.' }))
-            )
-            .catch(e => this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e })));
+            await httpClient
+              .post('/users/account/details', this.data)
+              .then(() =>
+                this.dispatchEvent(
+                  new CustomEvent('submit-suc', { bubbles: true, detail: 'Profile update successful.' })
+                )
+              )
+              .catch(e => this.dispatchEvent(new CustomEvent('submit-err', { bubbles: true, detail: e })));
+          },
+          confirm: true
         }
       })
     );
