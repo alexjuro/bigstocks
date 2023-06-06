@@ -98,11 +98,15 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     if (stockDiv) {
       const candle = stockDiv.parentElement?.querySelector('app-trading-candle');
       const info = stockDiv.parentElement?.querySelector('app-trading-info');
+      const preStock = info?.closest('app-stock');
+      const preId = preStock?.id;
 
       if (candle || info) {
         candle?.remove();
         info?.remove();
-      } else {
+      }
+
+      if (preId != stock.symbol) {
         const candleComponent = new CandleComponent();
         stockDiv.appendChild(candleComponent);
         candleComponent.updateComplete.then(() => {
@@ -152,7 +156,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     this.stockCandle = new Chart(element, {
       type: 'line',
       data: {
-        labels: ['DEC', 'JAN', 'FEB', 'MAR', 'APR', 'MAY'],
+        labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN'],
         datasets: [
           {
             data: data,
@@ -269,7 +273,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         const data = await response.json();
         stock.shares++;
         this.money = data.money;
-        this.showTradeNotification(`Successful purchase of ${stock.name} for ${bPrice}`, 'success');
+        this.showTradeNotification(`Successful purchase of ${stock.name} for ${bPrice} $`, 'success');
         if (this instanceof PortfolioComponent) {
           this.updateDoughnut();
           this.updateGraph();
@@ -314,9 +318,9 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
       const data = await response.json();
       stock.shares--;
       if (stock.shares === 0) {
-        this.showTradeNotification(`Sold last stock of ${stock.name} for ${sPrice}`, 'warning');
+        this.showTradeNotification(`Sold last stock of ${stock.name} for ${sPrice} $`, 'warning');
       } else {
-        this.showTradeNotification(`Sold ${stock.name} for ${sPrice}`, 'warning');
+        this.showTradeNotification(`Sold ${stock.name} for ${sPrice} $`, 'warning');
       }
       this.money = data.money;
       if (this instanceof PortfolioComponent) {
