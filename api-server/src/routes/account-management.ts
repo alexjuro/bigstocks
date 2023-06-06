@@ -9,6 +9,7 @@ import bcrypt from 'bcryptjs';
 const isValid = <T>(properties: Map<string, string>, obj: unknown): obj is T => {
   return (
     Object.getOwnPropertyNames(obj)
+      // unknown appropriate for parameter; needs cast to validate property
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .map(p => (obj as any)[p] !== null && properties.has(p) && properties.get(p) === typeof (obj as any)[p])
       .filter(Boolean).length === properties.size
