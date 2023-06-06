@@ -34,20 +34,15 @@ class AppFriendsComponent extends LitElement {
       new CustomEvent('update-pagename', { detail: 'Friends', bubbles: true, composed: true })
     );
 
-    /*
     try {
       const response = await httpClient.get('friends');
-      const data = await response.json();
-
-      this.friends = data.friends;
-      this.requests = data.requests;
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
       } else {
         console.log((e as Error).message);
       }
-    }*/
+    }
   }
   /*
   render() {
