@@ -31,7 +31,7 @@ class AppFriendsComponent extends LitElement {
   @eventOptions({ capture: true })
   protected async firstUpdated() {
     const appHeader = this.dispatchEvent(
-      new CustomEvent('update-pagename', { detail: 'Friends', bubbles: true, composed: true })
+      new CustomEvent('update-pagename', { detail: 'friends', bubbles: true, composed: true })
     );
 
     try {
@@ -311,7 +311,7 @@ class AppFriendsComponent extends LitElement {
 
     try {
       const response = await httpClient.post('friends/delete', { username: name });
-      // Weiterer Code für den Erfolgsfall hier
+      console.log('deleted');
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');

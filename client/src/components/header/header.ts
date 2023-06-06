@@ -84,7 +84,7 @@ class AppHeader extends PageMixin(LitElement) {
         <div id="left" class="headelem">
           <button type="button" @click="${this.getLeaderboard}">bigStocks</button>
         </div>
-        <div id="mid" class="headelem"><a href="#top">${this.pagename}</a></div>
+        <div id="mid" class="headelem"><a href="/users/${this.pagename}">${this.pagename}</a></div>
         <div id="right" class="headelem">
           <nav id="dnav">
             <button type="button" @click="${this.getNews}">news</button>
