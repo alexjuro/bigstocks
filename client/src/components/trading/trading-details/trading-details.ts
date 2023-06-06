@@ -55,6 +55,9 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
       this.startAsyncInit();
       this.name = this.getParamsFromURL().name;
       this.symbol = this.getParamsFromURL().symbol;
+      this.dispatchEvent(
+        new CustomEvent('update-pagename', { detail: `${this.symbol}-Details`, bubbles: true, composed: true })
+      );
       const response = await httpClient.get('trading/details/' + this.symbol);
       const data = await response.json();
       this.stock = data.stock;
