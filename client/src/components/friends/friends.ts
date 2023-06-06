@@ -35,38 +35,17 @@ class AppFriendsComponent extends LitElement {
       const response = await httpClient.get('friends');
       const data = await response.json();
 
-      //filters the data by accepted state
-      const friendsArray = data.friends;
-
-      const friends = friendsArray.filter((friend: any) => friend.accepted === true);
-      const requests = friendsArray.filter((friend: any) => friend.accepted === false);
-
-      this.friends = friends;
-      this.requests = requests;
-
-      const friendsNew = friends.map((friend: any) => {
-        const newPerformance = friend.performance.map((performance: any) => {
-          const formattedValue = performance.value.toLocaleString('de-DE', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-            useGrouping: false
-          });
-
-          return { ...performance, value: formattedValue };
-        });
-
-        return { ...friend, performance: newPerformance };
-      });
-
-      this.friends = friendsNew;
+      this.friends = data.friends;
+      this.requests = data.requests;
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
-        router.navigate('/user/sign-in');
+        router.navigate('/users/sign-in');
       } else {
         console.log((e as Error).message);
       }
     }
 
+    /*
     try {
       const response = await httpClient.post('friends', '');
       const data = await response.json();
@@ -89,7 +68,7 @@ class AppFriendsComponent extends LitElement {
       } else {
         console.log((e as Error).message);
       }
-    }
+    }*/
   }
 
   render() {

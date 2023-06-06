@@ -40,7 +40,24 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
       })
     );
 
-    res.json({ friends: friendsWithPerformance });
+    const friendsArray = friendsWithPerformance.map((friend: any) => {
+      const newPerformance = friend.performance.map((performance: any) => {
+        const formattedValue = performance.value.toLocaleString('de-DE', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+          useGrouping: false
+        });
+
+        return { ...performance, value: formattedValue };
+      });
+
+      return { ...friend, performance: newPerformance };
+    });
+
+    const friends = friendsArray.filter((friend: any) => friend.accepted === true);
+    const requests = friendsArray.filter((friend: any) => friend.accepted === false);
+
+    res.json({ friends: friends, requests: requests });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
   }
