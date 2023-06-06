@@ -139,11 +139,11 @@ button {
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 
   display: grid;
-  grid-template-columns: 1fr 4fr;
+  grid-template-columns: 1fr 4fr 1fr;
   grid-template-rows: 1fr 1fr;
   grid-template-areas:
-    'a b'
-    'a c';
+    'a b d'
+    'a c d';
 }
 
 .friendelem:nth-child(2n) {
@@ -217,6 +217,24 @@ button {
   background-color: rgb(237, 109, 109);
   color: rgba(0, 0, 0, 0.9);
   transition: all 0.3s ease-in-out;
+}
+
+.d {
+  grid-area: d;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.d button {
+  height: 30px;
+  padding: 0px 10px;
+  font-size: 17px;
+  margin-right: 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.7);
 }
 
 #background {

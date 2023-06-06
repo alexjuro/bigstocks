@@ -1,7 +1,6 @@
 /* Autor: Alexander Lesnjak */
 //TODO: show the picture of the user
-//TODO: make the accept and decline buttons work
-//TODO: find the friend by its username or save friends with email for the performance
+//TODO: show success
 
 import { LitElement, PropertyValueMap, html } from 'lit';
 import { httpClient } from '../../http-client.js';
@@ -47,24 +46,12 @@ class AppFriendsComponent extends LitElement {
 
     /*
     try {
-      const response = await httpClient.post('friends', '');
+      const response = await httpClient.post('friends', { username: 'axel' });
       const data = await response.json();
       console.log(data);
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
-        router.navigate('/user/sign-in');
-      } else {
-        console.log((e as Error).message);
-      }
-    }
-
-    try {
-      const response = await httpClient.post('friends/accept', '');
-      const data = await response.json();
-      console.log(data);
-    } catch (e) {
-      if ((e as Error).message == 'Unauthorized!') {
-        router.navigate('/user/sign-in');
+        router.navigate('/users/sign-in');
       } else {
         console.log((e as Error).message);
       }
@@ -94,7 +81,7 @@ class AppFriendsComponent extends LitElement {
                 id="input"
                 autocomplete="off"
               />
-              <button type="submit" @click="${this._addFriend}">Senden</button>
+              <button type="submit" @click="${() => this._addFriend()}">Senden</button>
             </div>
 
             <!--Feedback ob das senden funktioniert hat oder nicht-->
@@ -111,8 +98,8 @@ class AppFriendsComponent extends LitElement {
                     </div>
                     <div class="b"><button>${request.username}</button></div>
                     <div class="c">
-                      <button @click="${this.accept(request.name)}">accept</button>
-                      <button>decline</button>
+                      <button @click="${() => this._accept(request.username)}">accept</button>
+                      <button @click="${() => this._decline(request.username)}">decline</button>
                     </div>
                   </div>
                 `
@@ -131,6 +118,11 @@ class AppFriendsComponent extends LitElement {
                     </div>
                     <div class="b"><button>${friend.username}</button></div>
                     <div class="c">${friend.performance[0].value} €</div>
+                    <div class="d">
+                      <button @click="${() => this._delete(friend.username)}">
+                        <img src="/trash-red.svg" alt="" height="30px" />
+                      </button>
+                    </div>
                   </div>
                 `
               )}
@@ -148,28 +140,39 @@ class AppFriendsComponent extends LitElement {
 
   async _addFriend() {
     const friendname = this.nameElement.value;
-    if (friendname == '') {
-      this._displayError('You must type in a Username');
-      return;
-    }
-    try {
-      const response = await httpClient.post('friends', friendname);
 
-      if (response.ok) {
-        this._displaySuccess();
-      } else if (response.status === 409) {
-        this._displayError('You already added that friend');
-      } else if (response.status === 400) {
-        this._displayError('The given Username is yours');
-      } else if (response.status === 400) {
-        this._displayError('The given Username is yours');
-      }
+    try {
+      const response = await httpClient.post('friends', { username: friendname });
+      //TODO: hier
     } catch (e) {
-      console.log((e as Error).message);
+      //redirect if the user isnt logged in(never appears)
+      if ((e as Error).message == 'Unauthorized!') {
+        router.navigate('/users/sign-in');
+      }
+      //print error when the user isnt found
+      else if ((e as Error).message == 'Not Found') {
+        this._displayError('User not found');
+        console.log('User not found');
+      }
+      //print error if the friend is already in friends or requests
+      else if ((e as Error).message == 'Conflict') {
+        this._displayError('This friend already send you an request');
+        console.log('This friend already send you an request');
+      }
+      //print error if the user to add himself
+      else if ((e as Error).message == 'Bad Request') {
+        this._displayError('You tried to add yourself');
+        console.log('You tried to add yourself');
+      } else {
+        console.log((e as Error).message);
+      }
     }
+
+    this.nameElement.value = '';
   }
 
   async _displaySuccess() {
+    console.log('success');
     const inputElement = this.shadowRoot!.getElementById('input');
     const feedbackElement = this.shadowRoot!.getElementById('feedback');
     feedbackElement!.classList.remove('yes');
@@ -197,8 +200,48 @@ class AppFriendsComponent extends LitElement {
     }, 2000);
   }
 
-  async accept(name: string) {
-    this.requests = [];
-    this.requestUpdate();
+  async _accept(name: string) {
+    try {
+      const response = await httpClient.post('friends/accept', { username: name });
+      const data = await response.json();
+      console.log('accepted');
+    } catch (e) {
+      if ((e as Error).message == 'Unauthorized!') {
+        router.navigate('/users/sign-in');
+      } else {
+        console.log((e as Error).message);
+      }
+    }
+  }
+
+  async _decline(name: string) {
+    try {
+      const response = await httpClient.post('friends/decline', { username: name });
+      console.log('declined'); //TODO: das wird nicht ausgefuehrt
+      this._reloadFriends();
+    } catch (e) {
+      if ((e as Error).message == 'Unauthorized!') {
+        router.navigate('/users/sign-in');
+      } else {
+        console.log((e as Error).message);
+      }
+    }
+  }
+
+  async _delete(name: string) {
+    try {
+      const response = await httpClient.post('friends/delete', { username: name });
+    } catch (e) {
+      if ((e as Error).message == 'Unauthorized!') {
+        router.navigate('/users/sign-in');
+      } else {
+        console.log((e as Error).message);
+      }
+    }
+  }
+
+  async _reloadFriends() {
+    const friendswindow = this.shadowRoot!.getElementById('friendswindow');
+    friendswindow!.innerHTML = 'hello :)';
   }
 }
