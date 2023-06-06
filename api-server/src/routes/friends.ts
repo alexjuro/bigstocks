@@ -84,4 +84,71 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
   }
 });
 
+router.post('/accept', authService.authenticationMiddleware, async (req, res) => {
+  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const userId = res.locals.user.id;
+  const friendname = 'axel';
+
+  const user = await userDAO.findOne({ id: userId });
+  const friend = await userDAO.findOne({ username: friendname });
+
+  if (friend && user) {
+    //searches the friendname in the friends of user and deletes the entry
+    const index = user.friends.findIndex(friend => friend.username === friendname);
+    if (index !== -1) {
+      user.friends.splice(index, 1);
+    }
+    const newFriend = { username: friendname, accepted: true };
+
+    //searches the username in the friends of friend and deletes the entry
+    const indextwo = friend.friends.findIndex(friend => friend.username === user.username);
+    if (indextwo !== -1) {
+      friend.friends.splice(indextwo, 1);
+    }
+    const newUser = { username: user.username, accepted: true };
+
+    user.friends.push(newFriend);
+    friend.friends.push(newUser);
+
+    await userDAO.update(user);
+    await userDAO.update(friend);
+
+    res.status(200);
+  } else {
+    const error = 'user not found';
+    res.status(404).json(error);
+  }
+});
+
+router.post('/decline', authService.authenticationMiddleware, async (req, res) => {
+  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const userId = res.locals.user.id;
+  const friendname = 'axel';
+
+  const user = await userDAO.findOne({ id: userId });
+  const friend = await userDAO.findOne({ username: friendname });
+
+  if (friend && user) {
+    //searches the friendname in the friends of user and deletes the entry
+    const index = user.friends.findIndex(friend => friend.username === friendname);
+    if (index !== -1) {
+      user.friends.splice(index, 1);
+    }
+
+    //searches the username in the friends of friend and deletes the entry
+    const indextwo = friend.friends.findIndex(friend => friend.username === user.username);
+    if (indextwo !== -1) {
+      friend.friends.splice(indextwo, 1);
+    }
+
+    await userDAO.update(user);
+    await userDAO.update(friend);
+
+    res.status(200);
+  } else {
+    const error = 'user not found';
+    res.status(404).json(error);
+  }
+});
+
 export default router;

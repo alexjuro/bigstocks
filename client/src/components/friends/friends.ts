@@ -1,8 +1,6 @@
 /* Autor: Alexander Lesnjak */
 //TODO: show the picture of the user
 //TODO: make the accept and decline buttons work
-//TODO: make the add friend not redirect to another website
-//TODO: stop autofill
 //TODO: find the friend by its username or save friends with email for the performance
 
 import { LitElement, PropertyValueMap, html } from 'lit';
@@ -71,6 +69,18 @@ class AppFriendsComponent extends LitElement {
 
     try {
       const response = await httpClient.post('friends', '');
+      const data = await response.json();
+      console.log(data);
+    } catch (e) {
+      if ((e as Error).message == 'Unauthorized!') {
+        router.navigate('/user/sign-in');
+      } else {
+        console.log((e as Error).message);
+      }
+    }
+
+    try {
+      const response = await httpClient.post('friends/accept', '');
       const data = await response.json();
       console.log(data);
     } catch (e) {
