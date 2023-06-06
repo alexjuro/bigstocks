@@ -1,5 +1,4 @@
 /* Author: Alexander Lensjak */
-//TODO: return live performance
 
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';
@@ -52,6 +51,31 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
     res.json({ friends: friendsWithPerformance });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
+  }
+});
+
+router.post('/', authService.authenticationMiddleware, async (req, res) => {
+  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const filter: Partial<User> = { id: res.locals.user.id };
+  const friendfilter: Partial<User> = { username: req.body.user.username };
+
+  const user = await userDAO.findOne(filter);
+  const friend = await userDAO.findOne(friendfilter);
+
+  if (user && friend) {
+    const newFriendObject = {
+      username: friend.username,
+      email: friend.email,
+      accepted: false
+    };
+
+    user.friends.push(newFriendObject); // Add the new friend object to the friends array
+
+    await userDAO.update(user); // Update the user object in the database
+
+    res.sendStatus(200);
+  } else {
+    res.status(500);
   }
 });
 

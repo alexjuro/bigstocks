@@ -51,7 +51,7 @@ class AppFriendsComponent extends LitElement {
           const formattedValue = performance.value.toLocaleString('de-DE', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-            useGrouping: true
+            useGrouping: false
           });
 
           return { ...performance, value: formattedValue };
@@ -149,10 +149,15 @@ class AppFriendsComponent extends LitElement {
 
   async _addFriend() {
     const friend = this.nameElement.value;
-
     try {
-      await httpClient.post('friends', friend);
-      this._displaySuccess();
+      const response = await httpClient.post('friends', { username: friend });
+      console.log(friend);
+
+      if (response.ok) {
+        this._displaySuccess();
+      } else {
+        // Handle error response
+      }
     } catch (e) {
       this._displayError((e as Error).message);
       console.log((e as Error).message);

@@ -7,8 +7,14 @@ import componentStyle from './secret.css?inline';
 class SecretAppComponent extends LitElement {
   static styles = componentStyle;
 
-  @property({ type: Array })
-  requests: any[] = [];
+  @property()
+  username: string = '';
+
+  @property()
+  trials: number = 0;
+
+  @property()
+  cash: number = 0;
 
   rows = 8;
   cols = 8;
@@ -168,8 +174,28 @@ class SecretAppComponent extends LitElement {
     }
   }
 
-  showGameOver() {
+  async showGameOver() {
     console.log('game over');
+    try {
+      const response = await fetch('http://localhost:3000/api/minesweeper', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        // Trials updated successfully
+        const data = await response.json();
+        this.trials = data.trials.value;
+
+        // Perform any necessary actions after updating the trials
+      } else {
+        // Handle error response
+      }
+    } catch (error) {
+      // Handle network or other errors
+    }
   }
 
   showVictory() {
@@ -187,8 +213,13 @@ class SecretAppComponent extends LitElement {
     try {
       const response = await httpClient.get('minesweeper');
       const data = await response.json();
-
-      console.log('data:', data);
+      this.username = data.username;
+      this.trials = data.trials.value;
+      this.cash = data.money.toLocaleString('de-DE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: false
+      });
     } catch (e) {
       console.log((e as Error).message, 'error');
     }
@@ -197,8 +228,9 @@ class SecretAppComponent extends LitElement {
   render() {
     return html`
       <div id="container">
-        <div id="username">Username</div>
-        <div id="highscore">Highscore: ${this.highscore}</div>
+        <div id="username">${this.username}</div>
+        <div id="cash">cash: ${this.cash} $</div>
+        <div id="highscore">Tries left: ${this.trials}</div>
         <div class="board"></div>
         <div id="message"></div>
         <button id="restart-button" @click="${this.restartGame}">Restart</button>

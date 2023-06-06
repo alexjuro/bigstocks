@@ -31,7 +31,7 @@ class AppLeaderboardComponent extends LitElement {
         const formattedMoney = totalMoney.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-          useGrouping: true
+          useGrouping: false
         });
         return { name, money: formattedMoney };
       });
