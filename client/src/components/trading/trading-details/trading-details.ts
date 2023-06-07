@@ -11,6 +11,7 @@ import { router } from '../../../router/router';
 import { Chart, ChartData, ChartOptions } from 'chart.js/auto';
 import { StockService } from '../../../stock-service';
 import { PageMixin } from '../../page.mixin';
+import xss from 'xss';
 
 export interface Note {
   symbol: string;
@@ -120,7 +121,7 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
     event.preventDefault();
     const formData = new FormData(this.form);
     const noteText = formData.get('ftext') as string;
-    if (this.isFormValid()) {
+    if (this.isFormValid() && this.validate(noteText)) {
       const note: Note = {
         ...this.note,
         symbol: this.symbol,
@@ -134,12 +135,29 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
         this.showNotification((e as Error).message, 'error');
       }
     } else {
-      this.form.classList.add('was-validated');
+      this.form.classList.add('error-validation');
     }
   }
 
   isFormValid() {
     return this.form.checkValidity();
+  }
+
+  validate(note: string) {
+    let result = true;
+    // Überprüfung auf potenzielle NOSQL-Injection
+    const nosqlInjectionPattern = /[$\\'"]/;
+
+    if (nosqlInjectionPattern.test(note)) {
+      result = false;
+    }
+
+    // Überprüfung auf potenzielle XSS-Attacken
+    const sanitizedNote = xss(note);
+    if (sanitizedNote !== note) {
+      result = false;
+    }
+    return result;
   }
 
   render() {

@@ -75,6 +75,10 @@ textarea:focus {
   font-family: Arial, sans-serif;
 }
 
+.error-validation textarea {
+  border: 2px solid red;
+}
+
 .canvas {
   display: block;
   justify-content: center;

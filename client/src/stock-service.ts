@@ -7,7 +7,8 @@ const apiKey = [
   'cgsjqchr01qkrsgj9tk0cgsjqchr01qkrsgj9tkg',
   'chm9grpr01qs8kipkgf0chm9grpr01qs8kipkgfg',
   'chm9k69r01qs8kipkhlgchm9k69r01qs8kipkhm0',
-  'chm9lj9r01qs8kipki20chm9lj9r01qs8kipki2g'
+  'chm9lj9r01qs8kipki20chm9lj9r01qs8kipki2g',
+  'chvpmcpr01qp0736hs1gchvpmcpr01qp0736hs20'
 ];
 
 export class StockService {
@@ -41,9 +42,9 @@ export class StockService {
           };
         });
       } catch (error) {
-        console.log('WebSocket connection failed. Retrying in 2 seconds...');
+        console.log('WebSocket connection failed. Retrying in 0.5 seconds...');
         this.socket?.close();
-        await new Promise<void>(resolve => setTimeout(resolve, 2000));
+        await new Promise<void>(resolve => setTimeout(resolve, 500));
       }
     }
 

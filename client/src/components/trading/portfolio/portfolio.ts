@@ -12,7 +12,6 @@ import { TradingComponent } from '../tradingcomponent.js';
 import { UserStock } from '../../../interfaces/stock-interface.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
-// import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 @customElement('app-portfolio')
 export class PortfolioComponent extends TradingComponent {
@@ -48,6 +47,8 @@ export class PortfolioComponent extends TradingComponent {
   ChartDoughnut: any = {};
   @property({ type: Object })
   ChartGraph: any = {};
+
+  private sortBy: 'shares' | 'alphabet' = 'alphabet';
 
   constructor() {
     super();
@@ -250,17 +251,43 @@ export class PortfolioComponent extends TradingComponent {
     this.requestUpdate();
   }
 
+  sortStocks() {
+    if (this.sortBy === 'alphabet') {
+      this.userStocks.sort((a, b) => {
+        return a.symbol.localeCompare(b.symbol);
+      });
+    } else if (this.sortBy === 'shares') {
+      this.userStocks.sort((a, b) => {
+        return b.shares - a.shares;
+      });
+    }
+    this.requestUpdate();
+  }
+
+  toggleSort() {
+    this.sortBy = this.sortBy == 'alphabet' ? 'shares' : 'alphabet';
+    const candle = this.shadowRoot!.querySelector('app-trading-candle');
+    const info = this.shadowRoot!.querySelector('app-trading-info');
+    if (candle) {
+      candle.remove();
+    }
+    if (info) {
+      info.remove();
+    }
+    this.sortStocks();
+  }
+
   render() {
     return html`
       ${this.renderNotification()}
       <div class="container">
         <app-trading-notification></app-trading-notification>
         <div class="part-container graph-container">
-          <h1 id="upp">Portfolio-Graph</h1>
+          <h1 id="pUpp" class="upp">Portfolio-Graph</h1>
           <div class="graph">
             <canvas id="graph"></canvas>
           </div>
-          <h1 id="upp">Portfolio-Allocation</h1>
+          <h1 id="aUpp" class="upp">Portfolio-Allocation</h1>
           <div class="allo">
             <canvas id="doughnut"></canvas>
           </div>
@@ -268,7 +295,8 @@ export class PortfolioComponent extends TradingComponent {
         <div class="part-container info-container">
           <div style="margin-top: 0px" class="money">
             <p class="account" style="color: ${PortfolioComponent.colorArray[0]}">
-              <img src="${this.publicUrl}dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
+              <img src="${this.publicUrl}dollar.png" alt="Cash Icon" class="icon" />
+              ${this.money}$
             </p>
             <img src="${this.publicUrl}up.png" alt="Up Icon" class="icon" />
             <p class="account pValue">${(this.money + this.calculateTotalValue()).toFixed(1)}$</p>
@@ -281,7 +309,10 @@ export class PortfolioComponent extends TradingComponent {
           ${this.userStocks.length > 0
             ? html`
                 <div class="portfolio-page">
-                  <h1 id="upp">Your Stocks</h1>
+                  <button id="sort" @click=${this.toggleSort}>
+                    ${this.sortBy === 'alphabet' ? 'Sort Shares' : 'Sort Alphabetically'}
+                  </button>
+                  <h1 id="class">Your Stocks</h1>
                   ${this.userStocks.map(
                     stock => html`
                       <app-stock class="stock" id=${stock.symbol}>

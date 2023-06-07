@@ -3,8 +3,7 @@
 import { expect } from 'chai';
 import sinon, { SinonStubbedInstance } from 'sinon';
 import { LitElement } from 'lit';
-import { fixture, nextFrame } from '@open-wc/testing-helpers';
-import { TradingComponent } from '../tradingcomponent';
+import { fixture } from '@open-wc/testing-helpers';
 import { StockService } from '../../../stock-service';
 import './portfolio';
 import { httpClient } from '../../../http-client';

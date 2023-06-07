@@ -1,14 +1,14 @@
 /* Autor: Alexander Schellenberg */
 
 import { customElement } from 'lit/decorators.js';
-import { LitElement, html } from 'lit';
-import { property, query, state } from 'lit-element';
+import { html } from 'lit';
+import { property, state } from 'lit-element';
 import sharedStyle from '../../shared.css?inline';
 import componentStyle from './market.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
 import { StockService } from '../../../stock-service.js';
 import { TradingComponent } from '../tradingcomponent.js';
-import { Stock, UserStock } from '../../../interfaces/stock-interface.js';
+import { UserStock } from '../../../interfaces/stock-interface.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
 
@@ -63,7 +63,7 @@ export class MarketComponent extends TradingComponent {
       ${this.renderNotification()}
       <div class="container">
         <app-trading-notification></app-trading-notification>
-        <h1 id="upp">Marketplace</h1>
+        <h1 class="upp">Marketplace</h1>
         <div>
           <p class="account" style="color: #E58400">
             <img src="${this.publicUrl}dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
@@ -79,7 +79,7 @@ export class MarketComponent extends TradingComponent {
               <app-stock class="stock" id=${stock.symbol}>
                 <img src="${stock.image}" alt="${stock.name} Logo" />
                 <h2 @click=${(event: MouseEvent) => this.handleStockClick(event, stock)}>${stock.name}</h2>
-                <p id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
+                <p class="prices" id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
                 <p class="percentages" id="perc${stock.symbol}">
                   ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
                 </p>

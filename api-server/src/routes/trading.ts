@@ -9,6 +9,8 @@ import { User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
 import { cryptoService } from '../services/crypto.service.js';
 import { Note } from '../models/note.js';
+import xss from 'xss';
+import { validate } from 'uuid';
 
 const router = express.Router();
 
@@ -173,6 +175,9 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
   const cryptNote = cryptoService.encrypt(note.note);
 
   try {
+    if (validation(note)) {
+      res.status(403).json({ error: 'Potential Attack detected' });
+    }
     const exNote = await noteDAO.findOne({ userId, symbol: note.symbol });
     if (exNote) {
       exNote.note = cryptNote;
@@ -225,7 +230,6 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
     lowestPriceTransaction.status = false;
     lowestPriceTransaction.soldAt = new Date().getTime();
 
-    // Update the transaction
     await transactionDAO.update(lowestPriceTransaction);
 
     user.money = Number((user.money + lowestPriceTransaction.sPrice).toFixed(2)); // Add the sell price to the user's money
@@ -240,5 +244,23 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
     res.status(500).json({ error: 'An error occurred while updating the transaction' });
   }
 });
+
+function validation(note: Note) {
+  let result = false;
+
+  // Überprüfung auf potenzielle SQL-Injection
+  const sqlInjectionPattern = /[';]|--|\/\*|\*\//gi;
+  if (sqlInjectionPattern.test(note.note)) {
+    result = true;
+  }
+
+  // Überprüfung auf potenzielle XSS-Attacken
+  const sanitizedComment = xss(note.note);
+  if (sanitizedComment !== note.note) {
+    result = true;
+  }
+
+  return result;
+}
 
 export default router;

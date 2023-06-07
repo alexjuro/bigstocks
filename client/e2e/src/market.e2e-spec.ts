@@ -1,0 +1,126 @@
+/* Autor: Alexander Schellenberg */
+
+import { Browser, BrowserContext, Page, chromium, Locator } from 'playwright';
+import { expect } from 'chai';
+import config from './config.js';
+
+describe('/trading/market', () => {
+  let browser: Browser;
+  let context: BrowserContext;
+  let page: Page;
+  let info: Locator;
+  let candle: Locator;
+  let stock: Locator;
+
+  before(async () => {
+    browser = await chromium.launch(config.launchOptions);
+    context = await browser.newContext();
+    page = await context.newPage();
+
+    await page.goto(config.clientUrl('/app/sign-in'));
+    await page.fill('#username', 'admin');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await page.fill('#password', 'Password1');
+    await page.getByRole('button', { name: 'Sign-In', exact: true }).click();
+    await page.waitForURL(config.clientUrl('/news'));
+
+    await page.goto(config.clientUrl('/trading/market'));
+    info = page.locator('app-trading-info');
+    candle = page.locator('app-trading-candle');
+  });
+
+  after(async () => {
+    await context.close();
+    await browser.close();
+  });
+
+  describe('market page', () => {
+    it('should render the page correctly', async () => {
+      expect(await page.textContent('app-header a')).to.equal('Market');
+      expect(await page.textContent('h1')).to.equal('Marketplace');
+      await page.waitForSelector('app-stock');
+      expect(await page.locator('app-stock').count()).to.equal(24);
+    });
+  });
+  describe('same trading activities', () => {
+    it('should display stock information on click', async () => {
+      stock = page.locator('app-stock').first();
+      const stockh2 = stock.locator('h2');
+      await stockh2.click();
+
+      expect(await candle.isVisible()).to.be.true;
+      expect(await info.isVisible()).to.be.true;
+
+      const stockName = await stockh2.textContent();
+      expect(stockName).to.equal('Apple');
+
+      const price = await stock.locator('.prices').textContent();
+      expect(price).to.not.equal('N/A');
+
+      await stockh2.click();
+      expect(await candle.isVisible()).to.be.false;
+      expect(await info.isVisible()).to.be.false;
+    });
+
+    it('should execute buyStock function on Buy button click', async () => {
+      expect(await info.isVisible()).to.be.false;
+      const stockh2 = await stock.locator('h2');
+
+      await stockh2.click();
+      expect(await info.isVisible()).to.be.true;
+
+      const buyButton = page.locator('.buy');
+      await buyButton.click();
+
+      await page.waitForSelector('.success', { timeout: 5000 });
+
+      const sharesElement = await stock.locator('.shares').first();
+
+      const sharesText = await sharesElement.textContent();
+
+      expect(sharesText).to.equal('2x');
+    });
+
+    it('should execute sellStock function on Sell button click', async () => {
+      const sellButton = page.locator('.sell');
+      await sellButton.click();
+
+      await page.waitForSelector('.warning', { timeout: 5000 });
+
+      const sharesElement = await stock.locator('.shares').first();
+
+      const sharesText = await sharesElement.textContent();
+
+      expect(sharesText).to.equal('1x');
+    });
+
+    it('should navigate to details page on button click', async () => {
+      const detailsButton = stock.locator('.stockdetails');
+
+      await detailsButton.click();
+
+      expect(await page.url()).to.include('/trading/details');
+    });
+  });
+
+  describe('market error', () => {
+    it('should display an error notification when selling a stock where user has no stocks in', async () => {
+      await page.goBack();
+
+      stock = page.locator('app-stock').last();
+
+      const stockh2 = stock.locator('h2');
+      await stockh2.click();
+
+      const sellButton = stock.locator('.sell');
+      await sellButton.click();
+
+      await page.waitForSelector('.error', { timeout: 5000 });
+
+      const sharesElements = stock.locator('.shares');
+      const sharesCount = await sharesElements.count();
+
+      expect(sharesCount).to.equal(0);
+    });
+  });
+});

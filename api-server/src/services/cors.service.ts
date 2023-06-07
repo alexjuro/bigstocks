@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 class CorsService {
   corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    console.log('AAA');
     if (this.isOriginAllowed(req.get('Origin')) /*&& this.isSecureRequest(req)*/) {
       res.set('Access-Control-Allow-Origin', req.get('Origin'));
       res.set('Access-Control-Allow-Credentials', 'true');

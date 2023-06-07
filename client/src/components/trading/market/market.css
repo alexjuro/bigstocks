@@ -5,6 +5,7 @@
   flex-wrap: wrap;
   margin: 4vh;
 }
+
 .stock {
   display: inline-block;
   position: relative;
@@ -21,7 +22,7 @@
 
 .stock:hover {
   box-shadow: 0 0 10px 0 rgba(173, 168, 168, 0.2), 0 10px 10px 0 rgba(186, 183, 183, 0.24),
-    inset 600px 0 0 0 rgb(255, 246, 227);
+    inset 600px 0 0 0 rgba(246, 241, 255, 0.614);
 }
 
 @media screen and (max-width: 1200px) {

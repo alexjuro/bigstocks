@@ -2,9 +2,8 @@
 import { PageMixin } from '../page.mixin';
 import { LitElement } from 'lit';
 import { StockService } from '../../stock-service.js';
-import { UserStock, Stock } from '../../interfaces/stock-interface.js';
+import { UserStock } from '../../interfaces/stock-interface.js';
 import Chart from 'chart.js/auto';
-import { router } from '../../router/router.js';
 import { httpClient } from '../../http-client';
 import { PortfolioComponent } from './portfolio/portfolio';
 import { CandleComponent } from './trading-widgets/candlecomponent';
@@ -138,7 +137,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
           notification.style.opacity = '0';
           notification.classList.remove(type);
           notification.textContent = '';
-        }, 3000);
+        }, 5000);
       }
     }
   }
@@ -241,7 +240,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
   }
 
   async buyStock(event: Event, stock: UserStock) {
-    console.log('BUY!');
     if (this.tradeLock) {
       return;
     }
