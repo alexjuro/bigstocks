@@ -140,7 +140,7 @@ describe('/users/account', () => {
   });
 
   describe('/password', async () => {
-    it('should reject invalid body', async () => {
+    it('should reject invalid password', async () => {
       const res = await createFetch('POST', '/users/account/password', {
         id: user.id,
         password: 'invalidpassword'
@@ -148,6 +148,16 @@ describe('/users/account', () => {
 
       expect(res.status).to.equal(400);
       expect(((await res.json()) as Res).status).to.equal('bad request');
+    });
+
+    it('should accept valid body', async () => {
+      const res = await createFetch('POST', '/users/account/password', {
+        id: user.id,
+        password: 'ValidPassword1'
+      });
+
+      expect(res.status).to.equal(200);
+      expect(((await res.json()) as Res).status).to.equal('ok');
     });
   });
 });
