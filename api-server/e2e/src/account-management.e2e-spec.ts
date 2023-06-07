@@ -36,11 +36,114 @@ const signIn = async (username: string, password: string) => {
 describe('/users/account', () => {
   before(async () => (user.token = await signIn(user.name, user.password)));
 
-  describe('#post', () => {
-    it('should reject invalid body', async () => {
+  after(async () => {
+    await createFetch('POST', '/users/account/avatar', {
+      id: user.id,
+      avatar: ''
+    });
+    await createFetch('POST', '/users/account/details', {
+      id: user.id,
+      username: user.name,
+      email: user.email
+    });
+    await createFetch('POST', '/users/account/password', {
+      id: user.id,
+      password: user.password
+    });
+  });
+
+  describe('generic', () => {
+    it('should reject with additional properties', async () => {
+      const res = await createFetch('POST', '/users/account/avatar', {
+        id: user.id,
+        avatar: 'data:image/png;base64,imgdata',
+        field: 'value'
+      });
+
+      expect(res.status).to.equal(400);
+      expect(((await res.json()) as Res).status).to.equal('bad request');
+    });
+
+    it('should reject with missing properties', async () => {
+      const res = await createFetch('POST', '/users/account/avatar', { id: user.id });
+
+      expect(res.status).to.equal(400);
+      expect(((await res.json()) as Res).status).to.equal('bad request');
+    });
+
+    it('should reject with incorrect property type', async () => {
+      const res = await createFetch('POST', '/users/account/avatar', {
+        id: user.id,
+        avatar: 1
+      });
+
+      expect(res.status).to.equal(400);
+      expect(((await res.json()) as Res).status).to.equal('bad request');
+    });
+  });
+
+  describe('/avatar', () => {
+    it('should reject invalid image string', async () => {
       const res = await createFetch('POST', '/users/account/avatar', {
         id: user.id,
         avatar: 'invalid-string-data'
+      });
+
+      expect(res.status).to.equal(400);
+      expect(((await res.json()) as Res).status).to.equal('bad request');
+    });
+
+    it('should accept valid body', async () => {
+      const res = await createFetch('POST', '/users/account/avatar', {
+        id: user.id,
+        avatar: 'data:image/png;base64,imgdata'
+      });
+
+      expect(res.status).to.equal(200);
+      expect(((await res.json()) as Res).status).to.equal('ok');
+    });
+  });
+
+  describe('/details', async () => {
+    it('should reject invalid name', async () => {
+      const res = await createFetch('POST', '/users/account/details', {
+        id: user.id,
+        username: 'abc',
+        email: user.email
+      });
+
+      expect(res.status).to.equal(400);
+      expect(((await res.json()) as Res).status).to.equal('bad request');
+    });
+
+    it('should reject invalid email', async () => {
+      const res = await createFetch('POST', '/users/account/details', {
+        id: user.id,
+        username: user.name,
+        email: 'invalid@email.'
+      });
+
+      expect(res.status).to.equal(400);
+      expect(((await res.json()) as Res).status).to.equal('bad request');
+    });
+
+    it('should accept valid body', async () => {
+      const res = await createFetch('POST', '/users/account/details', {
+        id: user.id,
+        username: user.name,
+        email: 'testmail@bigstocks.com'
+      });
+
+      expect(res.status).to.equal(200);
+      expect(((await res.json()) as Res).status).to.equal('ok');
+    });
+  });
+
+  describe('/password', async () => {
+    it('should reject invalid body', async () => {
+      const res = await createFetch('POST', '/users/account/password', {
+        id: user.id,
+        password: 'invalidpassword'
       });
 
       expect(res.status).to.equal(400);
