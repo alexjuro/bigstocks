@@ -22,7 +22,7 @@ import leaderboard from './routes/leaderboard.js';
 import minesweeper from './routes/minesweeper.js';
 import config from '../config.json' assert { type: 'json' };
 import comment from './routes/comment.js';
-import { referrerPolicyMiddleware } from './services/ReferrerPolicyMiddleware.js';
+import { referrerPolicyMiddleware } from './services/referrerPolicyMiddleware.js';
 import { xContentTypeMiddleware } from './services/xContentTypeMiddleware.js';
 import { xFrameMiddleware } from './services/xFrameMiddleware.js';
 
