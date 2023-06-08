@@ -30,4 +30,4 @@ import './components/friends/friends.ts';
 import './components/widgets/rating/my-rating.js';
 import './components/sign-up/forgotPassword.js';
 import './components/sign-up/resetPassword.js';
-import './components/bigstocksgobrrr/secret.ts';
+import './components/bigstocksgobrrr/minesweeper.js';

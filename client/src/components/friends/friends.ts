@@ -218,7 +218,7 @@ class AppFriendsComponent extends LitElement {
 
     try {
       const response = await httpClient.post('friends', { username: friendname });
-      //TODO: hier
+      //TODO error when already added
     } catch (e) {
       //redirect if the user isnt logged in(never appears)
       if ((e as Error).message == 'Unauthorized!') {
