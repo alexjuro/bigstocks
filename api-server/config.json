@@ -1,5 +1,5 @@
 {
-  "server": { "https": false, "port": 3000 },
+  "server": { "https": true, "port": 3000 },
   "db": {
     "use": "mongodb",
     "connect": {

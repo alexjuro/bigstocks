@@ -218,7 +218,7 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
       return;
     }
 
-    // Find the transaction with the lowest buy price
+    // Find transaction with lowest buy price
     let lowestPriceTransaction = userTransactions[0];
     for (const transaction of userTransactions) {
       if (transaction.bPrice < lowestPriceTransaction.bPrice) {
@@ -232,7 +232,7 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
 
     await transactionDAO.update(lowestPriceTransaction);
 
-    user.money = Number((user.money + lowestPriceTransaction.sPrice).toFixed(2)); // Add the sell price to the user's money
+    user.money = Number((user.money + lowestPriceTransaction.sPrice).toFixed(2)); // Add  sell price to user money
 
     await updatePerformance(user, pValue);
     await userDAO.update(user);
@@ -248,13 +248,11 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
 function validation(note: Note) {
   let result = false;
 
-  // Überprüfung auf potenzielle SQL-Injection
   const sqlInjectionPattern = /[';]|--|\/\*|\*\//gi;
   if (sqlInjectionPattern.test(note.note)) {
     result = true;
   }
 
-  // Überprüfung auf potenzielle XSS-Attacken
   const sanitizedComment = xss(note.note);
   if (sanitizedComment !== note.note) {
     result = true;

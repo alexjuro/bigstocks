@@ -144,15 +144,16 @@ export class PortfolioComponent extends TradingComponent {
 
           subtitle: {
             display: true,
+            position: 'left',
             text: 'You have ' + this.userStocks.length + ' stocks!',
             font: {
-              size: 16
+              size: 10
             }
           },
           legend: {
             labels: {
               font: {
-                size: 14
+                size: 12
               }
             }
           }
@@ -204,7 +205,7 @@ export class PortfolioComponent extends TradingComponent {
           subtitle: {
             display: true,
             text: `${percentageChange.toFixed(2)}% from ${labels[0]} to ${labels[labels.length - 1]}`,
-            font: { size: 16, weight: 'bold' },
+            font: { size: 12, weight: 'bold' },
             position: 'top'
           },
           legend: {
@@ -312,7 +313,7 @@ export class PortfolioComponent extends TradingComponent {
                   <button id="sort" @click=${this.toggleSort}>
                     ${this.sortBy === 'alphabet' ? 'Sort Shares' : 'Sort Alphabetically'}
                   </button>
-                  <h1 id="class">Your Stocks</h1>
+                  <h1 class="upp">Your Stocks</h1>
                   ${this.userStocks.map(
                     stock => html`
                       <app-stock class="stock" id=${stock.symbol}>

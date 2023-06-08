@@ -29,7 +29,7 @@ h1 {
 }
 
 .graph-container {
-  flex-basis: 80%;
+  flex-basis: 60%;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -53,8 +53,8 @@ h1 {
 
 .graph {
   flex: 1;
-  width: 40rem;
-  height: 30rem;
+  width: 45rem;
+  height: 5rem;
   justify-content: center;
   display: block;
   margin: 0 auto;
@@ -62,8 +62,8 @@ h1 {
 
 .allo {
   flex: 1;
-  width: 30rem;
-  height: 30rem;
+  width: 25rem;
+  height: 25rem;
   justify-content: center;
   display: block;
   margin: 0 auto;
@@ -105,11 +105,11 @@ h1 {
 .stock {
   display: inline-block;
   position: relative;
-  font-size: 12px;
+  font-size: 10px;
   background-color: #ffffff;
   color: #373737;
   width: 100%;
-  margin: 10px 0 10px;
+  margin: 5px 0 5px;
   padding: 2%;
   box-sizing: border-box;
   border-radius: 1em;
@@ -124,5 +124,15 @@ h1 {
 }
 
 .prices {
-  font-size: 16px;
+  font-size: 12px;
+}
+
+.money {
+  margin: 2%;
+}
+
+.sort {
+  margin-top: 2%;
+  margin-bottom: 2%;
+  width: 20%;
 }
