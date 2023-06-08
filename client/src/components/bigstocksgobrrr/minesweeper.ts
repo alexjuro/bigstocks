@@ -313,11 +313,15 @@ class SecretAppComponent extends LitElement {
           <br />
           There is no warm up!
           <br />
-          Once you start the game there is either winning or losing. Everytime you win or lose your tries decrease by
-          one.
+          Everytime you win or lose your tries decrease by one. You get 3 tries every day. If you feel like you are
+          loosing, you can restart the One win adds 500$ to your cash. game. If you have never played minesweeper
+          before:
+          <h5>Here is a quick Tutorial:</h5>
+          Once you leftclick on a field it reveals how many mines are in a one block radius around the field. To win you
+          have to mark all mine with a rightclick on your mice.
           <br />
           <br />
-          One win adds 500$ to your cash.
+          That's it. Enjoy!
         </div>
       </div>
     `;

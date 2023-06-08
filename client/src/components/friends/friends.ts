@@ -127,7 +127,8 @@ class AppFriendsComponent extends LitElement {
           this.friends = json.friends;
           this.requests = json.requests;
 
-          return html`<div id="background">
+          return html`
+            <div id="background">
               <div id="kreis"></div>
             </div>
 
@@ -200,7 +201,8 @@ class AppFriendsComponent extends LitElement {
                   </div>
                 </div>
               </div>
-            </div>`;
+            </div>
+          `;
         }),
         html`<is-loading></is-loading>`
       )}

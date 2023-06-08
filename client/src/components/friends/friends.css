@@ -266,6 +266,18 @@ button {
   .frame {
     height: 60px;
   }
+
+  #feedback {
+    font-size: 14px;
+  }
+
+  #addwindow input {
+    font-size: 17px;
+  }
+
+  #addwindow button {
+    font-size: 17px;
+  }
 }
 
 @media (max-width: 1024px) {

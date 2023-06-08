@@ -57,7 +57,7 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
     const friends = friendsArray.filter((friend: any) => friend.accepted === true);
     const requests = friendsArray.filter((friend: any) => friend.accepted === false);
 
-    res.json({ friends: friends, requests: requests });
+    res.status(200).json({ friends: friends, requests: requests });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
   }
