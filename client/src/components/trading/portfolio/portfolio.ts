@@ -144,15 +144,16 @@ export class PortfolioComponent extends TradingComponent {
 
           subtitle: {
             display: true,
+            position: 'left',
             text: 'You have ' + this.userStocks.length + ' stocks!',
             font: {
-              size: 16
+              size: 14
             }
           },
           legend: {
             labels: {
               font: {
-                size: 14
+                size: 12
               }
             }
           }
@@ -204,7 +205,7 @@ export class PortfolioComponent extends TradingComponent {
           subtitle: {
             display: true,
             text: `${percentageChange.toFixed(2)}% from ${labels[0]} to ${labels[labels.length - 1]}`,
-            font: { size: 16, weight: 'bold' },
+            font: { size: 14, weight: 'bold' },
             position: 'top'
           },
           legend: {
