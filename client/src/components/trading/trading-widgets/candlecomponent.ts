@@ -19,7 +19,7 @@ export class CandleComponent extends PageMixin(LitElement) {
   render() {
     return html`
       <div class="candle-div">
-        <canvas width="200" height="300" id="candle"></canvas>
+        <canvas width="200" height="200" id="candle"></canvas>
       </div>
     `;
   }

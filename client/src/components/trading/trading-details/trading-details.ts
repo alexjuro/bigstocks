@@ -135,6 +135,7 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
         this.showNotification((e as Error).message, 'error');
       }
     } else {
+      this.showNotification('Please submit a valid note', 'error');
       this.form.classList.add('error-validation');
     }
   }
@@ -145,14 +146,12 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
 
   validate(note: string) {
     let result = true;
-    // Überprüfung auf potenzielle NOSQL-Injection
     const nosqlInjectionPattern = /[$\\'"]/;
 
     if (nosqlInjectionPattern.test(note)) {
       result = false;
     }
 
-    // Überprüfung auf potenzielle XSS-Attacken
     const sanitizedNote = xss(note);
     if (sanitizedNote !== note) {
       result = false;
