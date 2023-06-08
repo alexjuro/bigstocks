@@ -141,6 +141,8 @@ describe('user-profile-password', () => {
     expect(pass1.validity.customError).to.be.false;
     expect(checkValidity.calledOnce).to.be.true;
     expect(checkValidity.returned(true)).to.be.true;
-    expect((await listener).detail).to.be.a('function');
+    expect((await listener).detail).to.be.an('object');
+    expect((await listener).detail.cb).to.be.a('function');
+    expect((await listener).detail.confirm).to.be.true;
   });
 });
