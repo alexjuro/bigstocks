@@ -14,7 +14,7 @@ class SecretAppComponent extends LitElement {
   username: string = '';
 
   @property()
-  trials: number = 0;
+  tries: number = 0;
 
   @property()
   cash: number = 0;
@@ -210,7 +210,7 @@ class SecretAppComponent extends LitElement {
     messageElement!.innerHTML = 'Game Over';
 
     //decrease the amount of tries by one
-    if (this.trials != 0) {
+    if (this.tries != 0) {
       this.restartPost();
       this.changeTries();
     }
@@ -221,9 +221,7 @@ class SecretAppComponent extends LitElement {
     const messageElement = this.shadowRoot!.getElementById('message');
     messageElement!.innerHTML = 'You won!';
 
-    if (this.trials != 0) {
-      //TODO: change problem
-      //post
+    if (this.tries != 0) {
       this.cash = this.cash + 500;
       this.cashString = this.cash.toLocaleString('de-DE', {
         minimumFractionDigits: 2,
@@ -232,14 +230,13 @@ class SecretAppComponent extends LitElement {
       });
       const cashElem = this.shadowRoot?.getElementById('cash');
       cashElem!.innerHTML = `cash: ${this.cashString} $`;
-
-      this.victoryPost();
     }
 
     //decrease the amount of tries by one
-    if (this.trials != 0) {
+    if (this.tries != 0) {
       this.restartPost();
       this.changeTries();
+      this.victoryPost();
     }
   }
 
@@ -254,11 +251,11 @@ class SecretAppComponent extends LitElement {
 
   changeTries() {
     const marksleftElement = this.shadowRoot?.getElementById('tries');
-    marksleftElement!.innerHTML = `Tries left: ${this.trials} -1`;
-    this.trials = this.trials - 1;
+    marksleftElement!.innerHTML = `Tries left: ${this.tries} -1`;
+    this.tries = this.tries - 1;
 
     setTimeout(() => {
-      marksleftElement!.innerHTML = `Tries left: ${this.trials}`;
+      marksleftElement!.innerHTML = `Tries left: ${this.tries}`;
     }, 1000);
   }
 
@@ -275,7 +272,7 @@ class SecretAppComponent extends LitElement {
       const data = await response.json();
 
       this.username = data.username;
-      this.trials = data.trials.value;
+      this.tries = data.tries.value;
       this.cash = data.money;
       this.cashString = this.cash.toLocaleString('en-US', {
         minimumFractionDigits: 2,
@@ -290,7 +287,7 @@ class SecretAppComponent extends LitElement {
       cashElem!.innerHTML = `cash: ${this.cashString} $`;
 
       const triesElem = this.shadowRoot?.getElementById('tries');
-      triesElem!.innerHTML = `Tries left: ${this.trials}`;
+      triesElem!.innerHTML = `Tries left: ${this.tries}`;
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
@@ -314,10 +311,10 @@ class SecretAppComponent extends LitElement {
         <div id="how">
           <h4>How it works:</h4>
           <br />
-          You get one try to warm up.
+          There is no warm up!
           <br />
-          Once you click on Restart, the amount of you tries decreases by one. Every Day you get 3 tries. Once these are
-          used, you can still play Minesweeper, but can not win money.
+          Once you start the game there is either winning or losing. Everytime you win or lose your tries decrease by
+          one.
           <br />
           <br />
           One win adds 500$ to your cash.

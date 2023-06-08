@@ -206,7 +206,7 @@ router.post('/sign-up', async (req, res) => {
     avatar: '',
     compareEmail: req.body.email.toUpperCase(),
     friends: [{ username: 'PatrickBateman', accepted: false }],
-    trials: { date: new Date().toLocaleDateString(), value: 3 }
+    tries: { date: new Date().toLocaleDateString(), value: 3 }
   });
   if (newUser) {
     await sendCodeActivation(newUser.email, newCode);

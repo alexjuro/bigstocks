@@ -124,7 +124,6 @@ class AppFriendsComponent extends LitElement {
     return html`
       ${until(
         this.request.then(json => {
-          const data = json;
           this.friends = json.friends;
           this.requests = json.requests;
 
@@ -218,7 +217,8 @@ class AppFriendsComponent extends LitElement {
 
     try {
       const response = await httpClient.post('friends', { username: friendname });
-      //TODO error when already added
+      console.log('succes');
+      this._displaySuccess();
     } catch (e) {
       //redirect if the user isnt logged in(never appears)
       if ((e as Error).message == 'Unauthorized!') {
@@ -233,6 +233,11 @@ class AppFriendsComponent extends LitElement {
       else if ((e as Error).message == 'Conflict') {
         this._displayError('This friend already send you an request');
         console.log('This friend already send you an request');
+      }
+      //If you already send a Request to that person
+      else if ((e as Error).message == 'Not Acceptable') {
+        this._displayError('You have already send a Request to that person');
+        console.log('You have already send a Request to that person');
       }
       //print error if the user to add himself
       else if ((e as Error).message == 'Bad Request') {
@@ -272,14 +277,14 @@ class AppFriendsComponent extends LitElement {
     setTimeout(() => {
       feedbackElement!.classList.remove('no');
       feedbackElement!.innerHTML = '';
-    }, 2000);
+    }, 3000);
   }
 
   async _accept(name: string) {
     try {
       const response = await httpClient.post('friends/accept', { username: name });
-      const data = await response.json();
       console.log('accepted');
+      this._reloadFriends();
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
@@ -293,7 +298,9 @@ class AppFriendsComponent extends LitElement {
     try {
       const response = await httpClient.post('friends/decline', { username: name });
       console.log('declined'); //TODO: das wird nicht ausgefuehrt
-      this._reloadFriends();
+      setTimeout(() => {
+        this._reloadFriends();
+      }, 1000);
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
@@ -312,6 +319,7 @@ class AppFriendsComponent extends LitElement {
     try {
       const response = await httpClient.post('friends/delete', { username: name });
       console.log('deleted');
+      this._reloadFriends();
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
@@ -323,6 +331,64 @@ class AppFriendsComponent extends LitElement {
 
   async _reloadFriends() {
     const friendswindow = this.shadowRoot!.getElementById('friendswindow');
-    friendswindow!.innerHTML = 'hello :)';
+    const requestwindow = this.shadowRoot!.getElementById('requestwindow');
+
+    try {
+      const response = await httpClient.get('friends');
+      const data = await response.json();
+
+      const friends = data.friends;
+      const requests = data.requests;
+
+      //create the new Request and Friend Elements
+      const friendElem = friends.map(
+        (friend: { avatar: any; performance: any; username: any }) => `
+        <div class="friendelem">
+          <div class="a">
+            <div class="frame">
+              <img src="${friend.avatar}" />
+            </div>
+          </div>
+          <div class="b"><button>${friend.username}</button></div>
+            <div class="c">${friend.performance[0].value} €</div>
+            <div class="d">
+            <button>
+              <img src="/trash-red.svg" alt="" height="30px" />
+            </button>
+          </div>
+        </div>`
+      );
+
+      const requestElem = requests.map(
+        (request: { avatar: any; username: any }) => `
+        <div class="friendelem">
+          <div class="a">
+            <div class="frame">
+              <img src="${request.avatar}" />
+            </div>
+          </div>
+          <div class="b"><button>${request.username}</button></div>
+            <div class="c">
+              <button @click="${() => this._accept(request.username)}">accept</button>
+              <button @click="${() => this._decline(request.username)}">decline</button>
+            </div>
+            <div class="d">
+            <button>
+              <img src="/trash-red.svg" alt="" height="30px" />
+            </button>
+          </div>
+        </div>`
+      );
+
+      //set the InnerHtml to the updatet get request
+      friendswindow!.innerHTML = friendElem.join('');
+      requestwindow!.innerHTML = requestElem.join('');
+    } catch (e) {
+      if ((e as Error).message == 'Unauthorized!') {
+        router.navigate('/users/sign-in');
+      } else {
+        console.log((e as Error).message);
+      }
+    }
   }
 }

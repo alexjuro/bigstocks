@@ -84,13 +84,19 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
       return;
     }
 
+    if (friend.friends.some(u => u.username === user.username)) {
+      const alreadyAddedError = 'Error: You already send a request to that user';
+      res.status(406).json(alreadyAddedError);
+      return;
+    }
+
     const newFriend = { username: user.username, accepted: false };
 
     friend.friends.push(newFriend);
 
     await userDAO.update(friend);
 
-    res.status(200);
+    res.status(200).json({ message: 'success' });
   } else {
     const error = 'user not found';
     res.status(404).json(error);
@@ -123,7 +129,7 @@ router.post('/accept', authService.authenticationMiddleware, async (req, res) =>
     await userDAO.update(user);
     await userDAO.update(friend);
 
-    res.status(200);
+    res.status(200).json({ message: 'accepted' });
   } else {
     const error = 'user not found';
     res.status(404).json(error);
@@ -148,7 +154,7 @@ router.post('/decline', authService.authenticationMiddleware, async (req, res) =
     await userDAO.update(user);
     await userDAO.update(friend);
 
-    res.status(200);
+    res.status(200).json({ message: 'declined' });
   } else {
     const error = 'user not found';
     res.status(404).json(error);
@@ -179,7 +185,7 @@ router.post('/delete', authService.authenticationMiddleware, async (req, res) =>
     await userDAO.update(user);
     await userDAO.update(friend);
 
-    res.status(200);
+    res.status(200).json({ message: 'deleted' });
   } else {
     const error = 'user not found';
     res.status(404).json(error);
