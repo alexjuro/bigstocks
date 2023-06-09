@@ -23,10 +23,8 @@ class AppFriendsComponent extends LitElement {
 
   @state() request = httpClient.get('friends').then(async res => (await res.json()) as any);
 
-  @state()
-  requests: any[] = [];
-  @state()
-  friends: any[] = [];
+  @state() requests: any[] = [];
+  @state() friends: any[] = [];
 
   @eventOptions({ capture: true })
   protected async firstUpdated() {
@@ -113,7 +111,7 @@ class AppFriendsComponent extends LitElement {
                             </div>
                           </div>
                           <div class="b"><button>${friend.username}</button></div>
-                          <div class="c">Profit made: ${friend.profit} $</div>
+                          <div class="c">total profit made: ${friend.profit} $</div>
                           <div class="d">
                             <button @click="${() => this.deleteFriend(friend.username)}">
                               <img src="/trash-red.svg" alt="" height="30px" />
