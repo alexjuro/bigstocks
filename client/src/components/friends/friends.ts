@@ -23,9 +23,9 @@ class AppFriendsComponent extends LitElement {
 
   @state() request = httpClient.get('friends').then(async res => (await res.json()) as any);
 
-  @property({ type: Array })
+  @state()
   requests: any[] = [];
-  @property({ type: Array })
+  @state()
   friends: any[] = [];
 
   @eventOptions({ capture: true })
@@ -44,81 +44,6 @@ class AppFriendsComponent extends LitElement {
       }
     }
   }
-  /*
-  render() {
-    return html`
-      <div id="background">
-        <div id="kreis"></div>
-      </div>
-
-      <div id="main">
-        <div id="addFriend">
-          <button @click="${this._scrollToFriendForm}">Freund hinzufügen</button>
-        </div>
-        <div id="friendsContainer">
-          <div id="addMethod" class="containerelem">
-            <div id="textFreunde" class="textone">Freund hinzufügen:</div>
-            <!--Das Fenster zum absenden-->
-            <div id="addwindow" class="window">
-              <input
-                type="text"
-                name="username"
-                placeholder="Username"
-                onfocus="this.value=''"
-                id="input"
-                autocomplete="off"
-              />
-              <button type="submit" @click="${() => this._addFriend()}">Senden</button>
-            </div>
-
-            <!--Feedback ob das senden funktioniert hat oder nicht-->
-            <div id="feedback" class="clear"></div>
-
-            <div id="textFreunde">Freundschaftsanfragen:</div>
-            <div id="requestwindow" class="window">
-              <!--Beispiel fuer eine Anfrage-->
-              ${this.requests.map(
-                request => html`
-                  <div class="friendelem">
-                    <div class="a">
-                      <div class="frame"></div>
-                    </div>
-                    <div class="b"><button>${request.username}</button></div>
-                    <div class="c">
-                      <button @click="${() => this._accept(request.username)}">accept</button>
-                      <button @click="${() => this._decline(request.username)}">decline</button>
-                    </div>
-                  </div>
-                `
-              )}
-            </div>
-          </div>
-
-          <div id="friendsList" class="containerelem">
-            <div id="textFreunde">Freunde:</div>
-            <div id="friendswindow" class="window">
-              ${this.friends.map(
-                friend => html`
-                  <div class="friendelem">
-                    <div class="a">
-                      <div class="frame"></div>
-                    </div>
-                    <div class="b"><button>${friend.username}</button></div>
-                    <div class="c">${friend.profit} €</div>
-                    <div class="d">
-                      <button @click="${() => this._delete(friend.username)}">
-                        <img src="/trash-red.svg" alt="" height="30px" />
-                      </button>
-                    </div>
-                  </div>
-                `
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }*/
 
   render() {
     return html`
@@ -133,7 +58,7 @@ class AppFriendsComponent extends LitElement {
 
             <div id="main">
               <div id="addFriend">
-                <button @click="${this._scrollToFriendForm}">Freund hinzufügen</button>
+                <button @click="${this.scollToForm}">Freund hinzufügen</button>
               </div>
               <div id="friendsContainer">
                 <div id="addMethod" class="containerelem">
@@ -148,7 +73,7 @@ class AppFriendsComponent extends LitElement {
                       id="input"
                       autocomplete="off"
                     />
-                    <button type="submit" @click="${() => this._addFriend()}">Senden</button>
+                    <button type="submit" @click="${() => this.addFriend()}">Senden</button>
                   </div>
 
                   <!--Feedback ob das senden funktioniert hat oder nicht-->
@@ -167,8 +92,8 @@ class AppFriendsComponent extends LitElement {
                           </div>
                           <div class="b"><button>${request.username}</button></div>
                           <div class="c">
-                            <button @click="${() => this._accept(request.username)}">accept</button>
-                            <button @click="${() => this._decline(request.username)}">decline</button>
+                            <button @click="${() => this.acceptRequest(request.username)}">accept</button>
+                            <button @click="${() => this.declineRequest(request.username)}">decline</button>
                           </div>
                         </div>
                       `
@@ -190,7 +115,7 @@ class AppFriendsComponent extends LitElement {
                           <div class="b"><button>${friend.username}</button></div>
                           <div class="c">Profit made: ${friend.profit} $</div>
                           <div class="d">
-                            <button @click="${() => this._delete(friend.username)}">
+                            <button @click="${() => this.deleteFriend(friend.username)}">
                               <img src="/trash-red.svg" alt="" height="30px" />
                             </button>
                           </div>
@@ -208,12 +133,12 @@ class AppFriendsComponent extends LitElement {
     `;
   }
 
-  async _scrollToFriendForm() {
+  async scollToForm() {
     const scroll = this.shadowRoot!.getElementById('addMethod');
     scroll!.scrollIntoView({ behavior: 'smooth' });
   }
 
-  async _addFriend() {
+  async addFriend() {
     const friendname = this.nameElement.value;
 
     try {
@@ -281,76 +206,62 @@ class AppFriendsComponent extends LitElement {
     }, 3000);
   }
 
-  async _accept(name: string) {
+  async acceptRequest(name: string) {
     try {
       const response = await httpClient.post('friends/accept', { username: name });
       console.log('accepted');
-      setTimeout(() => {
-        this._reloadFriends();
-      }, 1000);
+      this.reloadComponent();
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
       } else {
-        console.log((e as Error).message);
+        this._displayError('Could not accept request');
       }
     }
   }
 
-  async _decline(name: string) {
+  async declineRequest(name: string) {
     try {
       const response = await httpClient.post('friends/decline', { username: name });
       console.log('declined'); //TODO: das wird nicht ausgefuehrt
-      setTimeout(() => {
-        this._reloadFriends();
-      }, 1000);
+      this.reloadComponent();
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
       } else {
-        console.log((e as Error).message);
+        this._displayError('Could not decline request');
       }
     }
   }
 
-  async _delete(name: string) {
+  async deleteFriend(name: string) {
     const confirmed = confirm('Möchten Sie diesen Freund wirklich löschen?');
     if (!confirmed) {
-      return; // Abbruch, wenn nicht bestätigt
+      return;
     }
 
     try {
       const response = await httpClient.post('friends/delete', { username: name });
-      console.log('deleted');
-      setTimeout(() => {
-        this._reloadFriends();
-      }, 1000);
+      this.reloadComponent();
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
       } else {
-        console.log((e as Error).message);
+        this._displayError('Could not delete friend');
       }
     }
   }
 
-  async _reloadFriends() {
+  async reloadComponent() {
     try {
-      const response = await httpClient.get('friends');
-      const data = await response.json();
+      this.request = httpClient.get('friends').then(async res => (await res.json()) as any);
 
-      const friends = data.friends;
-      const requests = data.requests;
-
-      this.friends = friends;
-      this.requests = requests;
-
-      this.requestUpdate(); // Aktualisierung des Lit-Elements anfordern
+      this.requestUpdate();
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
       } else {
-        console.log((e as Error).message);
+        this._displayError('Could not reload page');
       }
     }
   }
