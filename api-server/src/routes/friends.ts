@@ -4,12 +4,14 @@
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';
 import { User } from '../models/user.js';
+import { Transaction } from '../models/transaction.js';
 import { authService } from '../services/auth.service.js';
 
 const router = express.Router();
 
 router.get('/', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
   const filter: Partial<User> = { id: res.locals.user.id };
 
   try {
@@ -19,45 +21,38 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
       return;
     }
 
-    const friendsWithPerformance = await Promise.all(
-      user.friends.map(async friend => {
-        const friendUser = await userDAO.findOne({ username: friend.username });
-        if (!friendUser) {
-          return {
-            username: friend.username,
-            accepted: friend.accepted,
-            avatar: null,
-            performance: null // or any default value if the friend user is not found
-          };
+    const friendsArray = user.friends;
+
+    const friendsWithData = [];
+    for (let i = 0; i < friendsArray.length; i++) {
+      const friendObj = await userDAO.findOne({ username: friendsArray[i].username });
+      if (friendObj) {
+        const transactions = await transactionDAO.findAll({ userId: friendObj.id, status: false });
+
+        let profit = 0;
+        for (let j = 0; j < transactions.length; j++) {
+          profit += transactions[i].sPrice - transactions[i].bPrice;
         }
 
-        return {
-          username: friend.username,
-          accepted: friend.accepted,
-          avatar: friendUser.avatar,
-          performance: friendUser.performance.slice(friendUser.performance.length - 1, friendUser.performance.length) // Assuming the performance property exists in the friend user object
+        const friendspush = {
+          username: friendObj.username,
+          accepted: friendsArray[i].accepted,
+          avatar: friendObj.avatar,
+          profit: profit.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            useGrouping: false
+          })
         };
-      })
-    );
 
-    const friendsArray = friendsWithPerformance.map((friend: any) => {
-      const newPerformance = friend.performance.map((performance: any) => {
-        const formattedValue = performance.value.toLocaleString('de-DE', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-          useGrouping: false
-        });
+        friendsWithData.push(friendspush);
+      }
+    }
 
-        return { ...performance, value: formattedValue };
-      });
+    const friends = friendsWithData.filter((friend: any) => friend.accepted === true);
+    const requests = friendsWithData.filter((friend: any) => friend.accepted === false);
 
-      return { ...friend, performance: newPerformance };
-    });
-
-    const friends = friendsArray.filter((friend: any) => friend.accepted === true);
-    const requests = friendsArray.filter((friend: any) => friend.accepted === false);
-
-    res.json({ friends: friends, requests: requests });
+    res.status(200).json({ friends: friends, requests: requests });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
   }

@@ -30,8 +30,8 @@ class AppHeader extends PageMixin(LitElement) {
         this.visable = false;
       }, 150);
     } else {
-      circle!.style.width = '300px';
-      circle!.style.height = '300px';
+      circle!.style.width = '350px';
+      circle!.style.height = '350px';
       setTimeout(() => {
         mnav!.style.visibility = 'visible';
       }, 280);
@@ -75,6 +75,7 @@ class AppHeader extends PageMixin(LitElement) {
             <li><button type="button" @click="${this.getNews}">news</button></li>
             <li><button type="button" @click="${this.getPortfolio}">portfolio</button></li>
             <li><button type="button" @click="${this.getMarket}">market</button></li>
+            <li><button type="button" @click="${this.getFriends}">friends</button></li>
             <li><button type="button" @click="${this.getProfile}">profile</button></li>
             <li><button type="button" @click="${this.getSignOut}">sign-out</button></li>
           </ul>
@@ -90,6 +91,7 @@ class AppHeader extends PageMixin(LitElement) {
             <button type="button" @click="${this.getNews}">news</button>
             <button type="button" @click="${this.getPortfolio}">portfolio</button>
             <button type="button" @click="${this.getMarket}">market</button>
+            <button type="button" @click="${this.getFriends}">friends</button>
             <button type="button" @click="${this.getProfile}">profile</button>
             <button type="button" @click="${this.getSignOut}">sign-out</button>
           </nav>
@@ -172,6 +174,23 @@ class AppHeader extends PageMixin(LitElement) {
   async getProfile() {
     try {
       router.navigate('/profile');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
+  }
+
+  async getFriends() {
+    try {
+      router.navigate('/users/friends');
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }
