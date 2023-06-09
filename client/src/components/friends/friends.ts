@@ -104,7 +104,7 @@ class AppFriendsComponent extends LitElement {
                       <div class="frame"></div>
                     </div>
                     <div class="b"><button>${friend.username}</button></div>
-                    <div class="c">${friend.performance[0].value} €</div>
+                    <div class="c">${friend.profit} €</div>
                     <div class="d">
                       <button @click="${() => this._delete(friend.username)}">
                         <img src="/trash-red.svg" alt="" height="30px" />
@@ -126,7 +126,6 @@ class AppFriendsComponent extends LitElement {
         this.request.then(json => {
           this.friends = json.friends;
           this.requests = json.requests;
-
           return html`
             <div id="background">
               <div id="kreis"></div>
@@ -189,7 +188,7 @@ class AppFriendsComponent extends LitElement {
                             </div>
                           </div>
                           <div class="b"><button>${friend.username}</button></div>
-                          <div class="c">${friend.performance[0].value} €</div>
+                          <div class="c">Profit made: ${friend.profit} $</div>
                           <div class="d">
                             <button @click="${() => this._delete(friend.username)}">
                               <img src="/trash-red.svg" alt="" height="30px" />
@@ -286,7 +285,9 @@ class AppFriendsComponent extends LitElement {
     try {
       const response = await httpClient.post('friends/accept', { username: name });
       console.log('accepted');
-      this._reloadFriends();
+      setTimeout(() => {
+        this._reloadFriends();
+      }, 1000);
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
@@ -321,7 +322,9 @@ class AppFriendsComponent extends LitElement {
     try {
       const response = await httpClient.post('friends/delete', { username: name });
       console.log('deleted');
-      this._reloadFriends();
+      setTimeout(() => {
+        this._reloadFriends();
+      }, 1000);
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
@@ -332,9 +335,6 @@ class AppFriendsComponent extends LitElement {
   }
 
   async _reloadFriends() {
-    const friendswindow = this.shadowRoot!.getElementById('friendswindow');
-    const requestwindow = this.shadowRoot!.getElementById('requestwindow');
-
     try {
       const response = await httpClient.get('friends');
       const data = await response.json();
@@ -342,49 +342,10 @@ class AppFriendsComponent extends LitElement {
       const friends = data.friends;
       const requests = data.requests;
 
-      //create the new Request and Friend Elements
-      const friendElem = friends.map(
-        (friend: { avatar: any; performance: any; username: any }) => `
-        <div class="friendelem">
-          <div class="a">
-            <div class="frame">
-              <img src="${friend.avatar}" />
-            </div>
-          </div>
-          <div class="b"><button>${friend.username}</button></div>
-            <div class="c">${friend.performance[0].value} €</div>
-            <div class="d">
-            <button>
-              <img src="/trash-red.svg" alt="" height="30px" />
-            </button>
-          </div>
-        </div>`
-      );
+      this.friends = friends;
+      this.requests = requests;
 
-      const requestElem = requests.map(
-        (request: { avatar: any; username: any }) => `
-        <div class="friendelem">
-          <div class="a">
-            <div class="frame">
-              <img src="${request.avatar}" />
-            </div>
-          </div>
-          <div class="b"><button>${request.username}</button></div>
-            <div class="c">
-              <button @click="${() => this._accept(request.username)}">accept</button>
-              <button @click="${() => this._decline(request.username)}">decline</button>
-            </div>
-            <div class="d">
-            <button>
-              <img src="/trash-red.svg" alt="" height="30px" />
-            </button>
-          </div>
-        </div>`
-      );
-
-      //set the InnerHtml to the updatet get request
-      friendswindow!.innerHTML = friendElem.join('');
-      requestwindow!.innerHTML = requestElem.join('');
+      this.requestUpdate(); // Aktualisierung des Lit-Elements anfordern
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
