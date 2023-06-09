@@ -22,7 +22,7 @@ class SecretAppComponent extends LitElement {
 
   rows = 8;
   cols = 8;
-  totalMines = 1;
+  totalMines = 10;
   marksleft = 10;
 
   board: { element: HTMLDivElement; hasMine: boolean; revealed: boolean; marked: boolean }[][] = [];
