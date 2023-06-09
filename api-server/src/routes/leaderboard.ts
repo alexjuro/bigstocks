@@ -120,7 +120,6 @@ router.get('/lastDay', authService.authenticationMiddleware, async (req, res) =>
   //const randomdate = new Date('June 7, 2023 23:15:30');
 
   const dateOneWeekAgo = new Date();
-  dateOneWeekAgo.setDate(dateOneWeekAgo.getDate() - 1);
   dateOneWeekAgo.setHours(0, 0, 0, 0);
 
   const allTransaction = await transactionDAO.findAll({ status: false });
