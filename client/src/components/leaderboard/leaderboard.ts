@@ -56,7 +56,7 @@ class AppLeaderboardComponent extends LitElement {
           return html`
             <div id="content">
               <div id="pagetitle">
-                <button id="change" @click="${this._changeBoard}">${this.nottype} profit leaderboard</button>
+                <button id="change" @click="${this._changeBoard}">${this.nottype} profit</button>
                 <button @click="${this.redirectMinesweeper}">need cash?</button>
               </div>
 
