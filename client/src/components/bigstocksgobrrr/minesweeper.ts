@@ -144,7 +144,7 @@ class SecretAppComponent extends LitElement {
 
     this.marksleft = this.marksleft - 1; // Setze marksleft auf den ursprünglichen Wert
     const marksleftElement = this.shadowRoot?.getElementById('marksleft');
-    marksleftElement!.innerHTML = `marksleft: ${this.marksleft}`;
+    marksleftElement!.innerHTML = `Marks left: ${this.marksleft}`;
 
     this.markCell(row, col);
     this.checkGameCompleted();
@@ -166,7 +166,7 @@ class SecretAppComponent extends LitElement {
     //reset the marksleft to 10
     this.marksleft = 10;
     const marksleftElement = this.shadowRoot?.getElementById('marksleft');
-    marksleftElement!.innerHTML = `marksleft: ${this.marksleft}`;
+    marksleftElement!.innerHTML = `Marks left: ${this.marksleft}`;
 
     this.initGame();
   }

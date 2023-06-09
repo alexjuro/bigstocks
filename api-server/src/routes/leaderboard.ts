@@ -119,8 +119,8 @@ router.get('/lastDay', authService.authenticationMiddleware, async (req, res) =>
 
   //const randomdate = new Date('June 7, 2023 23:15:30');
 
-  const dateOneDayAgo = new Date();
-  dateOneDayAgo.setHours(0, 0, 0, 0);
+  let dateOneWeekAgo = new Date();
+  dateOneWeekAgo.setHours(0, 0, 0, 0);
 
   const allTransaction = await transactionDAO.findAll({ status: false });
 
@@ -128,7 +128,7 @@ router.get('/lastDay', authService.authenticationMiddleware, async (req, res) =>
 
   //returns all transaction made in the last week
   for (let i = 0; i < allTransaction.length; i++) {
-    if (allTransaction[i].createdAt >= dateOneDayAgo.getTime()) {
+    if (allTransaction[i].createdAt >= dateOneWeekAgo.getTime()) {
       const entry = {
         userId: allTransaction[i].userId,
         profit: allTransaction[i].sPrice - allTransaction[i].bPrice
