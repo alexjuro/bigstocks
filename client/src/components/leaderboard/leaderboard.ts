@@ -14,12 +14,9 @@ class AppLeaderboardComponent extends LitElement {
   static styles = componentStyle;
 
   @state() request = httpClient.get('leaderboard/lastWeek').then(async res => (await res.json()) as any);
-
-  @state()
-  leaderboard: any[] = [];
-
-  @state()
-  nottype: string = '';
+  @state() leaderboard: any[] = [];
+  @state() nottype: string = '';
+  @state() avatars: any = [];
 
   dayTrading = false;
 
@@ -46,24 +43,33 @@ class AppLeaderboardComponent extends LitElement {
         this.request.then(json => {
           this.leaderboard = json.leaderboard;
           this.nottype = json.nottype;
+          if (this.leaderboard[0]) {
+            this.avatars.push(this.leaderboard[0].avatar);
+          }
+          if (this.leaderboard[1]) {
+            this.avatars.push(this.leaderboard[1].avatar);
+          }
+          if (this.leaderboard[2]) {
+            this.avatars.push(this.leaderboard[2].avatar);
+          }
 
           return html`
             <div id="content">
               <div id="pagetitle">
-                <button id="change" @click="${this._changeBoard}">${this.nottype} profit leaderboard</button>
+                <button id="change" @click="${this._changeBoard}">${this.nottype} profit</button>
                 <button @click="${this.redirectMinesweeper}">need cash?</button>
               </div>
 
               <div id="imagesflex">
                 <div id="images">
                   <div class="frame">
-                    <img src="${this.leaderboard[2].avatar}" />
+                    <img src="${this.avatars[2]}" />
                   </div>
                   <div class="frame">
-                    <img src="${this.leaderboard[0].avatar}" />
+                    <img src="${this.avatars[0]}" />
                   </div>
                   <div class="frame">
-                    <img src="${this.leaderboard[1].avatar}" />
+                    <img src="${this.avatars[1]}" />
                   </div>
                 </div>
               </div>
@@ -116,7 +122,8 @@ class AppLeaderboardComponent extends LitElement {
     if (this.dayTrading == false) {
       try {
         this.request = httpClient.get('leaderboard/lastDay').then(async res => (await res.json()) as any);
-
+        //resets the avatars
+        //this.avatars = [];
         this.dayTrading = true;
 
         this.requestUpdate(); // Komponente neu laden
@@ -130,7 +137,8 @@ class AppLeaderboardComponent extends LitElement {
     } else {
       try {
         this.request = httpClient.get('leaderboard/lastWeek').then(async res => (await res.json()) as any);
-
+        //resets the avatars
+        //this.avatars = [];
         this.dayTrading = false;
 
         this.requestUpdate(); // Komponente neu laden

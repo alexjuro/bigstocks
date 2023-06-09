@@ -90,7 +90,7 @@ router.get('/lastWeek', authService.authenticationMiddleware, async (req, res) =
     }
   }
 
-  res.status(200).json({ leaderboard: leaderboard, nottype: 'daily' });
+  res.status(200).json({ leaderboard: leaderboard, nottype: 'daytrading' });
 });
 
 interface UserProfit {
@@ -119,8 +119,7 @@ router.get('/lastDay', authService.authenticationMiddleware, async (req, res) =>
 
   //const randomdate = new Date('June 7, 2023 23:15:30');
 
-  const dateOneWeekAgo = new Date();
-  dateOneWeekAgo.setDate(dateOneWeekAgo.getDate() - 1);
+  let dateOneWeekAgo = new Date();
   dateOneWeekAgo.setHours(0, 0, 0, 0);
 
   const allTransaction = await transactionDAO.findAll({ status: false });
@@ -167,7 +166,7 @@ router.get('/lastDay', authService.authenticationMiddleware, async (req, res) =>
     }
   }
 
-  res.status(200).json({ leaderboard: leaderboard, nottype: 'weekly' });
+  res.status(200).json({ leaderboard: leaderboard, nottype: 'last weeks' });
 });
 
 export default router;
