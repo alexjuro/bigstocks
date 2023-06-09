@@ -15,13 +15,13 @@ class AppLeaderboardComponent extends LitElement {
 
   @state() request = httpClient.get('leaderboard/lastWeek').then(async res => (await res.json()) as any);
 
-  @property({ type: Array })
-  global: any[] = [];
+  @state()
+  leaderboard: any[] = [];
 
-  @property({ type: Array })
-  friends: any[] = [];
+  @state()
+  nottype: string = '';
 
-  friendsshowed = false;
+  dayTrading = false;
 
   @eventOptions({ capture: true })
   protected async firstUpdated() {
@@ -44,25 +44,26 @@ class AppLeaderboardComponent extends LitElement {
     return html`
       ${until(
         this.request.then(json => {
-          this.global = json;
+          this.leaderboard = json.leaderboard;
+          this.nottype = json.nottype;
 
           return html`
             <div id="content">
               <div id="pagetitle">
-                <button @click="${this._changeBoard}">Friend leaderboard</button>
-                <button @click="${this.getFriends}">Friends</button>
+                <button id="change" @click="${this._changeBoard}">${this.nottype} profit leaderboard</button>
+                <button @click="${this.getFriends}">friends</button>
               </div>
 
               <div id="imagesflex">
                 <div id="images">
                   <div class="frame">
-                    <img src="${this.global[2].avatar}" />
+                    <img src="${this.leaderboard[2].avatar}" />
                   </div>
                   <div class="frame">
-                    <img src="${this.global[0].avatar}" />
+                    <img src="${this.leaderboard[0].avatar}" />
                   </div>
                   <div class="frame">
-                    <img src="${this.global[1].avatar}" />
+                    <img src="${this.leaderboard[1].avatar}" />
                   </div>
                 </div>
               </div>
@@ -78,7 +79,7 @@ class AppLeaderboardComponent extends LitElement {
               <div id="placementsflex">
                 <div id="placements">
                   <ol>
-                    ${this.global.map(
+                    ${this.leaderboard.map(
                       entry => html`
                         <li>
                           <div class="position">
@@ -112,14 +113,34 @@ class AppLeaderboardComponent extends LitElement {
   }
 
   async _changeBoard() {
-    if (this.friendsshowed == false) {
+    if (this.dayTrading == false) {
       try {
-        const response = await httpClient.get('leaderboard/lastWeek');
-        const data = await response.json();
+        this.request = httpClient.get('leaderboard/lastDay').then(async res => (await res.json()) as any);
 
-        console.log(data);
-      } catch (e) {}
+        this.dayTrading = true;
+
+        this.requestUpdate(); // Komponente neu laden
+      } catch (e) {
+        if ((e as Error).message == 'Unauthorized!') {
+          router.navigate('/users/sign-in');
+        } else {
+          console.log((e as Error).message);
+        }
+      }
     } else {
+      try {
+        this.request = httpClient.get('leaderboard/lastWeek').then(async res => (await res.json()) as any);
+
+        this.dayTrading = false;
+
+        this.requestUpdate(); // Komponente neu laden
+      } catch (e) {
+        if ((e as Error).message == 'Unauthorized!') {
+          router.navigate('/users/sign-in');
+        } else {
+          console.log((e as Error).message);
+        }
+      }
     }
   }
 }
