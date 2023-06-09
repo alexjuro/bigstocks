@@ -111,7 +111,7 @@ class AppFriendsComponent extends LitElement {
                             </div>
                           </div>
                           <div class="b"><button>${friend.username}</button></div>
-                          <div class="c">total profit made: ${friend.profit} $</div>
+                          <div class="c">profit made: ${friend.profit} $</div>
                           <div class="d">
                             <button @click="${() => this.deleteFriend(friend.username)}">
                               <img src="/trash-red.svg" alt="" height="30px" />

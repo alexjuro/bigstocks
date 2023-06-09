@@ -51,7 +51,7 @@ class AppLeaderboardComponent extends LitElement {
             <div id="content">
               <div id="pagetitle">
                 <button id="change" @click="${this._changeBoard}">${this.nottype} profit leaderboard</button>
-                <button @click="${this.getFriends}">friends</button>
+                <button @click="${this.redirectMinesweeper}">need cash?</button>
               </div>
 
               <div id="imagesflex">
@@ -104,9 +104,9 @@ class AppLeaderboardComponent extends LitElement {
     `;
   }
 
-  async getFriends() {
+  async redirectMinesweeper() {
     try {
-      router.navigate('/users/friends');
+      router.navigate('/minesweeper');
     } catch (e) {
       console.log(e);
     }

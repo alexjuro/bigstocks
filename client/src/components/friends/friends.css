@@ -412,6 +412,10 @@ button {
   #feedback {
     width: 80%;
   }
+
+  .c {
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 280px) {
