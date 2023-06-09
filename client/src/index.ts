@@ -28,6 +28,6 @@ import './components/header/header.ts';
 import './components/leaderboard/leaderboard.ts';
 import './components/friends/friends.ts';
 import './components/widgets/rating/my-rating.js';
-import './components/sign-up/forgotPassword.js';
-import './components/sign-up/resetPassword.js';
+import './components/forgotPassword/forgotPassword.js';
+import './components/forgotPassword/resetPassword.js';
 import './components/bigstocksgobrrr/secret.ts';

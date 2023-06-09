@@ -33,12 +33,12 @@ class SignUpComponent extends PageMixin(LitElement) {
         <div class="form ">
           <form @keydown="${this.handleKeyDown}" novalidate>
             <button id="constraintButton" type="button" @click="${this.toggleConstraints}">?</button>
-            <div>
+            <div class="userNameContainer">
               <label for="username">Username</label>
               <input minlength="4" maxlength="32" type="text" autofocus required id="username" placeholder="Username" @input=${this.handleUsernameChange} .value=${this.username} />
               <div class="invalid-feedback">Username must be valid</div>
             </div>
-            <div>
+            <div class="emailContainer">
               <label for="email">E-Mail</label>
               <input type="email" required id="email" placeholder="Email"  @input=${this.handleEmailChange} .value=${this.email}/>
               <div class="invalid-feedback">Email is required and must be valid</div>
@@ -110,6 +110,8 @@ class SignUpComponent extends PageMixin(LitElement) {
   }
 
   async firstUpdated() {
+    //er ekennt nich dass das die Variable in einem Event weitergegeben wird
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const appHeader = this.dispatchEvent(
       new CustomEvent('update-pagename', { detail: this.pageName, bubbles: true, composed: true })
     );
