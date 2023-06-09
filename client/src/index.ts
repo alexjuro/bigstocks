@@ -31,4 +31,3 @@ import './components/leaderboard/leaderboard.ts';
 import './components/friends/friends.ts';
 import './components/widgets/rating/my-rating.js';
 import './components/bigstocksgobrrr/minesweeper.js';
-import './components/bigstocksgobrrr/secret.ts';
