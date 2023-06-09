@@ -3,6 +3,8 @@
 import './components/app/app.ts';
 import './components/main/stonks.ts';
 import './components/news/FinnHubMarketNews.ts';
+import './components/forgotPassword/forgotPassword.js';
+import './components/forgotPassword/resetPassword.js';
 import './components/sign-in/sign-in.ts';
 import './components/sign-out/sign-out.ts';
 import './components/sign-up/sign-up.ts';
@@ -28,6 +30,5 @@ import './components/header/header.ts';
 import './components/leaderboard/leaderboard.ts';
 import './components/friends/friends.ts';
 import './components/widgets/rating/my-rating.js';
-import './components/sign-up/forgotPassword.js';
-import './components/sign-up/resetPassword.js';
 import './components/bigstocksgobrrr/minesweeper.js';
+import './components/bigstocksgobrrr/secret.ts';

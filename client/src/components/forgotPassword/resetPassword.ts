@@ -1,4 +1,5 @@
-// Autor: Lakzan Nathan
+/* Autor: Lakzan Nathan (FH Münster) */
+
 import { LitElement, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
@@ -8,17 +9,17 @@ import { PageMixin } from '../page.mixin.js';
 import sharedStyle from '../shared.css?inline';
 import componentStyle from '../sign-in/style.css?inline';
 
-@customElement('app-activation')
+@customElement('app-resetpassword')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ActivationComponent extends PageMixin(LitElement) {
   static styles = [componentStyle, sharedStyle];
   @state() showConstraints = false;
   @state() entropy = 0;
   @state() visibility = 'none';
+  @query('form')
+  private form!: HTMLFormElement;
 
-  @query('.indicator') entropyIndicator!: HTMLDivElement;
-
-  @query('form') private form!: HTMLFormElement;
+  @query('#safetyAnswerTwo') private safetyAnswerTwo!: HTMLInputElement;
 
   @query('#code') private codeElement!: HTMLFormElement;
 
@@ -26,15 +27,10 @@ class ActivationComponent extends PageMixin(LitElement) {
 
   @query('#password-check') private passwordCheckElement!: HTMLInputElement;
 
-  @query('#safetyAnswerOne') private safetyAnswerOne!: HTMLInputElement;
-
-  @query('#safetyAnswerTwo') private safetyAnswerTwo!: HTMLInputElement;
-
-  private pageName = 'Activation';
+  private pageName = 'Reset your Password';
   private code = '';
   private pw = '';
   private pwCheck = '';
-  private secQueOne = '';
   private secQueTwo = '';
 
   private quality = [
@@ -56,26 +52,22 @@ class ActivationComponent extends PageMixin(LitElement) {
   renderForm() {
     return html`
       <div class="Login-page">
-        <div class="form">
+        <div class="form ">
           <form novalidate>
             <button id="constraintButton" type="button" @click="${this.toggleConstraints}">?</button>
             <div>
               <label for="Code">Code</label>
-              <input
-                .value="${this.code}"
-                @input="${this.handleCodeChange}"
-                type="number"
-                required
-                id="code"
-                placeholder="Code"
-                min="99999"
-                max="999999"
-                autofocus
-              />
+              <input .value="${this.code}"
+                @input="${this.handleCodeChange}" type="number" required id="code" placeholder="Code" min="99999" max="999999"/>
               <div class="invalid-feedback">Code is required and must be valid</div>
             </div>
-
-            <div>
+              <div>
+              <label for="safetyAnswerTwo">What is your favorite animal?</label>
+              <input type="password" id="safetyAnswerTwo" placeholder="Please enter here" autocomplete="off" required @input=${this.handleSecureQuestionTwoChange}
+                .value=${this.secQueTwo}/>
+              <div class="invalid-feedback">Entering a answer is mandatory</div>
+            </div> 
+             <div>
               <label for="password">Password</label>
               <input
                 style="--color: ${this.color}"
@@ -115,35 +107,11 @@ class ActivationComponent extends PageMixin(LitElement) {
               <div class="invalid-feedback">
                 Re-entering the password is required and must match the first password entered
               </div>
-            </div>
-            <div>
-              <label for="safetyAnswerOne">What is your favorite food?</label>
-              <input
-                type="password"
-                id="safetyAnswerOne"
-                placeholder="Please enter here"
-                autocomplete="off"
-                required
-                @input=${this.handleSecureQuestionOneChange}
-                .value=${this.secQueOne}
-              />
-              <div class="invalid-feedback">Entering an answer is mandatory</div>
-            </div>
-            <div>
-              <label for="safetyAnswerTwo">What is your favorite animal?</label>
-              <input
-                type="password"
-                id="safetyAnswerTwo"
-                placeholder="Please enter here"
-                autocomplete="off"
-                required
-                @input=${this.handleSecureQuestionTwoChange}
-                .value=${this.secQueTwo}
-              />
-              <div class="invalid-feedback">Entering an answer is mandatory</div>
-            </div>
-            <button id="submitbutton" type="button" @click="${this.submit}">Create account</button>
+            </div>       
+            <button type="button" @click="${this.submit}">Create account</button>
           </form>
+            </p>
+           
         </div>
       </div>
     `;
@@ -179,16 +147,15 @@ class ActivationComponent extends PageMixin(LitElement) {
         code: this.codeElement.value,
         password: this.passwordElement.value,
         passwordCheck: this.passwordCheckElement.value,
-        safetyAnswerOne: this.safetyAnswerOne.value,
         safetyAnswerTwo: this.safetyAnswerTwo.value
       };
-      console.log(accountData);
       try {
-        await httpClient.post('users/activation', accountData);
+        await httpClient.post('users/resetPassword', accountData);
         console.log('after post');
         router.navigate('/news');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
+        router.navigate('/sign-up');
       }
     } else {
       this.form.classList.add('was-validated');
@@ -197,8 +164,8 @@ class ActivationComponent extends PageMixin(LitElement) {
   }
 
   isFormValid() {
-    const re = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d).{8,32}$/;
-    this.passwordElement.setCustomValidity(re.test(this.passwordElement.value) ? '' : 'Invalid Input');
+    const rePassword = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d).{8,32}$/;
+    this.passwordElement.setCustomValidity(rePassword.test(this.passwordElement.value) ? '' : 'Invalid Input');
     this.passwordCheckElement.setCustomValidity(
       this.passwordElement.value === this.passwordCheckElement.value
         ? ''
@@ -208,6 +175,7 @@ class ActivationComponent extends PageMixin(LitElement) {
   }
 
   async signIn() {
+    // window.location.href = 'users/sign-in';
     router.navigate('users/sign-in');
   }
 
@@ -219,8 +187,8 @@ class ActivationComponent extends PageMixin(LitElement) {
     );
     try {
       this.startAsyncInit();
-      await httpClient.get('/users/new' + location.search);
-      this.showNotification('We have sent you an email with a confirmation code that is valid for 10 minutes');
+      await httpClient.get('/users/auth' + location.search);
+      this.showNotification('We have sent you an email with a confirmation code that is valid for 3 minutes');
     } catch (e) {
       if ((e as { statusCode: number }).statusCode === 401) {
         router.navigate('/users/sign-in');
@@ -231,9 +199,8 @@ class ActivationComponent extends PageMixin(LitElement) {
       this.finishAsyncInit();
     }
   }
-
-  updateEntropy(_event: InputEvent) {
-    console.log('provoced Method updateEntropy');
+  updateEntropy = (event: InputEvent) => {
+    console.log('provoced updateEntropy');
     const str = this.passwordElement.value;
 
     const unique = new Set();
@@ -257,16 +224,14 @@ class ActivationComponent extends PageMixin(LitElement) {
         this.strength = l.strength;
       }
     });
-    this.pw = (_event.target as HTMLInputElement).value;
-  }
+    this.pw = (event.target as HTMLInputElement).value;
+    console.log(this.color);
+  };
   handlePasswordCheckChange(event: InputEvent) {
     this.pwCheck = (event.target as HTMLInputElement).value;
   }
   handleCodeChange(event: InputEvent) {
     this.code = (event.target as HTMLInputElement).value;
-  }
-  handleSecureQuestionOneChange(event: InputEvent) {
-    this.secQueOne = (event.target as HTMLInputElement).value;
   }
   handleSecureQuestionTwoChange(event: InputEvent) {
     this.secQueTwo = (event.target as HTMLInputElement).value;
