@@ -53,7 +53,7 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
   async firstUpdated() {
     try {
       this.startAsyncInit();
-      await httpClient.get('/users/auth' + location.search);
+      // await httpClient.get('/users/auth' + location.search);
       this.name = this.getParamsFromURL().name;
       this.symbol = this.getParamsFromURL().symbol;
       this.dispatchEvent(new CustomEvent('update-pagename', { detail: `${this.name}`, bubbles: true, composed: true }));
