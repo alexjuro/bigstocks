@@ -1,5 +1,5 @@
 {
-  "server": { "https": false, "port": 8080 },
+  "server": { "https": true, "port": 8443 },
   "client": {
     "dir": "../client/dist"
   }
