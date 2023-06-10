@@ -71,7 +71,10 @@ describe('TradingComponent', () => {
     marketComponent.updateStockDailyPercentage(stockSymbol, updatedPercentage);
 
     expect(marketComponent.userStocks[0].dailyPercentage).to.equal(updatedPercentage);
-    expect(targetElement!.classList.contains('setTextGreen')).to.be.true;
+    const computedStyles = getComputedStyle(targetElement!);
+    const color = computedStyles.getPropertyValue('color');
+
+    expect(color).to.equal('rgb(0, 128, 0)'); //green
   });
 
   it('should return the correct timestamps', async () => {

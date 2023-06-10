@@ -60,11 +60,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         }
         stock.price = price;
 
-        if (this instanceof PortfolioComponent) {
-          this.updateDoughnut();
-          this.updateGraph();
-        }
-
         if (this.shadowRoot) {
           const element = this.shadowRoot.getElementById('dot' + stock.symbol);
 

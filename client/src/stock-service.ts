@@ -1,4 +1,5 @@
 /* Autor: Alexander Schellenberg */
+import { PortfolioComponent } from './components/trading/portfolio/portfolio.js';
 import { TradingComponent } from './components/trading/tradingcomponent.js';
 
 const apiKey = [
@@ -179,6 +180,10 @@ export class StockService {
     if (this.observer instanceof TradingComponent) {
       this.observer!.updateStockPrice(symbol, price);
       this.observer!.requestUpdate();
+      if (this.observer instanceof PortfolioComponent) {
+        this.observer.updateDoughnut();
+        this.observer.updateGraph();
+      }
     }
   }
 }

@@ -142,7 +142,6 @@ describe('/trading/portfolio', () => {
       expect(await info.isVisible()).to.not.be.true;
       const stockh2 = await stock.locator('h2');
 
-      console.log('HA');
       await stockh2.click();
       expect(await info.isVisible()).to.be.true;
 
