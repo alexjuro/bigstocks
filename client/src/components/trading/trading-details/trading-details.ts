@@ -5,7 +5,6 @@ import { customElement, property, query } from 'lit/decorators.js';
 import sharedStyle from '../../shared.css?inline';
 import componentStyle from './trading-details.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
-import { TradingComponent } from '../tradingcomponent.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
 import { Chart, ChartData, ChartOptions } from 'chart.js/auto';
@@ -54,11 +53,10 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
   async firstUpdated() {
     try {
       this.startAsyncInit();
+      await httpClient.get('/users/auth' + location.search);
       this.name = this.getParamsFromURL().name;
       this.symbol = this.getParamsFromURL().symbol;
-      this.dispatchEvent(
-        new CustomEvent('update-pagename', { detail: `${this.symbol}-Details`, bubbles: true, composed: true })
-      );
+      this.dispatchEvent(new CustomEvent('update-pagename', { detail: `${this.name}`, bubbles: true, composed: true }));
       const response = await httpClient.get('trading/details/' + this.symbol);
       const data = await response.json();
       this.stock = data.stock;
@@ -128,7 +126,7 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
         note: noteText
       };
       try {
-        const response = await httpClient.post('trading/details/', { note });
+        await httpClient.post('trading/details/', { note });
         console.log('Form submitted!', noteText);
         router.navigate('/trading/market');
       } catch (e) {

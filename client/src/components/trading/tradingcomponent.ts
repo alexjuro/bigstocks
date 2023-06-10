@@ -2,7 +2,7 @@
 import { PageMixin } from '../page.mixin';
 import { LitElement } from 'lit';
 import { StockService } from '../../stock-service.js';
-import { UserStock } from '../../interfaces/stock-interface.js';
+import { UserStock } from './stock-interface.js';
 import Chart from 'chart.js/auto';
 import { httpClient } from '../../http-client';
 import { PortfolioComponent } from './portfolio/portfolio';
@@ -60,6 +60,11 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         }
         stock.price = price;
 
+        if (this instanceof PortfolioComponent) {
+          this.updateDoughnut();
+          this.updateGraph();
+        }
+
         if (this.shadowRoot) {
           const element = this.shadowRoot.getElementById('dot' + stock.symbol);
 
@@ -84,10 +89,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         console.log('FAIL');
         return;
       }
-
-      element.classList.remove('setTextGreen', 'setTextRed');
-      const cssClass = percentage >= 0 ? 'setTextGreen' : 'setTextRed';
-      element.classList.add(cssClass);
       stock.dailyPercentage = percentage;
     }
   }
@@ -110,6 +111,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         stockDiv.appendChild(candleComponent);
         candleComponent.updateComplete.then(() => {
           this.createStockCandles(candleComponent.candle, stockDiv.id, 'M');
+          // Wenn mehr Zeit da ist dann auch mit Tagen und Jahren ( Funktion ist ja da )
         });
 
         const infoComponent = new TradingInfoComponent();
@@ -142,6 +144,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     }
   }
 
+  // Wenn mehr Zeit da ist dann auch mit Tagen und Jahren
   async createStockCandles(element: HTMLCanvasElement, symbol: string, intervall: string) {
     const a = this.unixTimestamp(intervall);
     const data = await this.stockService!.getStockCandles(symbol, intervall, a!.timestamp, a!.now)

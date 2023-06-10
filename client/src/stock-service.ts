@@ -1,6 +1,4 @@
 /* Autor: Alexander Schellenberg */
-
-import { PortfolioComponent } from './components/trading/portfolio/portfolio';
 import { TradingComponent } from './components/trading/tradingcomponent.js';
 
 const apiKey = [
@@ -19,7 +17,7 @@ export class StockService {
   private apiCounter = 0;
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
-  public isConnected = false; // Verbindungsstatus des WebSockets
+  public isConnected = false;
 
   public async connectSocket(): Promise<void> {
     if (this.isConnected) {
@@ -51,14 +49,13 @@ export class StockService {
     this.socket!.onclose = event => {
       if (!event.wasClean) {
         console.log('WebSocket connection closed unexpectedly. Trying to reconnect...');
-        this.isConnected = false; // WebSocket-Verbindung ist geschlossen
+        this.isConnected = false;
         this.connectSocket();
       }
     };
 
     this.socket!.onmessage = event => {
       if (!this.isConnected) {
-        // WebSocket ist nicht verbunden, daher Operation abbrechen
         console.log('WebSocket is not connected. Ignoring incoming message.');
         return;
       }
@@ -120,7 +117,7 @@ export class StockService {
         }, delay);
       }
       this.observer!.requestUpdate();
-    }, 20000);
+    }, 8000);
   }
 
   public stopUpdatingStockPercentages() {
@@ -182,10 +179,6 @@ export class StockService {
     if (this.observer instanceof TradingComponent) {
       this.observer!.updateStockPrice(symbol, price);
       this.observer!.requestUpdate();
-      if (this.observer instanceof PortfolioComponent) {
-        this.observer.updateDoughnut();
-        this.observer.updateGraph();
-      }
     }
   }
 }

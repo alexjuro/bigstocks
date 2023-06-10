@@ -8,7 +8,7 @@ import { StockService } from '../../../stock-service';
 import './portfolio';
 import { httpClient } from '../../../http-client';
 import { PortfolioComponent } from './portfolio';
-import { UserStock } from '../../../interfaces/stock-interface';
+import { UserStock } from '../stock-interface';
 import { Chart } from 'chart.js';
 
 describe('app-portfolio', () => {

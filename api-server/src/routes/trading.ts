@@ -10,7 +10,6 @@ import { authService } from '../services/auth.service.js';
 import { cryptoService } from '../services/crypto.service.js';
 import { Note } from '../models/note.js';
 import xss from 'xss';
-import { validate } from 'uuid';
 
 const router = express.Router();
 
@@ -139,6 +138,12 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
       return;
     }
 
+    const moneyToDeduct = Number(bPrice);
+    if (user.money < moneyToDeduct) {
+      res.status(400).json({ error: 'Insufficient funds' });
+      return;
+    }
+
     const transaction = await transactionDAO.create({
       userId,
       symbol,
@@ -149,12 +154,6 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
       status: true,
       soldAt: 0
     });
-
-    const moneyToDeduct = Number(bPrice);
-    if (user.money < moneyToDeduct) {
-      res.status(400).json({ error: 'Insufficient funds' });
-      return;
-    }
 
     user.money = Number((user.money - moneyToDeduct).toFixed(2));
 
@@ -248,13 +247,11 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
 function validation(note: Note) {
   let result = false;
 
-  // Überprüfung auf potenzielle SQL-Injection
   const sqlInjectionPattern = /[';]|--|\/\*|\*\//gi;
   if (sqlInjectionPattern.test(note.note)) {
     result = true;
   }
 
-  // Überprüfung auf potenzielle XSS-Attacken
   const sanitizedComment = xss(note.note);
   if (sanitizedComment !== note.note) {
     result = true;

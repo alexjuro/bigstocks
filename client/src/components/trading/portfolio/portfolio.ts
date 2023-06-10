@@ -1,6 +1,6 @@
 /* Autor: Alexander Schellenberg */
 
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { html } from 'lit';
 import { property, query } from 'lit-element';
 import sharedStyle from '../../shared.css?inline';
@@ -9,7 +9,7 @@ import sharedTradingStyle from '../shared-trading.css?inline';
 import { StockService } from '../../../stock-service.js';
 import Chart from 'chart.js/auto';
 import { TradingComponent } from '../tradingcomponent.js';
-import { UserStock } from '../../../interfaces/stock-interface.js';
+import { UserStock } from '../stock-interface.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
 
@@ -58,6 +58,7 @@ export class PortfolioComponent extends TradingComponent {
     this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'Portfolio', bubbles: true, composed: true }));
     try {
       this.startAsyncInit();
+      await httpClient.get('/users/auth' + location.search);
       const response = await httpClient.get('trading' + location.search);
       const data = await response.json();
       const userTransactions = data.results;
@@ -313,7 +314,7 @@ export class PortfolioComponent extends TradingComponent {
                   <button id="sort" @click=${this.toggleSort}>
                     ${this.sortBy === 'alphabet' ? 'Sort Shares' : 'Sort Alphabetically'}
                   </button>
-                  <h1 id="class">Your Stocks</h1>
+                  <h1 class="upp">Your Stocks</h1>
                   ${this.userStocks.map(
                     stock => html`
                       <app-stock class="stock" id=${stock.symbol}>
@@ -323,7 +324,11 @@ export class PortfolioComponent extends TradingComponent {
                         <p class="prices" id="price${stock.symbol}">
                           Price: ${stock.price ? stock.price + '$' : 'N/A'}
                         </p>
-                        <p class="percentages" id="perc${stock.symbol}">
+                        <p
+                          class="percentages"
+                          id="perc${stock.symbol}"
+                          style="color: ${stock.dailyPercentage >= 0 ? 'green' : 'red'}"
+                        >
                           ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
                         </p>
                         <p class="shares" id="shares${stock.symbol}">${stock.shares}x</p>

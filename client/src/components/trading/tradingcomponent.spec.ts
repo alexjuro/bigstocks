@@ -2,11 +2,10 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { fixture } from '@open-wc/testing-helpers';
-import { UserStock } from '../../interfaces/stock-interface';
+import { UserStock } from './stock-interface';
 import { MarketComponent } from './market/market';
 import { StockService } from '../../stock-service';
 import { PortfolioComponent } from './portfolio/portfolio';
-import { router } from '../../router/router';
 import { httpClient } from '../../http-client';
 import { CandleComponent } from './trading-widgets/candlecomponent';
 import { TradingInfoComponent } from './trading-widgets/infocomponent';

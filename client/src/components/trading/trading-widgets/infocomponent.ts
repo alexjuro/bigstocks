@@ -1,11 +1,11 @@
 /* Autor: Alexander Schellenberg */
-import { html, css, LitElement } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { PageMixin } from '../../page.mixin';
 import sharedStyle from '../../shared.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
 import { router } from '../../../router/router';
-import { UserStock } from '../../../interfaces/stock-interface';
+import { UserStock } from '../stock-interface';
 
 @customElement('app-trading-info')
 export class TradingInfoComponent extends PageMixin(LitElement) {

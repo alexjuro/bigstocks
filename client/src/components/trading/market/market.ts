@@ -8,7 +8,7 @@ import componentStyle from './market.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
 import { StockService } from '../../../stock-service.js';
 import { TradingComponent } from '../tradingcomponent.js';
-import { UserStock } from '../../../interfaces/stock-interface.js';
+import { UserStock } from '../stock-interface.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
 
@@ -16,7 +16,7 @@ import { router } from '../../../router/router';
 export class MarketComponent extends TradingComponent {
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
   static publicUrl = './../../../../public/';
-  @state() userStocks!: UserStock[];
+  @state() searchText = '';
   @property({ type: Object })
   stockService = new StockService();
   constructor() {
@@ -27,6 +27,7 @@ export class MarketComponent extends TradingComponent {
     this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'Market', bubbles: true, composed: true }));
     try {
       this.startAsyncInit();
+      await httpClient.get('/users/auth' + location.search);
       const response = await httpClient.get('trading/market' + location.search);
       const data = await response.json();
       const userTransactions = data.results;
@@ -42,6 +43,7 @@ export class MarketComponent extends TradingComponent {
       this.stockService.setObserver(this);
       await this.stockService.connectSocket();
       this.sendSubscriptions();
+      this.stockService.updateStockPercentages();
     } catch (e) {
       if ((e as { statusCode: number }).statusCode === 401) {
         router.navigate('/users/sign-in');
@@ -58,7 +60,15 @@ export class MarketComponent extends TradingComponent {
     this.stockService.closeSocket();
   }
 
+  handleSearchInput(event: InputEvent) {
+    const inputElement = event.target as HTMLInputElement;
+    this.searchText = inputElement.value;
+  }
+
   render() {
+    const filteredStocks = this.userStocks.filter(stock =>
+      stock.name.toLowerCase().includes(this.searchText.toLowerCase())
+    );
     return html`
       ${this.renderNotification()}
       <div class="container">
@@ -73,14 +83,21 @@ export class MarketComponent extends TradingComponent {
             ${this.calculateTotalValue()}$
           </p>
         </div>
+        <div class="search-bar">
+          <input type="text" placeholder="Search stocks..." @input=${this.handleSearchInput} />
+        </div>
         <div class="market-stocks">
-          ${this.userStocks.map(
+          ${filteredStocks.map(
             stock => html`
               <app-stock class="stock" id=${stock.symbol}>
                 <img src="${stock.image}" alt="${stock.name} Logo" />
                 <h2 @click=${(event: MouseEvent) => this.handleStockClick(event, stock)}>${stock.name}</h2>
                 <p class="prices" id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
-                <p class="percentages" id="perc${stock.symbol}">
+                <p
+                  class="percentages"
+                  id="perc${stock.symbol}"
+                  style="color: ${stock.dailyPercentage >= 0 ? 'green' : 'red'}"
+                >
                   ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
                 </p>
                 ${stock.shares > 0 ? html` <p class="shares" id="shares${stock.symbol}">${stock.shares}x</p> ` : ''}

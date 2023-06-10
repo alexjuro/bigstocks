@@ -19,7 +19,7 @@ describe('/trading/portfolio', () => {
     page = await context.newPage();
 
     await page.goto(config.clientUrl('/app/sign-in'));
-    await page.fill('#username', 'admin');
+    await page.fill('#username', 'test');
     await page.getByRole('button', { name: 'Next' }).click();
     await page.fill('#password', 'Password1');
     await page.getByRole('button', { name: 'Sign-In', exact: true }).click();
@@ -135,13 +135,14 @@ describe('/trading/portfolio', () => {
       await page.waitForURL(config.clientUrl('/news'));
 
       await page.goto(config.clientUrl('/trading/portfolio'));
-      info = page.locator('app-trading-info');
-      candle = page.locator('app-trading-candle');
-      stock = page.locator('app-stock').first();
+      info = await page.locator('app-trading-info');
+      candle = await page.locator('app-trading-candle');
+      stock = await page.locator('app-stock').first();
 
       expect(await info.isVisible()).to.not.be.true;
       const stockh2 = await stock.locator('h2');
 
+      console.log('HA');
       await stockh2.click();
       expect(await info.isVisible()).to.be.true;
 

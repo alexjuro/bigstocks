@@ -18,7 +18,7 @@ describe('/trading/details', () => {
     page = await context.newPage();
 
     await page.goto(config.clientUrl('/app/sign-in'));
-    await page.fill('#username', 'admin');
+    await page.fill('#username', 'test');
     await page.getByRole('button', { name: 'Next' }).click();
     await page.fill('#password', 'Password1');
     await page.getByRole('button', { name: 'Sign-In', exact: true }).click();
@@ -45,7 +45,9 @@ describe('/trading/details', () => {
 
   describe('trading-details page', () => {
     it('should render the page correctly', async () => {
-      expect(await page.textContent('app-header a')).to.equal('AAPL-Details');
+      await page.waitForSelector('.stock', { timeout: 4000 });
+      expect(await page.url()).to.include('/trading/details');
+      expect(await page.locator('app-header a').textContent()).to.equal('AAPL-Details');
       expect(await page.locator('.stock').count()).to.equal(1);
       expect(await page.locator('h1').nth(0).textContent()).to.equal('Apple');
       expect(await page.locator('p').count()).to.equal(8);
