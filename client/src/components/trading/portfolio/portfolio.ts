@@ -58,7 +58,6 @@ export class PortfolioComponent extends TradingComponent {
     this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'Portfolio', bubbles: true, composed: true }));
     try {
       this.startAsyncInit();
-      // await httpClient.get('/users/auth' + location.search);
       const response = await httpClient.get('trading' + location.search);
       const data = await response.json();
       const userTransactions = data.results;
@@ -98,6 +97,17 @@ export class PortfolioComponent extends TradingComponent {
     }
     return cum;
   }
+
+  /*
+
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
+  }
+
+  */
 
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -231,8 +241,10 @@ export class PortfolioComponent extends TradingComponent {
     const labels = this.ChartGraph.data.labels ?? [];
     const lastLabel = labels[labels?.length - 1];
     const data = this.ChartGraph.data.datasets[0].data;
-    const day = new Date().toLocaleDateString().slice(0, lastLabel.length);
-    if (day == lastLabel) {
+    let day = new Date().toLocaleDateString();
+    day = day.split('/').join('.');
+    const slicedDay = day.slice(0, day.indexOf('.') + 2);
+    if (slicedDay == lastLabel) {
       data.pop();
       data.push(this.money + this.calculateTotalValue());
     } else {

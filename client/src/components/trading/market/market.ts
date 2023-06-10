@@ -27,7 +27,6 @@ export class MarketComponent extends TradingComponent {
     this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'Market', bubbles: true, composed: true }));
     try {
       this.startAsyncInit();
-      // await httpClient.get('/users/auth' + location.search);
       const response = await httpClient.get('trading/market' + location.search);
       const data = await response.json();
       const userTransactions = data.results;
@@ -53,6 +52,17 @@ export class MarketComponent extends TradingComponent {
       this.finishAsyncInit();
     }
   }
+
+  /*
+
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
+  }
+
+  */
 
   disconnectedCallback() {
     super.disconnectedCallback();

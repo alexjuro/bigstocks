@@ -80,9 +80,12 @@ describe('app-portfolio', () => {
     const fixtureElement = (await fixture('<app-portfolio></app-portfolio>')) as PortfolioComponent;
     await fixtureElement.updateComplete;
 
-    const d1 = new Date(Date.now() - 86400000).toLocaleDateString();
-    const d2 = new Date(Date.now() - 86400000 * 2).toLocaleDateString();
-    const d3 = new Date().toLocaleDateString();
+    let d1 = new Date(Date.now() - 86400000).toLocaleDateString();
+    d1 = d1.split('/').join('.');
+    let d2 = new Date(Date.now() - 86400000 * 2).toLocaleDateString();
+    d2 = d2.split('/').join('.');
+    let d3 = new Date().toLocaleDateString();
+    d3 = d3.split('/').join('.');
 
     const chartData = {
       labels: [d1, d2],
