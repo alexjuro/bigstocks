@@ -47,7 +47,7 @@ describe('/trading/details', () => {
     it('should render the page correctly', async () => {
       await page.waitForSelector('.stock', { timeout: 4000 });
       expect(await page.url()).to.include('/trading/details');
-      expect(await page.locator('app-header a').textContent()).to.equal('AAPL-Details');
+      expect(await page.locator('app-header a').textContent()).to.equal('Apple');
       expect(await page.locator('.stock').count()).to.equal(1);
       expect(await page.locator('h1').nth(0).textContent()).to.equal('Apple');
       expect(await page.locator('p').count()).to.equal(8);

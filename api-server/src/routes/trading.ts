@@ -123,6 +123,11 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const userId = res.locals.user.id;
 
+  if (!req.body.symbol || !req.body.name || !req.body.image || !req.body.bPrice || !req.body.pValue) {
+    res.status(400).json({ error: 'Missing parameters' });
+    return;
+  }
+
   const { symbol, name, image, bPrice, pValue } = req.body;
 
   try {
@@ -169,6 +174,11 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
 router.post('/details', authService.authenticationMiddleware, async (req, res) => {
   const noteDAO: GenericDAO<Note> = req.app.locals.noteDAO;
 
+  if (!req.body.note) {
+    res.status(400).json({ error: 'Missing parameters' });
+    return;
+  }
+
   const { note } = req.body;
   const userId = res.locals.user.id;
   const cryptNote = cryptoService.encrypt(note.note);
@@ -191,7 +201,7 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
     });
 
     res
-      .status(201)
+      .status(200)
       .json({ message: 'Note saved successfully', note: cryptoService.encrypt(newNote.note || exNote!.note) });
   } catch (error) {
     res.status(500).json({ error: `An error occurred while saving the note ${noteDAO}` });
@@ -202,6 +212,11 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const userId = res.locals.user.id;
+
+  if (!req.body.symbol || !req.body.sPrice || !req.body.pValue) {
+    res.status(400).json({ error: 'Missing parameters' });
+    return;
+  }
   const { symbol, sPrice, pValue } = req.body;
 
   try {
@@ -237,7 +252,7 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
     await userDAO.update(user);
 
     res
-      .status(202)
+      .status(200)
       .json({ message: 'Transaction updated successfully', money: user.money, performance: user.performance });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while updating the transaction' });

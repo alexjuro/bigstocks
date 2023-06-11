@@ -2,8 +2,6 @@ import { expect } from 'chai';
 import fetch from 'node-fetch';
 import config from './config.js';
 
-type Res = { status: string };
-
 const user = {
   id: '41b3ed0f-169d-447b-baf1-46eef5f82e72',
   name: 'test',
@@ -37,8 +35,110 @@ describe('/trading/market', () => {
   it('should retrieve market stocks', async () => {
     const res = await createFetch('GET', '/trading/market');
 
-    const responseBody = (await res.json()) as Res;
+    const responseBody = (await res.json()) as Record<string, string>;
 
     expect(res.status).to.equal(200);
+    expect(responseBody.results.length).to.equal(24);
+  });
+
+  it('should purchase a stock', async () => {
+    const requestBody = {
+      symbol: 'AAPL',
+      name: 'Apple Inc.',
+      image: 'https://example.com/apple.png',
+      bPrice: 50.5,
+      pValue: 500.0
+    };
+
+    const res = await createFetch('POST', '/trading', requestBody);
+
+    const responseBody = (await res.json()) as Record<string, string>;
+
+    expect(res.status).to.equal(201);
+    expect(responseBody.transaction).to.be.an('object');
+    expect(responseBody.money).to.be.a('number');
+    expect(responseBody.performance).to.be.an('array');
+  });
+
+  it('should not purchase unknown stock', async () => {
+    const requestBody = {
+      symbol: 'PPPP',
+      name: 'Apple',
+      image: 'https://example.com/apfadfae.png',
+      bPrice: 50.5,
+      pValue: 500.0
+    };
+
+    const res = await createFetch('POST', '/trading', requestBody);
+
+    const responseBody = (await res.json()) as Record<string, string>;
+
+    expect(res.status).to.equal(404);
+    expect(responseBody.error).to.deep.equal('Stock not found');
+  });
+
+  it('should not purchase stock with insufficient funds', async () => {
+    const requestBody = {
+      symbol: 'AAPL',
+      name: 'Apple',
+      image: 'https://example.com/apfadfae.png',
+      bPrice: 8900.5,
+      pValue: 500.0
+    };
+
+    const res = await createFetch('POST', '/trading', requestBody);
+
+    const responseBody = (await res.json()) as Record<string, string>;
+
+    expect(res.status).to.equal(400);
+    expect(responseBody.error).to.deep.equal('Insufficient funds');
+  });
+
+  it('should not purchase stock with missing values', async () => {
+    const requestBody = {
+      symbol: 'AAPL',
+      image: 'https://example.com/apfadfae.png',
+      bPrice: 10.5,
+      pValue: 500.0
+    };
+
+    const res = await createFetch('POST', '/trading', requestBody);
+
+    const responseBody = (await res.json()) as Record<string, string>;
+
+    expect(res.status).to.equal(400);
+    expect(responseBody.error).to.deep.equal('Missing parameters');
+  });
+
+  it('should sell a stock', async () => {
+    const requestBody = {
+      symbol: 'AAPL',
+      sPrice: 50.5,
+      pValue: 500.0
+    };
+
+    const res = await createFetch('PATCH', '/trading', requestBody);
+
+    const responseBody = (await res.json()) as Record<string, string>;
+
+    expect(res.status).to.equal(200);
+    expect(responseBody.message).to.deep.equal('Transaction updated successfully');
+    expect(responseBody.money).to.be.a('number');
+    expect(responseBody.performance).to.be.an('array');
+  });
+
+  it('should not be able to sell a stock without shares', async () => {
+    const requestBody = {
+      symbol: 'TSLA',
+      sPrice: 50.5,
+      pValue: 500.0
+    };
+
+    const res = await createFetch('PATCH', '/trading', requestBody);
+
+    const responseBody = (await res.json()) as Record<string, string>;
+
+    expect(res.status).to.equal(404);
+    expect(responseBody.error).to.deep.equal('No active transactions found for the specified stock symbol');
   });
 });
