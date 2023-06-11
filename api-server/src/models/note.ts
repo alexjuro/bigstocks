@@ -1,4 +1,4 @@
-/* Author: Alexander Schellenberg */
+/* Autor: Alexander Schellenberg */
 
 import { Entity } from './entity';
 

@@ -1,4 +1,4 @@
-/* Author: Alexander Schellenberg */
+/* Autor: Alexander Schellenberg */
 
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';

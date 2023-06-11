@@ -1,3 +1,4 @@
+/* Autor: Alexander Schellenberg */
 import { expect } from 'chai';
 import fetch from 'node-fetch';
 import config from './config.js';
