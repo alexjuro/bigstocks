@@ -36,7 +36,6 @@ class SignInComponent extends PageMixin(LitElement) {
   }
 
   handleKeyDownPassword(event: KeyboardEvent) {
-    console.log('Key down event:', event);
     if (event.key === 'Enter') {
       event.preventDefault(); // Prevent form submission by Enter key
       this.submit();
@@ -44,7 +43,6 @@ class SignInComponent extends PageMixin(LitElement) {
   }
 
   handleKeyDownUsername(event: KeyboardEvent) {
-    console.log('Key down event:', event);
     if (event.key === 'Enter') {
       event.preventDefault(); // Prevent form submission by Enter key
       this.nextStep();
@@ -76,10 +74,11 @@ class SignInComponent extends PageMixin(LitElement) {
           />
           <div class="invalid-feedback">Invalid Input</div>
         </div>
-        <p class="message">Forgot you password? <button @click="${this.forgotPassword}">Reset password!</button></p>
-        <p class="message">
-          Not registered?
-          <button @click=${this.signUp}>Create an account</button>
+        <p id="forgotPasswordMessage" class="message">
+          Forgot you password?<button id="forgotPasswordButton" @click="${this.forgotPassword}">Reset password!</button>
+        </p>
+        <p id="notRegisteredMessage" class="message">
+          Not registered?<button id="signUpButton" @click=${this.signUp}>Create an account</button>
         </p>
         <button type="button" id="nextButton" @click=${this.nextStep}>Next</button>
       </form>
@@ -108,10 +107,11 @@ class SignInComponent extends PageMixin(LitElement) {
           />
           <div class="invalid-feedback">Invalid Input</div>
         </div>
-        <p class="message">Forgot you password? <button @click="${this.forgotPassword}">Reset password!</button></p>
-        <p class="message">
-          Not registered?
-          <button id="signUpButton" @click=${this.signUp}>Create an account</button>
+        <p id="forgotPasswordMessage" class="message">
+          Forgot you password?<button @click="${this.forgotPassword}">Reset password!</button>
+        </p>
+        <p id="notRegisteredMessage" class="message">
+          Not registered?<button id="signUpButton" @click=${this.signUp}>Create an account</button>
         </p>
         <button type="button" id="backButton" @click=${this.backStep}>Back</button>
         <button type="button" id="submitButton" @click=${this.submit}>Sign-In</button>

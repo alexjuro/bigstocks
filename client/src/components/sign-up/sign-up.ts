@@ -34,18 +34,18 @@ class SignUpComponent extends PageMixin(LitElement) {
           <form @keydown="${this.handleKeyDown}" novalidate>
             <button id="constraintButton" type="button" @click="${this.toggleConstraints}">?</button>
             <div class="userNameContainer">
-              <label for="username">Username</label>
+              <label id=usernameLabel for="username">Username</label>
               <input minlength="4" maxlength="32" type="text" autofocus required id="username" placeholder="Username" @input=${this.handleUsernameChange} .value=${this.username} />
               <div class="invalid-feedback">Username must be valid</div>
             </div>
             <div class="emailContainer">
-              <label for="email">E-Mail</label>
+              <label id=emailLabel for="email">E-Mail</label>
               <input type="email" required id="email" placeholder="Email"  @input=${this.handleEmailChange} .value=${this.email}/>
               <div class="invalid-feedback">Email is required and must be valid</div>
             </div>
             <p class="message">
-              Already registered? <button @click="${this.signIn}">Sign-In</button>  </p>
-              <button type="button" @click="${this.submit}">Create account</button>
+              Already registered? <button id="signInButton" @click="${this.signIn}">Sign-In</button>  </p>
+              <button type="button" id="signUpButton" @click="${this.submit}">Create account</button>
             </p>
           </form>
         </div>
@@ -58,10 +58,10 @@ class SignUpComponent extends PageMixin(LitElement) {
       <div class="Login-page">
         <div class="form">
           <h1>Username Constraints:</h1>
-          <div class="password-constraints">
+          <div class="constraints">
             <ul>
               <li>
-                : It must consist of 4 to 32 characters, which can be alphanumeric (letters and numbers), hyphens, or
+                It must consist of 4 to 32 characters, which can be alphanumeric (letters and numbers), hyphens, or
                 periods.
               </li>
             </ul>

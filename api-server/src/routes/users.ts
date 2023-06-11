@@ -5,6 +5,7 @@ import { GenericDAO } from '../models/generic.dao.js';
 import { Role, User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
 import nodemailer from 'nodemailer';
+import { equal } from 'assert';
 
 const router = express.Router();
 const transporter = nodemailer.createTransport({
@@ -170,23 +171,24 @@ router.post('/sign-up', async (req, res) => {
   if (hasNotRequiredFields(req.body, ['email', 'username'], errors)) {
     return sendErrMsg(errors.join('\n'));
   }
-  const filter: Partial<User> = { compareEmail: req.body.compareEmail };
+  const filter: Partial<User> = { compareEmail: req.body.email };
   filter.compareEmail = filter.compareEmail?.toUpperCase();
   if (await userDAO.findOne(filter)) {
-    return sendErrMsg('Invalid Input');
+    console.log(filter.compareEmail?.toUpperCase());
+    return sendErrMsg('Invalid Input (EMAIL)');
   }
 
   if (checkUsername(req.body.username)) {
-    return sendErrMsg('Invalid username');
+    return sendErrMsg('Invalid username (USERNAME)');
   }
 
   if (checkEmail(req.body.email)) {
-    return sendErrMsg('Invalid input');
+    return sendErrMsg('Invalid input (EMAIL CONSTRAINTS)');
   }
 
   const filter2: Partial<User> = { username: req.body.username };
   if (await userDAO.findOne(filter2)) {
-    return sendErrMsg('Invalid Input');
+    return sendErrMsg('Invalid Input (USERNAME EXISTS)');
   }
 
   const newCode = createNumber();
@@ -256,7 +258,7 @@ router.post('/sign-in', async (req, res) => {
   const user = await userDAO.findOne(filter);
   if (user && (await bcrypt.compare(req.body.password, user.password))) {
     authService.createAndSetToken({ id: user.id }, res);
-    res.status(201).json(user);
+    res.status(200).json(user);
   } else {
     authService.removeToken(res);
     res.status(401).json({ message: 'Invalid Input!' });
@@ -334,6 +336,9 @@ function createNumber() {
 }
 
 async function sendCode(userEmail: string, code: number) {
+  if (userEmail === 'testuser1@email.de') {
+    return;
+  }
   transporter
     .sendMail({
       from: 'donotreply@fh-muenster.de',
@@ -355,6 +360,9 @@ The FH Muenster Sweng Team`
 }
 
 async function sendCodeActivation(userEmail: string, code: number) {
+  if (userEmail === 'testuser1@email.de') {
+    return;
+  }
   transporter
     .sendMail({
       from: 'donotreply@fh-muenster.de',

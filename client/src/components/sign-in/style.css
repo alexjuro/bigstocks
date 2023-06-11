@@ -88,14 +88,14 @@ label {
   top: 0;
   right: 5px;
   width: min-content;
-  border-radius: 100%;
+  border-radius: 1em;
   font-size: 1.2em;
   line-height: 1.5em;
   padding-top: 1px;
   padding-bottom: 1px;
 }
 
-.password-constraints {
+.constraints {
   margin-top: 20px;
   color: white;
   text-align: left;
@@ -105,17 +105,17 @@ label {
   padding: 4%;
 }
 
-.password-constraints p {
+.constraints p {
   font-weight: bolder;
   margin-bottom: 10px;
 }
 
-.password-constraints ul {
+.constraints ul {
   list-style-type: square;
   padding-left: 20px;
 }
 
-.password-constraints li {
+.constraints li {
   margin-bottom: 5px;
 }
 
