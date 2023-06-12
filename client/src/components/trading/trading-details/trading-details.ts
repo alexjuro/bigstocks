@@ -5,7 +5,6 @@ import { customElement, property, query } from 'lit/decorators.js';
 import sharedStyle from '../../shared.css?inline';
 import componentStyle from './trading-details.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
-import { TradingComponent } from '../tradingcomponent.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
 import { Chart, ChartData, ChartOptions } from 'chart.js/auto';

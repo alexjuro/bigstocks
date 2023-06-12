@@ -30,7 +30,6 @@ describe('TradingComponent', () => {
     expect(tradingComponent.stockService).deep.equal(new StockService()); // cuz MarketComponent initialisiert mit StockService
     expect(tradingComponent.stockCandle).deep.equal(null);
     expect(tradingComponent.money).deep.equal(0);
-    expect(tradingComponent.publicUrl).deep.equal('./../../../../public/');
   });
 
   it('should update stock price and apply CSS class changes', async () => {

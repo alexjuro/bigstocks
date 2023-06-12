@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 
 export const mochaHooks = async () => {
   const childProcesses = await Promise.all([
-    startServer('api-server', 'http://localhost:3000'),
-    startServer('web-server', 'http://localhost:8080')
+    startServer('api-server', 'https://localhost:3443'),
+    startServer('web-server', 'https://localhost:8443')
   ]);
   return {
     afterAll() {

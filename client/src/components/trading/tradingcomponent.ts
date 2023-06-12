@@ -14,7 +14,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
   public stockService: StockService | null = null;
   public stockCandle: Chart | null = null;
   public money = 0;
-  public publicUrl = './../../../../public/';
   private tradeLock = false;
   private notificationTimeout: NodeJS.Timeout | undefined;
 
@@ -114,7 +113,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
 
         const infoComponent = new TradingInfoComponent();
         infoComponent.stock = stock;
-        infoComponent.publicUrl = this.publicUrl;
         infoComponent.buyStock = this.buyStock.bind(this);
         infoComponent.sellStock = this.sellStock.bind(this);
         stockDiv.appendChild(infoComponent);

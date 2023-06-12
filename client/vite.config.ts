@@ -16,7 +16,7 @@ export default defineConfig({
       apply: 'build'
     }
   ],
-  server: { port: 8080 },
+  server: { port: 8443 },
   css: {
     postcss: {
       plugins: [postcssPresetEnv({ stage: 2 })]
