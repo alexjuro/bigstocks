@@ -108,7 +108,7 @@ describe('/trading/market', () => {
     const responseBody = (await res.json()) as Record<string, string>;
 
     expect(res.status).to.equal(400);
-    expect(responseBody.error).to.deep.equal('Missing parameters');
+    expect(responseBody.message).to.deep.equal('name can not be empty');
   });
 
   it('should sell a stock', async () => {

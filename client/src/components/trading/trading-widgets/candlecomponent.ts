@@ -1,11 +1,11 @@
 /* Autor: Alexander Schellenberg */
 
-import { LitElement, css, html } from 'lit';
+import { LitElement, html } from 'lit';
 
 import sharedStyle from '../../shared.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
 import { PageMixin } from '../../page.mixin';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 
 @customElement('app-trading-candle')
 export class CandleComponent extends PageMixin(LitElement) {

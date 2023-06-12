@@ -252,7 +252,7 @@ export class PortfolioComponent extends TradingComponent {
         labels.shift();
         data.shift();
       }
-      labels?.push(day);
+      labels?.push(slicedDay);
       data.push(this.money + this.calculateTotalValue());
     }
     const firstValue = data[0];

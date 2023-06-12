@@ -122,9 +122,10 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const userId = res.locals.user.id;
+  const errors: string[] = [];
 
-  if (!req.body.symbol || !req.body.name || !req.body.image || !req.body.bPrice || !req.body.pValue) {
-    res.status(400).json({ error: 'Missing parameters' });
+  if (hasNotRequiredFields(req.body, ['symbol', 'name', 'image', 'bPrice', 'pValue'], errors)) {
+    res.status(400).json({ message: errors.join('\n') });
     return;
   }
 
@@ -174,8 +175,10 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
 router.post('/details', authService.authenticationMiddleware, async (req, res) => {
   const noteDAO: GenericDAO<Note> = req.app.locals.noteDAO;
 
-  if (!req.body.note) {
-    res.status(400).json({ error: 'Missing parameters' });
+  const errors: string[] = [];
+
+  if (hasNotRequiredFields(req.body, ['note'], errors)) {
+    res.status(400).json({ message: errors.join('\n') });
     return;
   }
 
@@ -213,8 +216,10 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const userId = res.locals.user.id;
 
-  if (!req.body.symbol || !req.body.sPrice || !req.body.pValue) {
-    res.status(400).json({ error: 'Missing parameters' });
+  const errors: string[] = [];
+
+  if (hasNotRequiredFields(req.body, ['symbol', 'sPrice', 'pValue'], errors)) {
+    res.status(400).json({ message: errors.join('\n') });
     return;
   }
   const { symbol, sPrice, pValue } = req.body;
@@ -273,6 +278,17 @@ function validation(note: Note) {
   }
 
   return result;
+}
+
+function hasNotRequiredFields(object: { [key: string]: unknown }, requiredFields: string[], errors: string[]) {
+  let hasErrors = false;
+  requiredFields.forEach(fieldName => {
+    if (!object[fieldName]) {
+      errors.push(fieldName + ' can not be empty');
+      hasErrors = true;
+    }
+  });
+  return hasErrors;
 }
 
 export default router;

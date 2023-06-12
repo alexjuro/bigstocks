@@ -44,9 +44,9 @@ export class TradingInfoComponent extends PageMixin(LitElement) {
   get infoDiv(): HTMLElement | null {
     return this.shadowRoot?.querySelector('.info-div') as HTMLElement | null;
   }
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   buyStock = (event: Event, stock: UserStock) => {};
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   sellStock = (event: Event, stock: UserStock) => {};
 
   render() {

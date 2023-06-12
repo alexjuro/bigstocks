@@ -175,7 +175,6 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
           <div class="stock">
             <div class="card-title">
               <img src="${this.stock.image}"> </img>
-              <h1>${this.name}</h1>
             </div>
             <div class="canvas">
               <canvas id="bar"></canvas>
