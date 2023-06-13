@@ -7,7 +7,7 @@ import './details';
 import { ProfileMain } from './details';
 import { UserData } from '../types';
 
-let userData: Pick<UserData, 'id' | 'email' | 'name'>;
+let userData: Pick<UserData, 'id' | 'email' | 'username'>;
 
 describe('user-profile-details', () => {
   let el: ProfileMain;
@@ -19,7 +19,7 @@ describe('user-profile-details', () => {
     userData = {
       id: 0,
       email: 'admin@bigstocks.com',
-      name: 'HarryHacker'
+      username: 'HarryHacker'
     };
 
     el = (await fixture(html`<user-profile-details .data="${userData}"></user-profile-details>`)) as ProfileMain;
@@ -33,7 +33,7 @@ describe('user-profile-details', () => {
   });
 
   it('should fill in user data', () => {
-    expect(name.value).to.equal(userData.name);
+    expect(name.value).to.equal(userData.username);
     expect(email.value).to.equal(userData.email);
   });
 
@@ -84,6 +84,8 @@ describe('user-profile-details', () => {
     const listener = oneEvent(el, 'submit-req');
     (sr.querySelector('button') as HTMLButtonElement).click();
 
-    expect((await listener).detail).to.be.a('function');
+    expect((await listener).detail).to.be.an('object');
+    expect((await listener).detail.cb).to.be.a('function');
+    expect((await listener).detail.confirm).to.be.true;
   });
 });
