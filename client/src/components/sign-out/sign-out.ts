@@ -105,31 +105,27 @@ class SignOutComponent extends PageMixin(LitElement) {
   }
 
   validate(comment: string, rating: number) {
-    let result = true;
     if (rating > 5 || rating < 0) {
-      result = false;
+      this.commentElement.setCustomValidity('Invalid Rating');
+    } else if (comment.trim().length === 0) {
+      this.commentElement.setCustomValidity('Invalid Input');
+    } else {
+      const re = /\w/gm;
+      if (!re.test(this.commentElement.value)) {
+        this.commentElement.setCustomValidity('Invalid Input');
+      } else {
+        const nosqlInjectionPattern = /[$\\'"]/;
+        if (nosqlInjectionPattern.test(this.commentElement.value)) {
+          this.commentElement.setCustomValidity('Invalid Input');
+        } else {
+          this.commentElement.setCustomValidity('');
+        }
+      }
     }
-
-    this.commentElement.setCustomValidity(rating ? '' : 'Invalid Rating');
-
-    const re = /\w/gm;
-    this.commentElement.setCustomValidity(re.test(this.commentElement.value) ? '' : 'Invalid Input');
-    console.log(re.test(this.commentElement.value) ? '' : 'Invalid Input');
-    console.log(re.test(this.commentElement.value));
-    // Überprüfung auf potenzielle NOSQL-Injection
-    const nosqlInjectionPattern = /[$\\'"]/;
-    this.commentElement.setCustomValidity(nosqlInjectionPattern.test(this.commentElement.value) ? '' : 'Invalid Input');
 
     console.log(this.form.checkValidity());
 
     return this.form.checkValidity();
-
-    // Überprüfung auf potenzielle XSS-Attacken
-    const sanitizedComment = xss(comment);
-    if (sanitizedComment !== comment) {
-      result = false;
-    }
-    return result;
   }
   handleCommentChange(event: InputEvent) {
     this.comment = (event.target as HTMLInputElement).value;
