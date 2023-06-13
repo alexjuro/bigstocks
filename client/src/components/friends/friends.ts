@@ -1,7 +1,4 @@
 /* Autor: Alexander Lesnjak */
-//TODO: show the picture of the user
-//TODO: show success
-//TODO: reload after eg. accept friend
 
 import { LitElement, PropertyValueMap, html } from 'lit';
 import { httpClient } from '../../http-client.js';

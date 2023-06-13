@@ -122,7 +122,7 @@ class ActivationComponent extends PageMixin(LitElement) {
       <div class="Login-page">
         <div class="form">
           <h1>Password Constraints:</h1>
-          <div class="password-constraints">
+          <div class="constraints">
             <ul>
               <li>Password must be between 8 and 32 characters long</li>
               <li>One lowercase letter [a-z]</li>

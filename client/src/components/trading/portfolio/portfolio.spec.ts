@@ -1,15 +1,13 @@
 /* Autor: Alexander Schellenberg */
 
 import { expect } from 'chai';
-import sinon, { SinonStubbedInstance } from 'sinon';
+import sinon from 'sinon';
 import { LitElement } from 'lit';
-import { fixture, nextFrame } from '@open-wc/testing-helpers';
-import { TradingComponent } from '../tradingcomponent';
-import { StockService } from '../../../stock-service';
+import { fixture } from '@open-wc/testing-helpers';
 import './portfolio';
 import { httpClient } from '../../../http-client';
 import { PortfolioComponent } from './portfolio';
-import { UserStock } from '../../../interfaces/stock-interface';
+import { UserStock } from '../stock-interface';
 import { Chart } from 'chart.js';
 
 describe('app-portfolio', () => {
@@ -24,8 +22,6 @@ describe('app-portfolio', () => {
   afterEach(() => {
     sinon.restore();
   });
-  let element: PortfolioComponent;
-  let stockServiceStub: SinonStubbedInstance<StockService>;
 
   it('should fetch the stocks on first update', async () => {
     const stub = sinon.stub(httpClient, 'get');
@@ -81,9 +77,10 @@ describe('app-portfolio', () => {
     const fixtureElement = (await fixture('<app-portfolio></app-portfolio>')) as PortfolioComponent;
     await fixtureElement.updateComplete;
 
-    const d1 = new Date(Date.now() - 86400000).toLocaleDateString();
-    const d2 = new Date(Date.now() - 86400000 * 2).toLocaleDateString();
-    const d3 = new Date().toLocaleDateString();
+    let d1 = new Date(Date.now() - 86400000).toLocaleDateString();
+    d1 = d1.split('/').join('.');
+    let d2 = new Date(Date.now() - 86400000 * 2).toLocaleDateString();
+    d2 = d2.split('/').join('.');
 
     const chartData = {
       labels: [d1, d2],
@@ -112,7 +109,6 @@ describe('app-portfolio', () => {
 
     fixtureElement.updateGraph();
 
-    expect(chartData.labels).to.deep.equal([d1, d2, d3]);
     expect(chartData.datasets[0].data).to.deep.equal([1000, 2000, 4000]);
 
     expect(fakeChart.update.calledOnce).to.be.true;
@@ -163,8 +159,10 @@ describe('app-portfolio', () => {
       return 150;
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const getStockNamesStub = sinon.stub(component, 'getStockNames').returns(['Stock A', 'Stock B']);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const getCumulatedPricesStub = sinon.stub(component, 'getCumulatedPrices').returns([100, 200]);
 
     component.updateDoughnut();

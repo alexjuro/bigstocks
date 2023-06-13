@@ -5,6 +5,7 @@ import { GenericDAO } from '../models/generic.dao.js';
 import { Role, User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
 import nodemailer from 'nodemailer';
+import { equal } from 'assert';
 
 const router = express.Router();
 const transporter = nodemailer.createTransport({
@@ -85,7 +86,9 @@ router.post('/forgotPassword', async (req, res) => {
 
   const filter: Partial<User> = { username: req.body.username };
   const user = await userDAO.findOne(filter);
+  console.log('found User');
   if (user && (await bcrypt.compare(req.body.safetyAnswerOne, user.safetyAnswerOne))) {
+    console.log('correct Answer');
     authService.createAndSetShortToken({ id: user.id }, res);
     const code = createNumber();
     user.code = code;
@@ -173,11 +176,12 @@ router.post('/sign-up', async (req, res) => {
   const filter: Partial<User> = { compareEmail: req.body.email };
   filter.compareEmail = filter.compareEmail?.toUpperCase();
   if (await userDAO.findOne(filter)) {
-    return sendErrMsg('Invalid Input');
+    console.log(filter.compareEmail?.toUpperCase());
+    return sendErrMsg('Invalid Input (EMAIL)');
   }
 
   if (checkUsername(req.body.username)) {
-    return sendErrMsg('Invalid username');
+    return sendErrMsg('Invalid username (USERNAME)');
   }
 
   if (checkEmail(req.body.email)) {
@@ -186,7 +190,7 @@ router.post('/sign-up', async (req, res) => {
 
   const filter2: Partial<User> = { username: req.body.username };
   if (await userDAO.findOne(filter2)) {
-    return sendErrMsg('Invalid Input');
+    return sendErrMsg('Invalid Input (USERNAME EXISTS)');
   }
 
   const newCode = createNumber();
@@ -258,7 +262,7 @@ router.post('/sign-in', async (req, res) => {
   const user = await userDAO.findOne(filter);
   if (user && (await bcrypt.compare(req.body.password, user.password))) {
     authService.createAndSetToken({ id: user.id }, res);
-    res.status(201).json(user);
+    res.status(200).json(user);
   } else {
     authService.removeToken(res);
     res.status(401).json({ message: 'Invalid Input!' });
@@ -336,6 +340,9 @@ function createNumber() {
 }
 
 async function sendCode(userEmail: string, code: number) {
+  if (userEmail === 'testuser1@email.de') {
+    return;
+  }
   transporter
     .sendMail({
       from: 'donotreply@fh-muenster.de',
@@ -357,6 +364,9 @@ The FH Muenster Sweng Team`
 }
 
 async function sendCodeActivation(userEmail: string, code: number) {
+  if (userEmail === 'testuser1@email.de') {
+    return;
+  }
   transporter
     .sendMail({
       from: 'donotreply@fh-muenster.de',

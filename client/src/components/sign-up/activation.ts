@@ -154,15 +154,16 @@ class ActivationComponent extends PageMixin(LitElement) {
       <div class="Login-page">
         <div class="form">
           <h1>Password Constraints:</h1>
-          <div class="password-constraints">
-            <ul>
-              <li>Password must be between 8 and 32 characters long</li>
-              <li>One lowercase letter [a-z]</li>
-              <li>One uppercase letter [A-Z]</li>
-              <li>One digit [0-9]</li>
-            </ul>
+            <div class="constraints">
+              <ul>
+                <li>Password must be between 8 and 32 characters long</li>
+                <li>One lowercase letter [a-z]</li>
+                <li>One uppercase letter [A-Z]</li>
+                <li>One digit [0-9]</li>
+              </ul>
+            </div>
+            <button type="button" @click="${this.toggleConstraints}">Go Back!</button>
           </div>
-          <button type="button" @click="${this.toggleConstraints}">Go Back!</button>
         </div>
       </div>
     `;

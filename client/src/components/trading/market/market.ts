@@ -1,14 +1,14 @@
 /* Autor: Alexander Schellenberg */
 
 import { customElement } from 'lit/decorators.js';
-import { LitElement, html } from 'lit';
-import { property, query, state } from 'lit-element';
+import { html } from 'lit';
+import { property, state } from 'lit-element';
 import sharedStyle from '../../shared.css?inline';
 import componentStyle from './market.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
 import { StockService } from '../../../stock-service.js';
 import { TradingComponent } from '../tradingcomponent.js';
-import { Stock, UserStock } from '../../../interfaces/stock-interface.js';
+import { UserStock } from '../stock-interface.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
 
@@ -16,7 +16,7 @@ import { router } from '../../../router/router';
 export class MarketComponent extends TradingComponent {
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
   static publicUrl = './../../../../public/';
-  @state() userStocks!: UserStock[];
+  @state() searchText = '';
   @property({ type: Object })
   stockService = new StockService();
   constructor() {
@@ -53,34 +53,60 @@ export class MarketComponent extends TradingComponent {
     }
   }
 
+  /*
+
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
+  }
+
+  */
+
   disconnectedCallback() {
     super.disconnectedCallback();
     this.stockService.closeSocket();
   }
 
+  handleSearchInput(event: InputEvent) {
+    const inputElement = event.target as HTMLInputElement;
+    this.searchText = inputElement.value;
+  }
+
   render() {
+    const filteredStocks = this.userStocks.filter(stock =>
+      stock.name.toLowerCase().includes(this.searchText.toLowerCase())
+    );
     return html`
       ${this.renderNotification()}
       <div class="container">
         <app-trading-notification></app-trading-notification>
-        <h1 id="upp">Marketplace</h1>
+        <h1 class="upp">Marketplace</h1>
         <div>
           <p class="account" style="color: #E58400">
-            <img src="${this.publicUrl}dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
+            <img src="dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
           </p>
           <p class="account" style="color: #663399">
-            <img src="${this.publicUrl}stock.png" alt="Stocks Icon" class="icon" />
+            <img src="stock.png" alt="Stocks Icon" class="icon" />
             ${this.calculateTotalValue()}$
           </p>
         </div>
+        <div class="search-bar">
+          <input type="text" placeholder="Search stocks..." @input=${this.handleSearchInput} />
+        </div>
         <div class="market-stocks">
-          ${this.userStocks.map(
+          ${filteredStocks.map(
             stock => html`
               <app-stock class="stock" id=${stock.symbol}>
                 <img src="${stock.image}" alt="${stock.name} Logo" />
                 <h2 @click=${(event: MouseEvent) => this.handleStockClick(event, stock)}>${stock.name}</h2>
-                <p id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
-                <p class="percentages" id="perc${stock.symbol}">
+                <p class="prices" id="price${stock.symbol}">Price: ${stock.price ? stock.price + '$' : 'N/A'}</p>
+                <p
+                  class="percentages"
+                  id="perc${stock.symbol}"
+                  style="color: ${stock.dailyPercentage >= 0 ? 'green' : 'red'}"
+                >
                   ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
                 </p>
                 ${stock.shares > 0 ? html` <p class="shares" id="shares${stock.symbol}">${stock.shares}x</p> ` : ''}

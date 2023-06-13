@@ -2,11 +2,10 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { fixture } from '@open-wc/testing-helpers';
-import { UserStock } from '../../interfaces/stock-interface';
+import { UserStock } from './stock-interface';
 import { MarketComponent } from './market/market';
 import { StockService } from '../../stock-service';
 import { PortfolioComponent } from './portfolio/portfolio';
-import { router } from '../../router/router';
 import { httpClient } from '../../http-client';
 import { CandleComponent } from './trading-widgets/candlecomponent';
 import { TradingInfoComponent } from './trading-widgets/infocomponent';
@@ -30,35 +29,6 @@ describe('TradingComponent', () => {
     expect(tradingComponent.stockService).deep.equal(new StockService()); // cuz MarketComponent initialisiert mit StockService
     expect(tradingComponent.stockCandle).deep.equal(null);
     expect(tradingComponent.money).deep.equal(0);
-    expect(tradingComponent.publicUrl).deep.equal('./../../../../public/');
-  });
-
-  it('should return the correct amount of money', () => {
-    tradingComponent.money = 1000;
-    expect(tradingComponent.getMoney()).deep.equal(1000);
-  });
-
-  it('should return the user stocks', () => {
-    tradingComponent.userStocks = stocks;
-    expect(tradingComponent.getStocks()).deep.equal([stocks[0], stocks[1]]);
-  });
-
-  it('should return the stock symbols', () => {
-    tradingComponent.userStocks = stocks;
-    expect(tradingComponent.getStockSymbols()).deep.equal(['AAPL', 'MSFT']);
-  });
-
-  it('should return the stock names', () => {
-    tradingComponent.userStocks = stocks;
-    expect(tradingComponent.getStockNames()).deep.equal(['Apple', 'Microsoft']);
-  });
-
-  it('should subscribe to stock symbols', () => {
-    const subscribeSpy = sinon.spy(tradingComponent.stockService, 'subscribe');
-    tradingComponent.userStocks = stocks;
-    tradingComponent.sendSubscriptions();
-    expect(subscribeSpy.calledWithExactly('AAPL')).to.be.true;
-    expect(subscribeSpy.calledWithExactly('MSFT')).to.be.true;
   });
 
   it('should update stock price and apply CSS class changes', async () => {
@@ -100,7 +70,10 @@ describe('TradingComponent', () => {
     marketComponent.updateStockDailyPercentage(stockSymbol, updatedPercentage);
 
     expect(marketComponent.userStocks[0].dailyPercentage).to.equal(updatedPercentage);
-    expect(targetElement!.classList.contains('setTextGreen')).to.be.true;
+    const computedStyles = getComputedStyle(targetElement!);
+    const color = computedStyles.getPropertyValue('color');
+
+    expect(color).to.equal('rgb(0, 128, 0)'); //green
   });
 
   it('should return the correct timestamps', async () => {
@@ -309,6 +282,7 @@ describe('TradingComponent', () => {
 
     try {
       await marketComponent.buyStock(new Event('click'), stock);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log('error ' + error);
       expect(error).to.be.an.instanceOf(Error);

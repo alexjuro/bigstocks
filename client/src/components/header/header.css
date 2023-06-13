@@ -93,7 +93,7 @@ nav ul {
   top: 0px;
   left: 0px;
   width: 100%;
-  display: flex;
+  display: none;
   justify-content: flex-end;
 }
 
@@ -148,6 +148,10 @@ img {
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.3);
     filter: blur(2px); /* Hinzufügen des Blur-Effekts auf die Border */
+  }
+
+  #background2 {
+    display: flex;
   }
 }
 
