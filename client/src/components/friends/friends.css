@@ -139,11 +139,11 @@ button {
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 
   display: grid;
-  grid-template-columns: 1fr 4fr;
+  grid-template-columns: 1fr 4fr 1fr;
   grid-template-rows: 1fr 1fr;
   grid-template-areas:
-    'a b'
-    'a c';
+    'a b d'
+    'a c d';
 }
 
 .friendelem:nth-child(2n) {
@@ -159,12 +159,18 @@ button {
 }
 
 .frame {
-  height: 85%;
+  height: 80px;
   aspect-ratio: 1;
   border-radius: 50%;
   outline: 1px solid rgba(0, 0, 0, 0.5);
   outline-offset: 3px;
   background-color: rgba(0, 0, 0, 0.7);
+}
+
+.frame img {
+  width: inherit;
+  height: inherit;
+  border-radius: 50%;
 }
 
 .b {
@@ -219,6 +225,24 @@ button {
   transition: all 0.3s ease-in-out;
 }
 
+.d {
+  grid-area: d;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.d button {
+  height: 30px;
+  padding: 0px 10px;
+  font-size: 17px;
+  margin-right: 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.7);
+}
+
 #background {
   position: absolute;
   top: 70px;
@@ -236,6 +260,24 @@ button {
   left: 40vw;
   border-radius: 50%;
   position: relative;
+}
+
+@media (max-width: 1600px) {
+  .frame {
+    height: 60px;
+  }
+
+  #feedback {
+    font-size: 14px;
+  }
+
+  #addwindow input {
+    font-size: 17px;
+  }
+
+  #addwindow button {
+    font-size: 17px;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -310,6 +352,10 @@ button {
     width: 100%;
   }
 
+  .frame {
+    height: 50px;
+  }
+
   .b {
     padding-left: 5px;
   }
@@ -365,6 +411,10 @@ button {
 
   #feedback {
     width: 80%;
+  }
+
+  .c {
+    font-size: 13px;
   }
 }
 

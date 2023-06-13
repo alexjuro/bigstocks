@@ -1,19 +1,24 @@
 /* Autor: Alexander Lesnjak */
-//TODO: chnage redirect url to normal url
-//TODO: make the button work
+
+//This Component shows who made the most Profit in one Day/ Week and All Time
 
 import { LitElement, html } from 'lit';
-import { customElement, property, eventOptions } from 'lit/decorators.js';
+import { customElement, property, eventOptions, state } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import componentStyle from './leaderboard.css?inline';
 import { router } from '../../router/router.js';
+import { until } from 'lit/directives/until.js';
 
 @customElement('app-leaderboard')
 class AppLeaderboardComponent extends LitElement {
   static styles = componentStyle;
 
-  @property({ type: Array })
-  scores: any[] = [];
+  @state() request = httpClient.get('leaderboard/lastWeek').then(async res => (await res.json()) as any);
+  @state() leaderboard: any[] = [];
+  @state() nottype: string = '';
+  @state() avatars: any = [];
+
+  dayTrading = false;
 
   @eventOptions({ capture: true })
   protected async firstUpdated() {
@@ -22,83 +27,128 @@ class AppLeaderboardComponent extends LitElement {
     );
 
     try {
-      const response = await httpClient.get('leaderboard');
-      const data = await response.json();
-
-      const scores = data.map((entry: { name: any; performance: any }) => {
-        const { name, performance } = entry;
-        let totalMoney = performance[0].value;
-        const formattedMoney = totalMoney.toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-          useGrouping: false
-        });
-        return { name, money: formattedMoney };
-      });
-
-      scores.sort((a: { money: string }, b: { money: string }) => {
-        const moneyA = parseFloat(a.money.replace(/\./g, '').replace(',', '.'));
-        const moneyB = parseFloat(b.money.replace(/\./g, '').replace(',', '.'));
-        return moneyB - moneyA;
-      });
-
-      this.scores = scores.slice(0, 5);
-
-      //console.log('scores:', scores);
+      const response = await httpClient.get('leaderboard/lastWeek');
     } catch (e) {
-      console.log((e as Error).message, 'error');
+      if ((e as Error).message == 'Unauthorized!') {
+        router.navigate('/users/sign-in');
+      } else {
+        console.log((e as Error).message);
+      }
     }
   }
 
   render() {
     return html`
-      <div id="content">
-        <div id="pagetitle">
-          <button @click="">Friend leaderboard</button>
-          <button @click="${this.getFriends}">Friends</button>
-        </div>
+      ${until(
+        this.request.then(json => {
+          this.leaderboard = json.leaderboard;
+          this.nottype = json.nottype;
+          if (this.leaderboard[0]) {
+            this.avatars.push(this.leaderboard[0].avatar);
+          }
+          if (this.leaderboard[1]) {
+            this.avatars.push(this.leaderboard[1].avatar);
+          }
+          if (this.leaderboard[2]) {
+            this.avatars.push(this.leaderboard[2].avatar);
+          }
 
-        <div id="imagesflex">
-          <div id="images">
-            <div class="frame"></div>
-            <div class="frame"></div>
-            <div class="frame"></div>
-          </div>
-        </div>
+          return html`
+            <div id="content">
+              <div id="pagetitle">
+                <button id="change" @click="${this._changeBoard}">${this.nottype} profit</button>
+                <button @click="${this.redirectMinesweeper}">need cash?</button>
+              </div>
 
-        <div id="placementsflex">
-          <div id="placements">
-            <ol>
-              ${this.scores.map(
-                (score, index) => html`
-                  <li>
-                    <div class="position">
-                      <div><button @click="${() => this.redirectToProfile(score.name)}">${score.name}</button></div>
-                      <div>${score.money} $</div>
-                    </div>
-                  </li>
-                `
-              )}
-            </ol>
-          </div>
-        </div>
+              <div id="imagesflex">
+                <div id="images">
+                  <div class="frame">
+                    <img src="${this.avatars[2]}" />
+                  </div>
+                  <div class="frame">
+                    <img src="${this.avatars[0]}" />
+                  </div>
+                  <div class="frame">
+                    <img src="${this.avatars[1]}" />
+                  </div>
+                </div>
+              </div>
 
-        <div id="background">
-          <div id="kreis"></div>
-        </div>
-      </div>
+              <div id="namesflex">
+                <div id="names">
+                  <div>3.</div>
+                  <div>1.</div>
+                  <div>2.</div>
+                </div>
+              </div>
+
+              <div id="placementsflex">
+                <div id="placements">
+                  <ol>
+                    ${this.leaderboard.map(
+                      entry => html`
+                        <li>
+                          <div class="position">
+                            <div>${entry.username}</div>
+                            <div>${entry.profit} $</div>
+                          </div>
+                        </li>
+                      `
+                    )}
+                  </ol>
+                </div>
+              </div>
+
+              <div id="background">
+                <div id="kreis"></div>
+              </div>
+            </div>
+          `;
+        }),
+        html`<is-loading></is-loading>`
+      )}
     `;
   }
 
-  redirectToProfile(username: string) {
-    router.navigate(`users/${username}`);
-  }
-
-  async getFriends() {
+  async redirectMinesweeper() {
     try {
-      router.navigate('/users/friends');
+      router.navigate('/minesweeper');
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  async _changeBoard() {
+    if (this.dayTrading == false) {
+      try {
+        this.request = httpClient.get('leaderboard/lastDay').then(async res => (await res.json()) as any);
+        //resets the avatars
+        //this.avatars = [];
+        this.dayTrading = true;
+
+        this.requestUpdate(); // Komponente neu laden
+      } catch (e) {
+        if ((e as Error).message == 'Unauthorized!') {
+          router.navigate('/users/sign-in');
+        } else {
+          console.log((e as Error).message);
+        }
+      }
+    } else {
+      try {
+        this.request = httpClient.get('leaderboard/lastWeek').then(async res => (await res.json()) as any);
+        //resets the avatars
+        //this.avatars = [];
+        this.dayTrading = false;
+
+        this.requestUpdate(); // Komponente neu laden
+      } catch (e) {
+        if ((e as Error).message == 'Unauthorized!') {
+          router.navigate('/users/sign-in');
+        } else {
+          console.log((e as Error).message);
+        }
+      }
     }
   }
 }

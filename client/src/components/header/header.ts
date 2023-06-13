@@ -30,8 +30,8 @@ class AppHeader extends PageMixin(LitElement) {
         this.visable = false;
       }, 150);
     } else {
-      circle!.style.width = '300px';
-      circle!.style.height = '300px';
+      circle!.style.width = '350px';
+      circle!.style.height = '350px';
       setTimeout(() => {
         mnav!.style.visibility = 'visible';
       }, 280);
@@ -75,8 +75,9 @@ class AppHeader extends PageMixin(LitElement) {
             <li><button type="button" @click="${this.getNews}">news</button></li>
             <li><button type="button" @click="${this.getPortfolio}">portfolio</button></li>
             <li><button type="button" @click="${this.getMarket}">market</button></li>
+            <li><button type="button" @click="${this.getFriends}">friends</button></li>
             <li><button type="button" @click="${this.getProfile}">profile</button></li>
-            <li><button type="button" @click="${this.getSignIn}">sign-in</button></li>
+            <li><button type="button" @click="${this.getSignOut}">sign-out</button></li>
           </ul>
         </nav>
       </div>
@@ -84,14 +85,15 @@ class AppHeader extends PageMixin(LitElement) {
         <div id="left" class="headelem">
           <button type="button" @click="${this.getLeaderboard}">bigStocks</button>
         </div>
-        <div id="mid" class="headelem"><a href="#top">${this.pagename}</a></div>
+        <div id="mid" class="headelem"><a href="/users/${this.pagename}">${this.pagename}</a></div>
         <div id="right" class="headelem">
           <nav id="dnav">
             <button type="button" @click="${this.getNews}">news</button>
             <button type="button" @click="${this.getPortfolio}">portfolio</button>
             <button type="button" @click="${this.getMarket}">market</button>
+            <button type="button" @click="${this.getFriends}">friends</button>
             <button type="button" @click="${this.getProfile}">profile</button>
-            <button type="button" @click="${this.getSignIn}">sign-in</button>
+            <button type="button" @click="${this.getSignOut}">sign-out</button>
           </nav>
           <button id="btn" @click="${this.toggle}">
             <img src="/list.svg" alt="" height="27px" />
@@ -186,9 +188,26 @@ class AppHeader extends PageMixin(LitElement) {
     }, 100);
   }
 
-  async getSignIn() {
+  async getFriends() {
     try {
-      router.navigate('/user/sign-in');
+      router.navigate('/users/friends');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+    const circle = this.shadowRoot!.getElementById('circle');
+    const mnav = this.shadowRoot!.getElementById('mnav');
+
+    mnav!.style.visibility = 'hidden';
+    setTimeout(() => {
+      circle!.style.width = '0px';
+      circle!.style.height = '0px';
+      this.visable = false;
+    }, 100);
+  }
+
+  async getSignOut() {
+    try {
+      router.navigate('/users/sign-out');
     } catch (e) {
       this.showNotification((e as Error).message, 'error');
     }

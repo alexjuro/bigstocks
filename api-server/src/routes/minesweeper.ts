@@ -13,20 +13,51 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
   const filter: Partial<User> = { id: res.locals.user.id };
   const user = await dao.findOne(filter);
 
-  res.status(200).json(user);
+  if (user) {
+    if (user.tries.date != new Date().toLocaleDateString()) {
+      user.tries.date = new Date().toLocaleDateString();
+      user.tries.value = 3;
+    }
+
+    await dao.update(user);
+
+    res.status(200).json({ username: user?.username, tries: user?.tries, money: user?.money });
+  }
 });
 
-/*router.post('/', authService.authenticationMiddleware, async (req, res) => {
+router.post('/restart', authService.authenticationMiddleware, async (req, res) => {
   const dao: GenericDAO<User> = req.app.locals.userDAO;
-  res.status(200);
-});*/
+  const userId = res.locals.user.id;
 
-router.post('/', authService.authenticationMiddleware, async (req, res) => {
+  const user = await dao.findOne({ id: userId });
+
+  if (user) {
+    const oldtries = user.tries.value;
+    user.tries.value = oldtries - 1;
+
+    await dao.update(user);
+    res.status(200).json({ message: 'updated tries' });
+  } else {
+    res.status(404).json({ message: 'User not found' });
+  }
+});
+
+router.post('/victory', authService.authenticationMiddleware, async (req, res) => {
+  const dao: GenericDAO<User> = req.app.locals.userDAO;
+  const filter: Partial<User> = { id: res.locals.user.id };
+
   try {
-    res.sendStatus(200);
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(500);
+    const user = await dao.findOne(filter);
+
+    if (user) {
+      const oldmoney = user.money;
+      user.money = oldmoney + 500;
+
+      await dao.update(user);
+      res.status(200).json({ money: user.money });
+    }
+  } catch (e) {
+    res.status(404);
   }
 });
 

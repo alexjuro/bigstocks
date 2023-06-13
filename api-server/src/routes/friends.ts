@@ -1,23 +1,17 @@
 /* Author: Alexander Lensjak */
+//TODO: username hardcoded
 
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';
 import { User } from '../models/user.js';
+import { Transaction } from '../models/transaction.js';
 import { authService } from '../services/auth.service.js';
 
 const router = express.Router();
 
-/*router.get('/', authService.authenticationMiddleware, async (req, res) => {
-  const dao: GenericDAO<User> = req.app.locals.userDAO;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const filter: Partial<User> = { id: res.locals.user.id };
-  const user = await dao.findOne(filter);
-
-  res.status(200).json(user);
-});*/
-
 router.get('/', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
   const filter: Partial<User> = { id: res.locals.user.id };
 
   try {
@@ -27,28 +21,38 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
       return;
     }
 
-    const friendsWithPerformance = await Promise.all(
-      user.friends.map(async friend => {
-        const friendUser = await userDAO.findOne({ email: friend.email });
-        if (!friendUser) {
-          return {
-            username: friend.username,
-            accepted: friend.accepted,
-            avatar: null,
-            performance: null // or any default value if the friend user is not found
-          };
+    const friendsArray = user.friends;
+
+    const friendsWithData = [];
+    for (let i = 0; i < friendsArray.length; i++) {
+      const friendObj = await userDAO.findOne({ username: friendsArray[i].username });
+      if (friendObj) {
+        const transactions = await transactionDAO.findAll({ userId: friendObj.id, status: false });
+
+        let profit = 0;
+        for (let j = 0; j < transactions.length; j++) {
+          profit += transactions[i].sPrice - transactions[i].bPrice;
         }
 
-        return {
-          username: friend.username,
-          accepted: friend.accepted,
-          avatar: friendUser.avatar,
-          performance: friendUser.performance.slice(friendUser.performance.length - 1, friendUser.performance.length) // Assuming the performance property exists in the friend user object
+        const friendspush = {
+          username: friendObj.username,
+          accepted: friendsArray[i].accepted,
+          avatar: friendObj.avatar,
+          profit: profit.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            useGrouping: false
+          })
         };
-      })
-    );
 
-    res.json({ friends: friendsWithPerformance });
+        friendsWithData.push(friendspush);
+      }
+    }
+
+    const friends = friendsWithData.filter((friend: any) => friend.accepted === true);
+    const requests = friendsWithData.filter((friend: any) => friend.accepted === false);
+
+    res.status(200).json({ friends: friends, requests: requests });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
   }
@@ -56,58 +60,131 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
 
 router.post('/', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-  const filter: Partial<User> = { id: res.locals.user.id };
-  const friendfilter: Partial<User> = { username: req.body.user.username };
+  const userId = res.locals.user.id;
+  const friendname = req.body.username;
 
-  const user = await userDAO.findOne(filter);
-  const friend = await userDAO.findOne(friendfilter);
+  const user = await userDAO.findOne({ id: userId });
+  const friend = await userDAO.findOne({ username: friendname });
 
-  if (user && friend) {
-    const newFriendObject = {
-      username: friend.username,
-      email: friend.email,
-      accepted: false
-    };
+  if (friend && user) {
+    if (user.username == friend.username) {
+      const dontTryToAddYourself = 'Error: The given Username is yours';
+      res.status(400).json(dontTryToAddYourself);
+      return;
+    }
 
-    user.friends.push(newFriendObject); // Add the new friend object to the friends array
+    if (user.friends.some(f => f.username === friend.username)) {
+      const alreadyAddedError = 'Error: This friend already send you an request';
+      res.status(409).json(alreadyAddedError);
+      return;
+    }
 
-    await userDAO.update(user); // Update the user object in the database
+    if (friend.friends.some(u => u.username === user.username)) {
+      const alreadyAddedError = 'Error: You already send a request to that user';
+      res.status(406).json(alreadyAddedError);
+      return;
+    }
 
-    res.sendStatus(200);
+    const newFriend = { username: user.username, accepted: false };
+
+    friend.friends.push(newFriend);
+
+    await userDAO.update(friend);
+
+    res.status(200).json({ message: 'success' });
   } else {
-    res.status(500);
+    const error = 'user not found';
+    res.status(404).json(error);
   }
 });
 
-/*
-router.post('/', async (req, res) => {
+router.post('/accept', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-  const email = 'al568412@fh-muenster.de';
+  const userId = res.locals.user.id;
+  const friendname = req.body.username;
 
-  try {
-    const user = await userDAO.findOne({ email: email });
+  const user = await userDAO.findOne({ id: userId });
+  const friend = await userDAO.findOne({ username: friendname });
 
-    //wenn der freund nicht gefunden wurde
-    if (!(await userDAO.findOne({ name: req.body.friend }))) {
-      res.status(400).json({ error: "The friend couldn't be found" });
-    } else {
-      //wenn sie bereits freunde sind
-      if (user?.friends.some(friend => friend.username === req.body.friend)) {
-        res.status(401).json({ error: 'You are already friends' });
-      } else {
-        const newFriend = { name: 'Alex', accepted: false };
-        user?.friends.push(newFriend);
-
-        // Benutzer aktualisieren
-        if (user) {
-          await userDAO.update(user);
-        }
-        res.send(200);
-      }
+  if (friend && user) {
+    //searches the friendname in the friends of user and deletes the entry
+    //I accept the request, so I have an entry with false in my Table
+    const index = user.friends.findIndex(friend => friend.username === friendname);
+    if (index !== -1) {
+      user.friends.splice(index, 1);
     }
-  } catch (error) {
-    res.status(500).json({ error: 'An error occurred while retrieving user stocks' });
+    const newFriend = { username: friendname, accepted: true };
+
+    //My friend who send the request does not has an entry with false in his Table, so I create a new Entry for me
+    const newUser = { username: user.username, accepted: true };
+
+    user.friends.push(newFriend);
+    friend.friends.push(newUser);
+
+    await userDAO.update(user);
+    await userDAO.update(friend);
+
+    res.status(200).json({ message: 'accepted' });
+  } else {
+    const error = 'user not found';
+    res.status(404).json(error);
   }
-});*/
+});
+
+router.post('/decline', authService.authenticationMiddleware, async (req, res) => {
+  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const userId = res.locals.user.id;
+  const friendname = req.body.username;
+
+  const user = await userDAO.findOne({ id: userId });
+  const friend = await userDAO.findOne({ username: friendname });
+
+  if (friend && user) {
+    //searches the friendname in the friends of user and deletes the entry
+    const index = user.friends.findIndex(friend => friend.username === friendname);
+    if (index !== -1) {
+      user.friends.splice(index, 1);
+    }
+
+    await userDAO.update(user);
+    await userDAO.update(friend);
+
+    res.status(200).json({ message: 'declined' });
+  } else {
+    const error = 'user not found';
+    res.status(404).json(error);
+  }
+});
+
+router.post('/delete', authService.authenticationMiddleware, async (req, res) => {
+  const userDAO: GenericDAO<User> = req.app.locals.userDAO;
+  const userId = res.locals.user.id;
+  const friendname = req.body.username;
+
+  const user = await userDAO.findOne({ id: userId });
+  const friend = await userDAO.findOne({ username: friendname });
+
+  if (friend && user) {
+    //searches the friendname in the friends of user and deletes the entry
+    const index = user.friends.findIndex(friend => friend.username === friendname);
+    if (index !== -1) {
+      user.friends.splice(index, 1);
+    }
+
+    //searches the username in the friends of the friend and deletes the entry
+    const indextwo = friend.friends.findIndex(friend => friend.username === user.username);
+    if (indextwo !== -1) {
+      friend.friends.splice(indextwo, 1);
+    }
+
+    await userDAO.update(user);
+    await userDAO.update(friend);
+
+    res.status(200).json({ message: 'deleted' });
+  } else {
+    const error = 'user not found';
+    res.status(404).json(error);
+  }
+});
 
 export default router;
