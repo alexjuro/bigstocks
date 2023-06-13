@@ -13,7 +13,6 @@ export class TradingInfoComponent extends PageMixin(LitElement) {
 
   static properties = {
     stock: { type: Object },
-    publicUrl: { type: String },
     buyStock: { type: Function },
     sellStock: { type: Function }
   };
@@ -26,8 +25,6 @@ export class TradingInfoComponent extends PageMixin(LitElement) {
     price: 0,
     dailyPercentage: 0
   };
-
-  publicUrl = '';
 
   get buyButton(): HTMLButtonElement | null {
     return this.shadowRoot?.querySelector('.buy') as HTMLButtonElement | null;
@@ -50,21 +47,21 @@ export class TradingInfoComponent extends PageMixin(LitElement) {
   sellStock = (event: Event, stock: UserStock) => {};
 
   render() {
-    const { stock, publicUrl, buyStock, sellStock } = this;
+    const { stock, buyStock, sellStock } = this;
 
     return html`
       <div class="info-div">
         <button class="buy" @click=${(event: Event) => buyStock(event, stock)}>
           Buy
-          <img src="${publicUrl}buy.png" alt="Buy" />
+          <img src="buy.png" alt="Buy" />
         </button>
         <button class="sell" @click=${(event: Event) => sellStock(event, stock)}>
           Sell
-          <img src="${publicUrl}sell.png" alt="Sell" />
+          <img src="sell.png" alt="Sell" />
         </button>
         <button class="stockdetails" @click=${() => this.navigateToDetails(stock)}>
           Details
-          <img src="${publicUrl}details.png" alt="Details" />
+          <img src="details.png" alt="Details" />
         </button>
       </div>
     `;

@@ -11,6 +11,7 @@ import { Chart, ChartData, ChartOptions } from 'chart.js/auto';
 import { StockService } from '../../../stock-service';
 import { PageMixin } from '../../page.mixin';
 import xss from 'xss';
+import { UserStock } from '../stock-interface';
 
 export interface Note {
   symbol: string;
@@ -24,6 +25,8 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
   @property({ type: Object })
   stockService = new StockService();
 
+  @query('#bar') bar!: HTMLCanvasElement;
+
   @property({ type: Object })
   private ChartBar = {};
 
@@ -34,10 +37,18 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
   private symbol = '';
 
   @property({ type: Object })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private companyData: any = {};
 
   @property()
-  private stock: any = {};
+  private stock: UserStock = {
+    shares: 0,
+    name: '',
+    symbol: '',
+    image: '',
+    price: 0,
+    dailyPercentage: 0
+  };
 
   @property()
   private note: Note = {
@@ -46,9 +57,6 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
   };
 
   @query('form') private form!: HTMLFormElement;
-
-  // eslint-disable-next-line @typescript-eslint/member-ordering
-  @query('#bar') bar!: HTMLCanvasElement;
 
   async firstUpdated() {
     try {
@@ -81,6 +89,7 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
     return { symbol, name };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createBar(data: any) {
     const bar = this.shadowRoot?.querySelector('#bar') as HTMLCanvasElement;
 

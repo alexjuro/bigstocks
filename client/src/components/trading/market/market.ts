@@ -85,10 +85,10 @@ export class MarketComponent extends TradingComponent {
         <h1 class="upp">Marketplace</h1>
         <div>
           <p class="account" style="color: #E58400">
-            <img src="${this.publicUrl}dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
+            <img src="dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
           </p>
           <p class="account" style="color: #663399">
-            <img src="${this.publicUrl}stock.png" alt="Stocks Icon" class="icon" />
+            <img src="stock.png" alt="Stocks Icon" class="icon" />
             ${this.calculateTotalValue()}$
           </p>
         </div>

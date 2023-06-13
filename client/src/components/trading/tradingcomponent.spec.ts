@@ -29,7 +29,6 @@ describe('TradingComponent', () => {
     expect(tradingComponent.stockService).deep.equal(new StockService()); // cuz MarketComponent initialisiert mit StockService
     expect(tradingComponent.stockCandle).deep.equal(null);
     expect(tradingComponent.money).deep.equal(0);
-    expect(tradingComponent.publicUrl).deep.equal('./../../../../public/');
   });
 
   it('should update stock price and apply CSS class changes', async () => {
@@ -283,6 +282,7 @@ describe('TradingComponent', () => {
 
     try {
       await marketComponent.buyStock(new Event('click'), stock);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log('error ' + error);
       expect(error).to.be.an.instanceOf(Error);

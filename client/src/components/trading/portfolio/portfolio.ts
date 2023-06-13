@@ -44,9 +44,11 @@ export class PortfolioComponent extends TradingComponent {
   @property({ type: Object })
   stockService = new StockService();
   @property({ type: Object })
-  ChartDoughnut: any = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ChartDoughnut: any;
   @property({ type: Object })
-  ChartGraph: any = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ChartGraph: any;
 
   private sortBy: 'shares' | 'alphabet' = 'alphabet';
 
@@ -141,9 +143,8 @@ export class PortfolioComponent extends TradingComponent {
         plugins: {
           tooltip: {
             callbacks: {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               label: (context: any) => {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const label = context.label;
                 const currentValue = context.raw.toFixed(2);
                 const total = context.chart._metasets[context.datasetIndex].total;
                 const percentage = parseFloat(((currentValue / total) * 100).toFixed(1));
@@ -309,14 +310,14 @@ export class PortfolioComponent extends TradingComponent {
         <div class="part-container info-container">
           <div style="margin-top: 0px" class="money">
             <p class="account" style="color: ${PortfolioComponent.colorArray[0]}">
-              <img src="${this.publicUrl}dollar.png" alt="Cash Icon" class="icon" />
+              <img src="dollar.png" alt="Cash Icon" class="icon" />
               ${this.money}$
             </p>
-            <img src="${this.publicUrl}up.png" alt="Up Icon" class="icon" />
+            <img src="up.png" alt="Up Icon" class="icon" />
             <p class="account pValue">${(this.money + this.calculateTotalValue()).toFixed(1)}$</p>
-            <img src="${this.publicUrl}down.png" alt="Down Icon" class="icon" />
+            <img src="down.png" alt="Down Icon" class="icon" />
             <p class="account" style="color: ${PortfolioComponent.colorArray[1]}">
-              <img src="${this.publicUrl}stock.png" alt="Stock Icon" class="icon" />
+              <img src="stock.png" alt="Stock Icon" class="icon" />
               ${this.calculateTotalValue()}$
             </p>
           </div>
