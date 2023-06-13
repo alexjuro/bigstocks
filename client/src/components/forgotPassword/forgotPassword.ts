@@ -29,7 +29,7 @@ class forgotPasswordOne extends PageMixin(LitElement) {
           <form novalidate>
             <div>
               <label for="username">Username</label>
-              <input type="text" autofocus required id="username" placeholder="Username" />
+              <input minlength="4" maxlength="32" type="text" autofocus required id="username" placeholder="Username" />
               <div class="invalid-feedback">Username is required</div>
             </div>
             <div>

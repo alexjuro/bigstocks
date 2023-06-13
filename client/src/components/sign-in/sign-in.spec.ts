@@ -1,6 +1,5 @@
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
-import { httpClient } from '../../http-client';
 import { router } from '../../router/router';
 import sinon from 'sinon';
 import './sign-in';
@@ -66,7 +65,6 @@ describe('SignInComponent', () => {
       password: 'Password123FASDF'
     };
 
-    const postStub = sinon.stub(httpClient, 'post').resolves();
     const navigateStub = sinon.stub(router, 'navigate').resolves();
 
     const usernameInput = element.shadowRoot!.querySelector('#username') as HTMLInputElement;
@@ -89,6 +87,4 @@ describe('SignInComponent', () => {
 
     expect(navigateStub.calledWith('/news')).to.be.true;
   });
-
-  //Ab hier kommen die End-to-End Tests
 });
