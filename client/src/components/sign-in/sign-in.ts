@@ -7,6 +7,7 @@ import sharedStyle from '../shared.css?inline';
 import style from './style.css?inline';
 
 @customElement('sign-in')
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class SignInComponent extends PageMixin(LitElement) {
   static styles = [style, sharedStyle];
 
@@ -30,6 +31,7 @@ class SignInComponent extends PageMixin(LitElement) {
 
   @eventOptions({ capture: true })
   async firstUpdated() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const appHeader = this.dispatchEvent(
       new CustomEvent('update-pagename', { detail: this.pageName, bubbles: true, composed: true })
     );
@@ -64,6 +66,8 @@ class SignInComponent extends PageMixin(LitElement) {
         <div>
           <label for="username">Username</label>
           <input
+            minlength="4"
+            maxlength="32"
             type="text"
             autofocus
             required

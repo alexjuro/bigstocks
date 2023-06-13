@@ -3,12 +3,12 @@
 import { expect } from 'chai';
 import config from './config.js';
 import { Browser, BrowserContext, Page, chromium } from 'playwright';
-import fetch from 'node-fetch';
 
-describe('/users/sign-up', () => {
+describe('/users/sign-out', () => {
   let browser: Browser;
   let context: BrowserContext;
   let page: Page;
+  //   let userSession: UserSession;
 
   before(async () => {
     browser = await chromium.launch(config.launchOptions);
@@ -16,65 +16,73 @@ describe('/users/sign-up', () => {
   beforeEach(async () => {
     context = await browser.newContext();
     page = await context.newPage();
-    await page.goto(config.clientUrl('/users/sign-up'));
+    await page.goto(config.clientUrl('/users/sign-in'));
   });
 
   afterEach(async () => {
     await context.close();
   });
 
-  describe('render sign-up', () => {
+  describe('render sign-in', () => {
     it('should render the page correctly', async () => {
-      await page.goto(config.clientUrl('/users/sign-up'));
       await page.fill('#username', 'testuser');
-      await page.fill('#email', 'testuser@email.de');
-      expect(page.getByRole('button', { name: 'Create Account' })).to.not.be.null;
-      expect(page.getByRole('button', { name: 'Sign-In' })).to.not.be.null;
-      expect(await page.textContent('app-header a')).to.equal('Sign-Up');
-      expect(await page.textContent('#usernameLabel')).to.equal('Username');
-      expect(await page.textContent('#emailLabel')).to.equal('E-Mail');
-      expect(await page.textContent('p')).to.contain('Already registered?');
-      await page.getByRole('button', { name: '?' }).click();
-      expect(await page.textContent('h1')).to.contain('Username Constraints');
-      console.log(await page.textContent('.constraints li'));
-      expect(await page.textContent('.constraints li')).to.contains('4 to 32 characters');
-      await page.getByRole('button', { name: 'Go it!' }).click();
+      expect(await page.textContent('#forgotPasswordButton')).to.not.be.null;
+      expect(await page.textContent('#signUpButton')).to.not.be.null;
+      expect(await page.textContent('app-header a')).to.equal('Log-In');
+      expect(await page.textContent('label')).to.equal('Username');
+      expect(await page.textContent('#forgotPasswordMessage')).to.contain('Forgot you password?');
+      expect(await page.textContent('#notRegisteredMessage')).to.contain('Not registered?');
+
+      await page.getByRole('button', { name: 'Next' }).click();
+      expect(await page.textContent('label')).to.equal('Password');
+      expect(await page.textContent('#forgotPasswordMessage')).to.contain('Forgot you password?');
+      expect(await page.textContent('#notRegisteredMessage')).to.contain('Not registered?');
+      expect(await page.textContent('#backButton')).to.equal('Back');
+      expect(await page.textContent('#submitButton')).to.equal('Sign-In');
     });
   });
 
-  describe('sign-up process', () => {
-    it('sign-up correctly', async () => {
-      await page.goto(config.clientUrl('/users/sign-up'));
-      await page.fill('#username', 'testuser1');
-      await page.fill('#email', 'testuser1@email.de');
-      await page.getByRole('button', { name: 'Create Account' }).click();
-      const response = await page.waitForResponse('**/sign-up');
-      expect(response.status()).to.equal(201);
-      console.log(await response.allHeaders());
-      const headerValue = await response.headerValue('set-cookie');
-      const token = headerValue!.split(';')[0].trim().substring('jwt-token='.length);
-      console.log(token);
-      const response1 = await fetch('http://localhost:3000/api/users/', {
-        method: 'DELETE',
-        headers: { Cookie: `jwt-token=${token}` }
-      });
-      console.log(response1);
+  describe('sign-in process', async () => {
+    it('successfull Sign-in', async () => {
+      await page.fill('#username', 'admin');
+      await page.getByRole('button', { name: 'Next' }).click();
+      await page.fill('#password', 'Password1');
+      await page.getByRole('button', { name: 'Sign-In' }).click();
+      const response = await page.waitForResponse('**/sign-in');
+      expect(response.status()).to.equal(200);
     });
 
-    it('sign-up incorrectly username to short', async () => {
-      await page.goto(config.clientUrl('/users/sign-up'));
-      await page.fill('#username', 'tes');
-      await page.fill('#email', 'testuser1@email.de');
-      await page.getByRole('button', { name: 'Create Account' }).click();
-      expect(page.getByText('Username must be valid')).to.not.be.null;
+    it('wrong Username', async () => {
+      await page.fill('#username', 'admin123');
+      await page.getByRole('button', { name: 'Next' }).click();
+      await page.fill('#password', 'Password1');
+      await page.getByRole('button', { name: 'Sign-In' }).click();
+      const response = await page.waitForResponse('**/sign-in');
+      expect(response.status()).to.equal(401);
     });
 
-    it('sign-up incorrectly invalid Email', async () => {
-      await page.goto(config.clientUrl('/users/sign-up'));
-      await page.fill('#username', 'testuser1');
-      await page.fill('#email', 'testuser');
-      await page.getByRole('button', { name: 'Create Account' }).click();
-      expect(page.getByText('Email is required and must be valid')).to.not.be.null;
+    it('wrong Password', async () => {
+      await page.fill('#username', 'admin123');
+      await page.getByRole('button', { name: 'Next' }).click();
+      await page.fill('#password', 'Password123');
+      await page.getByRole('button', { name: 'Sign-In' }).click();
+      const response = await page.waitForResponse('**/sign-in');
+      expect(response.status()).to.equal(401);
+    });
+
+    it('Username to short', async () => {
+      await page.fill('#username', 'ad');
+      await page.getByRole('button', { name: 'Next' }).click();
+      expect(page.getByText('Invalid Input')).to.not.be.null;
+    });
+
+    it('Password to short', async () => {
+      await page.goto(config.clientUrl('/app/users/sign-in'));
+      await page.fill('#username', 'admin123');
+      await page.getByRole('button', { name: 'Next' }).click();
+      await page.fill('#password', 'Pas');
+      await page.getByRole('button', { name: 'Sign-In' }).click();
+      expect(page.getByText('Invalid Input')).to.not.be.null;
     });
   });
 });

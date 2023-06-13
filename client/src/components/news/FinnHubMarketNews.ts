@@ -19,6 +19,7 @@ interface Article {
 }
 
 @customElement('finnhub-market-news')
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class FinnHubMarketNews extends PageMixin(LitElement) {
   static styles = [newsStyle, sharedStyle];
   apiKey = 'chdrhk1r01qi6ghjs8s0chdrhk1r01qi6ghjs8sg';
@@ -38,6 +39,7 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
     };
   }
   async firstUpdated() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const appHeader = this.dispatchEvent(
       new CustomEvent('update-pagename', { detail: this.pagenName, bubbles: true, composed: true })
     );

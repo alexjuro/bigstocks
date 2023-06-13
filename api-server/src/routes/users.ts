@@ -86,7 +86,9 @@ router.post('/forgotPassword', async (req, res) => {
 
   const filter: Partial<User> = { username: req.body.username };
   const user = await userDAO.findOne(filter);
+  console.log('found User');
   if (user && (await bcrypt.compare(req.body.safetyAnswerOne, user.safetyAnswerOne))) {
+    console.log('correct Answer');
     authService.createAndSetShortToken({ id: user.id }, res);
     const code = createNumber();
     user.code = code;
