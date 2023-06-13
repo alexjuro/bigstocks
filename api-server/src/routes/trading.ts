@@ -1,4 +1,4 @@
-/* Author: Alexander Schellenberg */
+/* Autor: Alexander Schellenberg */
 
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';
@@ -9,6 +9,7 @@ import { User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
 import { cryptoService } from '../services/crypto.service.js';
 import { Note } from '../models/note.js';
+import xss from 'xss';
 
 const router = express.Router();
 
@@ -121,6 +122,12 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const userId = res.locals.user.id;
+  const errors: string[] = [];
+
+  if (hasNotRequiredFields(req.body, ['symbol', 'name', 'image', 'bPrice', 'pValue'], errors)) {
+    res.status(400).json({ message: errors.join('\n') });
+    return;
+  }
 
   const { symbol, name, image, bPrice, pValue } = req.body;
 
@@ -137,6 +144,12 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
       return;
     }
 
+    const moneyToDeduct = Number(bPrice);
+    if (user.money < moneyToDeduct) {
+      res.status(400).json({ error: 'Insufficient funds' });
+      return;
+    }
+
     const transaction = await transactionDAO.create({
       userId,
       symbol,
@@ -147,12 +160,6 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
       status: true,
       soldAt: 0
     });
-
-    const moneyToDeduct = Number(bPrice);
-    if (user.money < moneyToDeduct) {
-      res.status(400).json({ error: 'Insufficient funds' });
-      return;
-    }
 
     user.money = Number((user.money - moneyToDeduct).toFixed(2));
 
@@ -168,11 +175,21 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
 router.post('/details', authService.authenticationMiddleware, async (req, res) => {
   const noteDAO: GenericDAO<Note> = req.app.locals.noteDAO;
 
+  const errors: string[] = [];
+
+  if (hasNotRequiredFields(req.body, ['note'], errors)) {
+    res.status(400).json({ message: errors.join('\n') });
+    return;
+  }
+
   const { note } = req.body;
   const userId = res.locals.user.id;
   const cryptNote = cryptoService.encrypt(note.note);
 
   try {
+    if (validation(note)) {
+      res.status(403).json({ error: 'Potential Attack detected' });
+    }
     const exNote = await noteDAO.findOne({ userId, symbol: note.symbol });
     if (exNote) {
       exNote.note = cryptNote;
@@ -187,7 +204,7 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
     });
 
     res
-      .status(201)
+      .status(200)
       .json({ message: 'Note saved successfully', note: cryptoService.encrypt(newNote.note || exNote!.note) });
   } catch (error) {
     res.status(500).json({ error: `An error occurred while saving the note ${noteDAO}` });
@@ -198,6 +215,13 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const userId = res.locals.user.id;
+
+  const errors: string[] = [];
+
+  if (hasNotRequiredFields(req.body, ['symbol', 'sPrice', 'pValue'], errors)) {
+    res.status(400).json({ message: errors.join('\n') });
+    return;
+  }
   const { symbol, sPrice, pValue } = req.body;
 
   try {
@@ -225,7 +249,6 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
     lowestPriceTransaction.status = false;
     lowestPriceTransaction.soldAt = new Date().getTime();
 
-    // Update the transaction
     await transactionDAO.update(lowestPriceTransaction);
 
     user.money = Number((user.money + lowestPriceTransaction.sPrice).toFixed(2)); // Add the sell price to the user's money
@@ -234,11 +257,38 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
     await userDAO.update(user);
 
     res
-      .status(202)
+      .status(200)
       .json({ message: 'Transaction updated successfully', money: user.money, performance: user.performance });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while updating the transaction' });
   }
 });
+
+function validation(note: Note) {
+  let result = false;
+
+  const sqlInjectionPattern = /[';]|--|\/\*|\*\//gi;
+  if (sqlInjectionPattern.test(note.note)) {
+    result = true;
+  }
+
+  const sanitizedComment = xss(note.note);
+  if (sanitizedComment !== note.note) {
+    result = true;
+  }
+
+  return result;
+}
+
+function hasNotRequiredFields(object: { [key: string]: unknown }, requiredFields: string[], errors: string[]) {
+  let hasErrors = false;
+  requiredFields.forEach(fieldName => {
+    if (!object[fieldName]) {
+      errors.push(fieldName + ' can not be empty');
+      hasErrors = true;
+    }
+  });
+  return hasErrors;
+}
 
 export default router;

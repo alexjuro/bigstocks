@@ -4,8 +4,6 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import { LitElement } from 'lit';
 import { fixture } from '@open-wc/testing-helpers';
-import { TradingComponent } from '../tradingcomponent';
-import { StockService } from '../../../stock-service';
 import './market';
 import { httpClient } from '../../../http-client';
 
