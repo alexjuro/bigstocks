@@ -1,4 +1,4 @@
-/* Author: Nico Pareigis */
+/* Autor: Nico Pareigis */
 
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';

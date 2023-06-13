@@ -1,18 +1,10 @@
-/* Author: Nico Pareigis */
+/* Autor: Nico Pareigis */
 
 .container {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-}
-
-.intro {
-  margin: 1rem auto;
-  padding: 1rem 2.4rem;
-  border-radius: 6px;
-  font-size: 2rem;
-  color: ghostwhite;
-  background-color: var(--primary);
+  margin-top: 1.4rem;
 }
 
 .date {
@@ -160,6 +152,9 @@ span {
 }
 
 @media (min-width: 700px) {
+  .container {
+    margin-top: 2.4rem;
+  }
   .date {
     display: inline-block;
   }

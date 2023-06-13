@@ -1,4 +1,4 @@
-/* Author: Nico Pareigis */
+/* Autor: Nico Pareigis */
 
 export type UserData = {
   id: number;

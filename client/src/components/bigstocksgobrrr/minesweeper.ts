@@ -1,14 +1,29 @@
 import { LitElement, html, css } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import componentStyle from './secret.css?inline';
+import { httpClient } from '../../http-client.js';
+import { customElement, eventOptions, property, state } from 'lit/decorators.js';
+import componentStyle from './minesweeper.css?inline';
+import { router } from '../../router/router.js';
 
 @customElement('app-minesweeper')
 class SecretAppComponent extends LitElement {
   static styles = componentStyle;
 
+  @state() request = httpClient.get('minesweeper').then(async res => (await res.json()) as any);
+
+  @property()
+  username: string = '';
+
+  @property()
+  tries: number = 0;
+
+  @property()
+  cash: number = 0;
+  cashString: string = '';
+
   rows = 8;
   cols = 8;
-  totalMines = 2;
+  totalMines = 10;
+  marksleft = 10;
 
   board: { element: HTMLDivElement; hasMine: boolean; revealed: boolean; marked: boolean }[][] = [];
   gameOver = false;
@@ -117,11 +132,20 @@ class SecretAppComponent extends LitElement {
   }
 
   handleRightClick(event: Event) {
+    if (this.marksleft == 0) {
+      return;
+    }
+
     event.preventDefault();
     if (this.gameOver || this.successfulGame) return;
     const target = event.target as HTMLDivElement;
     const row = parseInt(target.dataset.row || '0');
     const col = parseInt(target.dataset.col || '0');
+
+    this.marksleft = this.marksleft - 1; // Setze marksleft auf den ursprünglichen Wert
+    const marksleftElement = this.shadowRoot?.getElementById('marksleft');
+    marksleftElement!.innerHTML = `Marks left: ${this.marksleft}`;
+
     this.markCell(row, col);
     this.checkGameCompleted();
   }
@@ -134,9 +158,26 @@ class SecretAppComponent extends LitElement {
     this.board = [];
     this.gameOver = false;
     this.successfulGame = false;
-    if (this.messageElement) this.messageElement.textContent = '';
-    if (this.highscoreElement) this.highscoreElement.textContent = `Highscore: ${this.highscore}`;
+
+    //turn of the Game Over/ Victory  message
+    const messageElement = this.shadowRoot!.getElementById('message');
+    messageElement!.innerHTML = '';
+
+    //reset the marksleft to 10
+    this.marksleft = 10;
+    const marksleftElement = this.shadowRoot?.getElementById('marksleft');
+    marksleftElement!.innerHTML = `Marks left: ${this.marksleft}`;
+
     this.initGame();
+  }
+
+  async restartPost() {
+    try {
+      const response = await httpClient.post('minesweeper/restart', '');
+      console.log('updated tries');
+    } catch (e) {
+      console.log('error');
+    }
   }
 
   initGame() {
@@ -156,7 +197,6 @@ class SecretAppComponent extends LitElement {
         }
       }
       if (!allMinesMarked) {
-        break;
       }
     }
     if (allMinesMarked) {
@@ -164,28 +204,128 @@ class SecretAppComponent extends LitElement {
     }
   }
 
-  showGameOver() {
+  async showGameOver() {
     console.log('game over');
+    const messageElement = this.shadowRoot!.getElementById('message');
+    messageElement!.innerHTML = 'Game Over';
+
+    //decrease the amount of tries by one
+    if (this.tries != 0) {
+      this.restartPost();
+      this.changeTries();
+    }
   }
 
   showVictory() {
     console.log('great success');
+    const messageElement = this.shadowRoot!.getElementById('message');
+    messageElement!.innerHTML = 'You won!';
+
+    if (this.tries != 0) {
+      this.cash = this.cash + 500;
+      this.cashString = this.cash.toLocaleString('de-DE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: false
+      });
+      const cashElem = this.shadowRoot?.getElementById('cash');
+      cashElem!.innerHTML = `cash: ${this.cashString} $`;
+    }
+
+    //decrease the amount of tries by one
+    if (this.tries != 0) {
+      this.restartPost();
+      this.changeTries();
+      this.victoryPost();
+    }
   }
 
-  firstUpdated() {
+  async victoryPost() {
+    try {
+      const response = await httpClient.post('minesweeper/victory', '');
+      console.log('updated money');
+    } catch (e) {
+      console.log('error');
+    }
+  }
+
+  changeTries() {
+    const marksleftElement = this.shadowRoot?.getElementById('tries');
+    marksleftElement!.innerHTML = `Tries left: ${this.tries} -1`;
+    this.tries = this.tries - 1;
+
+    setTimeout(() => {
+      marksleftElement!.innerHTML = `Tries left: ${this.tries}`;
+    }, 1000);
+  }
+
+  @eventOptions({ capture: true })
+  async firstUpdated() {
     this.initGame();
+
+    const appHeader = this.dispatchEvent(
+      new CustomEvent('update-pagename', { detail: 'Minesweeper', bubbles: true, composed: true })
+    );
+
+    try {
+      const response = await httpClient.get('minesweeper');
+      const data = await response.json();
+
+      this.username = data.username;
+      this.tries = data.tries.value;
+      this.cash = data.money;
+      this.cashString = this.cash.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: false
+      });
+
+      const usernameElem = this.shadowRoot?.getElementById('username');
+      usernameElem!.innerHTML = `${this.username}`;
+
+      const cashElem = this.shadowRoot?.getElementById('cash');
+      cashElem!.innerHTML = `cash: ${this.cashString} $`;
+
+      const triesElem = this.shadowRoot?.getElementById('tries');
+      triesElem!.innerHTML = `Tries left: ${this.tries}`;
+    } catch (e) {
+      if ((e as Error).message == 'Unauthorized!') {
+        router.navigate('/users/sign-in');
+      } else {
+        console.log((e as Error).message);
+      }
+    }
   }
 
   render() {
     return html`
       <div id="container">
-        <div id="username">Username</div>
-        <div id="highscore">Highscore: ${this.highscore}</div>
+        <div id="username">...</div>
+        <div id="cash">cash: ... $</div>
+        <div id="tries">Tries left: ...</div>
         <div class="board"></div>
         <div id="message"></div>
+        <div id="marksleft">Marks left: ${this.marksleft}</div>
         <button id="restart-button" @click="${this.restartGame}">Restart</button>
-        If you found this, you are an absolute legend. You are smart, handsome. <br />
-        big PP energy spreads from you
+
+        <div id="how">
+          <h4>How it works:</h4>
+          <br />
+          There is no warm up!
+          <br />
+          Everytime you win or lose your tries decrease by one. You get 3 tries every day. If you feel like you are
+          loosing, you can restart the game. One win adds 500$ to your cash. If you have never played minesweeper
+          before:
+          <br />
+          <br />
+
+          <h4>Here is a quick Tutorial:</h4>
+          Once you leftclick on a field it reveals how many mines are in a one block radius around the field. To win you
+          have to mark all mines with a rightclick.
+          <br />
+          <br />
+          That's it. Enjoy!
+        </div>
       </div>
     `;
   }

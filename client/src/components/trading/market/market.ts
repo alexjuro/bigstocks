@@ -24,6 +24,7 @@ export class MarketComponent extends TradingComponent {
   }
 
   async firstUpdated() {
+    this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'Market', bubbles: true, composed: true }));
     try {
       this.startAsyncInit();
       const response = await httpClient.get('trading/market' + location.search);

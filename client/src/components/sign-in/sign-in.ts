@@ -34,6 +34,16 @@ class SignInComponent extends PageMixin(LitElement) {
       new CustomEvent('update-pagename', { detail: this.pageName, bubbles: true, composed: true })
     );
   }
+  //Autofocus password
+  updated(changedProperties: Map<PropertyKey, unknown>) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('step') && this.step === 2) {
+      setTimeout(() => {
+        this.passwordElement.focus();
+      }, 0);
+    }
+  }
 
   handleKeyDownPassword(event: KeyboardEvent) {
     console.log('Key down event:', event);
@@ -81,7 +91,7 @@ class SignInComponent extends PageMixin(LitElement) {
           Not registered?
           <button @click=${this.signUp}>Create an account</button>
         </p>
-        <button type="button" @click=${this.nextStep}>Next</button>
+        <button type="button" id="nextButton" @click=${this.nextStep}>Next</button>
       </form>
     `;
   }
@@ -96,6 +106,7 @@ class SignInComponent extends PageMixin(LitElement) {
         <div>
           <label for="password">Password</label>
           <input
+            autofocus
             type="password"
             required
             minlength="8"
@@ -111,10 +122,10 @@ class SignInComponent extends PageMixin(LitElement) {
         <p class="message">Forgot you password? <button @click="${this.forgotPassword}">Reset password!</button></p>
         <p class="message">
           Not registered?
-          <button @click=${this.signUp}>Create an account</button>
+          <button id="signUpButton" @click=${this.signUp}>Create an account</button>
         </p>
-        <button type="button" @click=${this.backStep}>Back</button>
-        <button type="button" @click=${this.submit}>Sign-In</button>
+        <button type="button" id="backButton" @click=${this.backStep}>Back</button>
+        <button type="button" id="submitButton" @click=${this.submit}>Sign-In</button>
       </form>
     `;
   }

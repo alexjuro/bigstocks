@@ -3,8 +3,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 70vh;
   font-family: Arial, sans-serif;
+
+  position: relative;
+  z-index: 9;
 }
 
 .board {
@@ -43,6 +45,7 @@
 #message {
   position: absolute;
   text-align: center;
+  top: 250px;
   margin-top: 20px;
   font-size: 55px;
 }
@@ -56,15 +59,38 @@ button {
   cursor: pointer;
 }
 
-#highscore {
+#tries {
   margin: 20px;
   font-size: 18px;
 }
 
-#username {
+#cash {
   margin-top: 20px;
   font-size: 18px;
+}
+
+#marksleft {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+#username {
+  margin-top: 100px;
+  font-size: 18px;
   animation: rainbow 5s infinite;
+}
+
+#how {
+  margin-top: 20px;
+  width: 650px;
+  align-items: left;
+  margin-bottom: 150px;
+}
+
+@media (max-width: 1024px) {
+  #how {
+    width: 250px;
+  }
 }
 
 @keyframes rainbow {

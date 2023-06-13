@@ -1,8 +1,17 @@
-/* Author: Nico Pareigis */
+/* Autor: Nico Pareigis */
 
 :host {
   display: block;
   margin: 1rem;
+}
+
+a {
+  text-decoration: underline;
+}
+
+a:hover {
+  cursor: pointer;
+  color: var(--secondary);
 }
 
 dialog {
