@@ -4,7 +4,6 @@ import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { httpClient } from '../../http-client';
 import { router } from '../../router/router';
-import { StockService } from '../../stock-service';
 import componentStyle from './app.css?inline';
 import sharedStyle from '../shared.css?inline';
 
