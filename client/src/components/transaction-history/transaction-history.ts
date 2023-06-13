@@ -109,28 +109,28 @@ export class TransactionHistory extends PageMixin(LitElement) {
                       <img src="${i.image}" />
                       <span>${i.name}</span>
                     </div>
-                    <span class="profit" style="--color:${profit.header}">${`${profit.prefix} ${profit.profit}`}€</span>
+                    <span class="profit" style="--color:${profit.header}">${`${profit.prefix} ${profit.profit}`}$</span>
                     <span class="date">${this.timeDiff(i.createdAt)} ago</span>
                   </div>
                   <div class="detail">
                     <div class="transaction-data">
                       <fieldset>
                         <legend>Bought</legend>
-                        <p>${this.timeDiff(i.createdAt)} ago for <b>${i.bPrice}€</b></p>
+                        <p>${this.timeDiff(i.createdAt)} ago for <b>${i.bPrice}$</b></p>
                         <hr />
                         <p>${this.formatDate(boughtAt, false)} at ${this.formatTime(boughtAt)}</p>
                       </fieldset>
                       <fieldset>
                         <legend>Sold</legend>
                         ${i.soldAt
-                          ? html`<p>${this.timeDiff(i.soldAt)} ago for <b>${i.sPrice}€</b></p>
+                          ? html`<p>${this.timeDiff(i.soldAt)} ago for <b>${i.sPrice}$</b></p>
                               <hr />
                               <p>${this.formatDate(soldAt, false)} at ${this.formatTime(soldAt)}</p>`
                           : html`<p>Not yet sold.</p>`}
                       </fieldset>
                     </div>
                     <div class="transaction-summary">
-                      <p class="profit" style="--color:${profit.detail}">${`${profit.prefix} ${profit.profit}`}€</p>
+                      <p class="profit" style="--color:${profit.detail}">${`${profit.prefix} ${profit.profit}`}$</p>
                       <p>Held for ${this.timeDiff(i.createdAt, i.soldAt)}.</p>
                     </div>
                   </div>
