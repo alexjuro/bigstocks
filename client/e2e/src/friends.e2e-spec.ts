@@ -1,6 +1,5 @@
 /* Autor: Alexander Lesnjak */
 
-/*
 import { Browser, BrowserContext, Page, chromium, Locator } from 'playwright';
 import { expect } from 'chai';
 import config from './config.js';
@@ -28,13 +27,11 @@ const signIn = async (context: BrowserContext, username: string, password: strin
   ]);
 };
 
-describe('/profile', () => {
+describe('/users/friends', () => {
   let browser: Browser;
   let context: BrowserContext;
   let page: Page;
-  let avatar: Locator;
-  let details: Locator;
-  let password: Locator;
+  //   let userSession: UserSession;
 
   before(async () => {
     browser = await chromium.launch(config.launchOptions);
@@ -43,10 +40,7 @@ describe('/profile', () => {
 
     await signIn(context, user.name, user.password);
 
-    await page.goto(config.clientUrl('/profile'));
-    avatar = page.locator('user-profile-avatar');
-    details = page.locator('user-profile-details');
-    password = page.locator('user-profile-password');
+    await page.goto(config.clientUrl('/users/friends'));
   });
 
   after(async () => {
@@ -54,36 +48,59 @@ describe('/profile', () => {
     await browser.close();
   });
 
-  describe('page', () => {
+  describe('render friends', () => {
     it('should render the page correctly', async () => {
-      expect(await page.textContent('app-header a')).to.equal('Profile');
-      expect(await page.locator('user-profile h2').nth(0).textContent()).to.equal('Account');
-      expect(await page.locator('user-profile h2').nth(1).textContent()).to.equal('Transactions');
-      expect(await page.textContent('user-profile-avatar h3')).to.equal('Avatar');
-      expect(await page.textContent('user-profile-details h3')).to.equal('General Information');
-      expect(await page.textContent('user-profile-password h3')).to.equal('Password');
-    });
+      expect(await page.textContent('#background')).to.not.be.null;
+      expect(await page.textContent('#main')).to.not.be.null;
+      expect(await page.textContent('#addFriend button')).to.equal('Add friend');
+      expect(await page.textContent('#friendsContainer')).to.not.be.null;
+      expect(await page.textContent('#addMethod')).to.not.be.null;
+      expect(await page.textContent('#addwindow')).to.not.be.null;
+      expect(await page.textContent('#sendbtn')).to.equal('Send');
 
-    it('should fail given invalid password', async () => {
-      await details.locator('#name').fill('abcd');
-      await details.getByRole('button', { name: 'Save' }).click();
-      await page.fill('dialog input', `${user.password}!`);
-      await page.getByText('Confirm', { exact: true }).click();
+      expect(await page.textContent('#feedback')).to.not.be.null;
 
-      await page.waitForSelector('app-notification');
-      expect(await page.getByText('Incorrect Password.').textContent()).to.not.be.null;
-    });
-
-    it('should succeed given valid password', async () => {
-      await page.route(config.serverUrl('/users/account/details'), route => route.fulfill({ status: 200 }));
-
-      await details.locator('#name').fill('abcd');
-      await details.getByRole('button', { name: 'Save' }).click();
-      await page.fill('dialog input', user.password);
-      await page.getByText('Confirm', { exact: true }).click();
-
-      await page.waitForSelector('app-notification');
-      expect(await page.getByText('Profile update successful.').textContent()).to.not.be.null;
+      expect(await page.textContent('#requestwindow')).to.not.be.null;
+      expect(await page.textContent('#friendsList')).to.not.be.null;
+      expect(await page.textContent('#friendswindow')).to.not.be.null;
     });
   });
-});*/
+
+  describe('add friend process', async () => {
+    it('should fail adding yourself', async () => {
+      await page.fill('#input', user.name);
+
+      await page.getByText('Send', { exact: true }).click();
+
+      const response = await page.waitForResponse('**/friends');
+      expect(response.status()).to.equal(400);
+    });
+
+    it('should fail adding PatrickBateman', async () => {
+      await page.fill('#input', 'PatrickBateman');
+
+      await page.getByText('Send', { exact: true }).click();
+
+      const response = await page.waitForResponse('**/friends');
+      expect(response.status()).to.equal(409);
+    });
+
+    it('should fail adding User that does not exist', async () => {
+      await page.fill('#input', 'asghyats7asg8');
+
+      await page.getByText('Send', { exact: true }).click();
+
+      const response = await page.waitForResponse('**/friends');
+      expect(response.status()).to.equal(404);
+    });
+
+    it('should fail adding friend again', async () => {
+      await page.fill('#input', 'axel');
+
+      await page.getByText('Send', { exact: true }).click();
+
+      const response = await page.waitForResponse('**/friends');
+      expect(response.status()).to.equal(409);
+    });
+  });
+});

@@ -47,17 +47,18 @@ export class AppFriendsComponent extends LitElement {
   }
 
   render() {
-    return html` <div id="background">
+    return html`
+      <div id="background">
         <div id="kreis"></div>
       </div>
 
       <div id="main">
         <div id="addFriend">
-          <button @click="${this.scollToForm}">Freund hinzufügen</button>
+          <button @click="${this.scollToForm}">Add friend</button>
         </div>
         <div id="friendsContainer">
           <div id="addMethod" class="containerelem">
-            <div id="textFreunde" class="textone">Freund hinzufügen:</div>
+            <div id="textFreunde" class="textone">Add friend:</div>
             <!--Das Fenster zum absenden-->
             <div id="addwindow" class="window">
               <input
@@ -68,13 +69,13 @@ export class AppFriendsComponent extends LitElement {
                 id="input"
                 autocomplete="off"
               />
-              <button type="submit" id="sendbtn" @click="${() => this.addFriend()}">Senden</button>
+              <button type="submit" id="sendbtn" @click="${() => this.addFriend()}">Send</button>
             </div>
 
             <!--Feedback ob das senden funktioniert hat oder nicht-->
             <div id="feedback" class="clear"></div>
 
-            <div id="textFreunde">Freundschaftsanfragen:</div>
+            <div id="textFreunde">Requests:</div>
             <div id="requestwindow" class="window">
               <!--Beispiel fuer eine Anfrage-->
               ${this.requests.map(
@@ -97,7 +98,7 @@ export class AppFriendsComponent extends LitElement {
           </div>
 
           <div id="friendsList" class="containerelem">
-            <div id="textFreunde">Freunde:</div>
+            <div id="textFreunde">Friends:</div>
             <div id="friendswindow" class="window">
               ${this.friends.map(
                 friend => html`
@@ -120,7 +121,8 @@ export class AppFriendsComponent extends LitElement {
             </div>
           </div>
         </div>
-      </div>`;
+      </div>
+    `;
   }
 
   /*

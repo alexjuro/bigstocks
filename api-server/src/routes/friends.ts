@@ -74,7 +74,7 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
     }
 
     if (user.friends.some(f => f.username === friend.username)) {
-      const alreadyAddedError = 'Error: This friend already send you an request';
+      const alreadyAddedError = 'Error: This friend already send you an request or you are already friends';
       res.status(409).json(alreadyAddedError);
       return;
     }
