@@ -291,7 +291,6 @@ button {
   }
 
   #addFriend {
-    display: block;
     display: flex;
     height: 50px;
     justify-content: left;
