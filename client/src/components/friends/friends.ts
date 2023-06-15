@@ -88,8 +88,8 @@ export class AppFriendsComponent extends LitElement {
                     </div>
                     <div class="b"><button>${request.username}</button></div>
                     <div class="c">
-                      <button @click="${() => this.acceptRequest(request.username)}">accept</button>
-                      <button @click="${() => this.declineRequest(request.username)}">decline</button>
+                      <button id="acceptBtn" @click="${() => this.acceptRequest(request.username)}">accept</button>
+                      <button id="declineBtn" @click="${() => this.declineRequest(request.username)}">decline</button>
                     </div>
                   </div>
                 `
@@ -111,7 +111,7 @@ export class AppFriendsComponent extends LitElement {
                     <div class="b"><button>${friend.username}</button></div>
                     <div class="c">profit made: ${friend.profit} $</div>
                     <div class="d">
-                      <button @click="${() => this.deleteFriend(friend.username)}">
+                      <button id="deleteBtn" @click="${() => this.deleteFriend(friend.username)}">
                         <img src="/trash-red.svg" alt="" height="30px" />
                       </button>
                     </div>

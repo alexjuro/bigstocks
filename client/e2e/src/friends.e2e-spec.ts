@@ -103,4 +103,31 @@ describe('/users/friends', () => {
       expect(response.status()).to.equal(409);
     });
   });
+
+  describe('maintain friends', async () => {
+    it('should decline a request', async () => {
+      await page.locator('#declineBtn').first().click();
+
+      const response = await page.waitForResponse('**/friends/decline');
+      expect(response.status()).to.equal(200);
+    });
+
+    it('should accept a request', async () => {
+      await page.locator('#acceptBtn').first().click();
+
+      const response = await page.waitForResponse('**/friends/accept');
+      expect(response.status()).to.equal(200);
+    });
+
+    // it('should delete last accepted  a friend', async () => {
+    //   page.on('dialog', async dialog => {
+    //     await dialog.accept();
+    //   });
+
+    //   await page.locator('#deleteBtn').nth(2).click();
+
+    //   const response = await page.waitForResponse('**/friends/delete');
+    //   expect(response.status()).to.equal(200);
+    // });
+  });
 });
