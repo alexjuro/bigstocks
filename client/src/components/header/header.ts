@@ -6,7 +6,7 @@ import { httpClient } from '../../http-client';
 import { router } from '../../router/router';
 
 @customElement('app-header')
-class AppHeader extends PageMixin(LitElement) {
+export class AppHeader extends PageMixin(LitElement) {
   static styles = componentStyle;
   @property() pagename = 'pagename';
 

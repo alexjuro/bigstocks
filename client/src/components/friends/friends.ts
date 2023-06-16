@@ -8,8 +8,7 @@ import componentStyle from './friends.css?inline';
 import { until } from 'lit/directives/until.js';
 
 @customElement('app-friends')
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-class AppFriendsComponent extends LitElement {
+export class AppFriendsComponent extends LitElement {
   static styles = componentStyle;
 
   @query('#input') private nameElement!: HTMLInputElement;
@@ -18,8 +17,7 @@ class AppFriendsComponent extends LitElement {
     super();
   }
 
-  @state() request = httpClient.get('friends').then(async res => (await res.json()) as any);
-
+  //@state() request: Promise<any> = httpClient.get('friends').then(async res => (await res.json()) as any);
   @state() requests: any[] = [];
   @state() friends: any[] = [];
 
@@ -31,6 +29,14 @@ class AppFriendsComponent extends LitElement {
 
     try {
       const response = await httpClient.get('friends');
+
+      const data = await response.json();
+
+      this.friends = data.friends;
+      this.requests = data.requests;
+
+      console.log(this.friends);
+      console.log(this.requests);
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
@@ -41,11 +47,94 @@ class AppFriendsComponent extends LitElement {
   }
 
   render() {
+    return html` <div id="background">
+        <div id="kreis"></div>
+      </div>
+
+      <div id="main">
+        <div id="addFriend">
+          <button @click="${this.scollToForm}">Freund hinzufügen</button>
+        </div>
+        <div id="friendsContainer">
+          <div id="addMethod" class="containerelem">
+            <div id="textFreunde" class="textone">Freund hinzufügen:</div>
+            <!--Das Fenster zum absenden-->
+            <div id="addwindow" class="window">
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                onfocus="this.value=''"
+                id="input"
+                autocomplete="off"
+              />
+              <button type="submit" id="sendbtn" @click="${() => this.addFriend()}">Senden</button>
+            </div>
+
+            <!--Feedback ob das senden funktioniert hat oder nicht-->
+            <div id="feedback" class="clear"></div>
+
+            <div id="textFreunde">Freundschaftsanfragen:</div>
+            <div id="requestwindow" class="window">
+              <!--Beispiel fuer eine Anfrage-->
+              ${this.requests.map(
+                request => html`
+                  <div class="friendelem">
+                    <div class="a">
+                      <div class="frame">
+                        <img src="${request.avatar}" />
+                      </div>
+                    </div>
+                    <div class="b"><button>${request.username}</button></div>
+                    <div class="c">
+                      <button @click="${() => this.acceptRequest(request.username)}">accept</button>
+                      <button @click="${() => this.declineRequest(request.username)}">decline</button>
+                    </div>
+                  </div>
+                `
+              )}
+            </div>
+          </div>
+
+          <div id="friendsList" class="containerelem">
+            <div id="textFreunde">Freunde:</div>
+            <div id="friendswindow" class="window">
+              ${this.friends.map(
+                friend => html`
+                  <div class="friendelem">
+                    <div class="a">
+                      <div class="frame">
+                        <img src="${friend.avatar}" />
+                      </div>
+                    </div>
+                    <div class="b"><button>${friend.username}</button></div>
+                    <div class="c">profit made: ${friend.profit} $</div>
+                    <div class="d">
+                      <button @click="${() => this.deleteFriend(friend.username)}">
+                        <img src="/trash-red.svg" alt="" height="30px" />
+                      </button>
+                    </div>
+                  </div>
+                `
+              )}
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  /*
+  render() {
+    if (!this.request) {
+      return html`<is-loading></is-loading>`;
+    }
+
     return html`
       ${until(
         this.request.then(json => {
           this.friends = json.friends;
           this.requests = json.requests;
+
           return html`
             <div id="background">
               <div id="kreis"></div>
@@ -68,7 +157,7 @@ class AppFriendsComponent extends LitElement {
                       id="input"
                       autocomplete="off"
                     />
-                    <button type="submit" @click="${() => this.addFriend()}">Senden</button>
+                    <button type="submit" id="sendbtn" @click="${() => this.addFriend()}">Senden</button>
                   </div>
 
                   <!--Feedback ob das senden funktioniert hat oder nicht-->
@@ -126,7 +215,7 @@ class AppFriendsComponent extends LitElement {
         html`<is-loading></is-loading>`
       )}
     `;
-  }
+  }*/
 
   async scollToForm() {
     const scroll = this.shadowRoot!.getElementById('addMethod');
@@ -135,6 +224,11 @@ class AppFriendsComponent extends LitElement {
 
   async addFriend() {
     const friendname = this.nameElement.value;
+
+    if (friendname == '') {
+      this._displayError('Please enter a username');
+      return;
+    }
 
     try {
       const response = await httpClient.post('friends', { username: friendname });
@@ -249,8 +343,10 @@ class AppFriendsComponent extends LitElement {
 
   async reloadComponent() {
     try {
-      this.request = httpClient.get('friends').then(async res => (await res.json()) as any);
-
+      const response = await httpClient.get('friends');
+      const data = await response.json();
+      this.friends = data.friends;
+      this.requests = data.requests;
       this.requestUpdate();
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {

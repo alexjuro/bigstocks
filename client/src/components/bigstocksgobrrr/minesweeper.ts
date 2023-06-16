@@ -5,7 +5,7 @@ import componentStyle from './minesweeper.css?inline';
 import { router } from '../../router/router.js';
 
 @customElement('app-minesweeper')
-class SecretAppComponent extends LitElement {
+export class SecretAppComponent extends LitElement {
   static styles = componentStyle;
 
   @state() request = httpClient.get('minesweeper').then(async res => (await res.json()) as any);

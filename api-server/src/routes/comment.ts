@@ -39,7 +39,7 @@ function validation(comment: Comment, errors: string[]) {
     errors.push('Potential NoSQL injection detected in comment');
   }
 
-  const re = /\w/gm;
+  const re = /^\w[\w ]+$/gm;
   if (re.test(comment.comment)) {
     errors.push('Invalid Comment!!');
   }

@@ -1,7 +1,5 @@
 /* Autor: Alexander Lesnjak */
 
-//This Component shows who made the most Profit in one Day/ Week and All Time
-
 import { LitElement, html } from 'lit';
 import { customElement, property, eventOptions, state } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
@@ -10,10 +8,10 @@ import { router } from '../../router/router.js';
 import { until } from 'lit/directives/until.js';
 
 @customElement('app-leaderboard')
-class AppLeaderboardComponent extends LitElement {
+export class AppLeaderboardComponent extends LitElement {
   static styles = componentStyle;
 
-  @state() request = httpClient.get('leaderboard/lastWeek').then(async res => (await res.json()) as any);
+  //@state() request = httpClient.get('leaderboard/lastWeek').then(async res => (await res.json()) as any);
   @state() leaderboard: any[] = [];
   @state() nottype: string = '';
   @state() avatars: any = [];
@@ -28,6 +26,20 @@ class AppLeaderboardComponent extends LitElement {
 
     try {
       const response = await httpClient.get('leaderboard/lastWeek');
+      const data = await response.json();
+
+      this.leaderboard = data.leaderboard;
+      this.nottype = data.nottype;
+
+      if (this.leaderboard[0]) {
+        this.avatars.push(this.leaderboard[0].avatar);
+      }
+      if (this.leaderboard[1]) {
+        this.avatars.push(this.leaderboard[1].avatar);
+      }
+      if (this.leaderboard[2]) {
+        this.avatars.push(this.leaderboard[2].avatar);
+      }
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
@@ -37,6 +49,59 @@ class AppLeaderboardComponent extends LitElement {
     }
   }
 
+  render() {
+    return html` <div id="content">
+      <div id="pagetitle">
+        <button id="change" @click="${this._changeBoard}">${this.nottype} profit</button>
+        <button @click="${this.redirectMinesweeper}">need cash?</button>
+      </div>
+
+      <div id="imagesflex">
+        <div id="images">
+          <div class="frame">
+            <img src="${this.avatars[2]}" />
+          </div>
+          <div class="frame">
+            <img src="${this.avatars[0]}" />
+          </div>
+          <div class="frame">
+            <img src="${this.avatars[1]}" />
+          </div>
+        </div>
+      </div>
+
+      <div id="namesflex">
+        <div id="names">
+          <div>3.</div>
+          <div>1.</div>
+          <div>2.</div>
+        </div>
+      </div>
+
+      <div id="placementsflex">
+        <div id="placements">
+          <ol>
+            ${this.leaderboard.map(
+              entry => html`
+                <li>
+                  <div class="position">
+                    <div>${entry.username}</div>
+                    <div>${entry.profit} $</div>
+                  </div>
+                </li>
+              `
+            )}
+          </ol>
+        </div>
+      </div>
+
+      <div id="background">
+        <div id="kreis"></div>
+      </div>
+    </div>`;
+  }
+
+  /*
   render() {
     return html`
       ${until(
@@ -109,6 +174,7 @@ class AppLeaderboardComponent extends LitElement {
       )}
     `;
   }
+  */
 
   async redirectMinesweeper() {
     try {
@@ -121,12 +187,26 @@ class AppLeaderboardComponent extends LitElement {
   async _changeBoard() {
     if (this.dayTrading == false) {
       try {
-        this.request = httpClient.get('leaderboard/lastDay').then(async res => (await res.json()) as any);
-        //resets the avatars
-        //this.avatars = [];
+        const response = await httpClient.get('leaderboard/lastDay');
+        const data = await response.json();
+
+        this.avatars = [];
         this.dayTrading = true;
 
-        this.requestUpdate(); // Komponente neu laden
+        this.leaderboard = data.leaderboard;
+        this.nottype = data.nottype;
+
+        if (this.leaderboard[0]) {
+          this.avatars.push(this.leaderboard[0].avatar);
+        }
+        if (this.leaderboard[1]) {
+          this.avatars.push(this.leaderboard[1].avatar);
+        }
+        if (this.leaderboard[2]) {
+          this.avatars.push(this.leaderboard[2].avatar);
+        }
+
+        this.requestUpdate();
       } catch (e) {
         if ((e as Error).message == 'Unauthorized!') {
           router.navigate('/users/sign-in');
@@ -136,12 +216,26 @@ class AppLeaderboardComponent extends LitElement {
       }
     } else {
       try {
-        this.request = httpClient.get('leaderboard/lastWeek').then(async res => (await res.json()) as any);
-        //resets the avatars
-        //this.avatars = [];
-        this.dayTrading = false;
+        const response = await httpClient.get('leaderboard/lastWeek');
+        const data = await response.json();
 
-        this.requestUpdate(); // Komponente neu laden
+        this.avatars = [];
+        this.dayTrading = true;
+
+        this.leaderboard = data.leaderboard;
+        this.nottype = data.nottype;
+
+        if (this.leaderboard[0]) {
+          this.avatars.push(this.leaderboard[0].avatar);
+        }
+        if (this.leaderboard[1]) {
+          this.avatars.push(this.leaderboard[1].avatar);
+        }
+        if (this.leaderboard[2]) {
+          this.avatars.push(this.leaderboard[2].avatar);
+        }
+
+        this.requestUpdate();
       } catch (e) {
         if ((e as Error).message == 'Unauthorized!') {
           router.navigate('/users/sign-in');

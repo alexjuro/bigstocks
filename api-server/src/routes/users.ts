@@ -22,7 +22,7 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
     return;
   }
   if (res.locals.user.exp < Math.floor(Date.now() / 1000)) {
-    const result = await userDAO.delete(req.body.id); // Warum wird der User nicht gelöscht ?!!!
+    const result = await userDAO.delete(res.locals.user.id); // User wird nach Ablauf des Tokens gelöscht
     console.log(result);
     authService.removeToken(res);
     res.status(401).json({ message: 'Token expired!' });
@@ -39,7 +39,13 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
     return sendErrMsg(errors.join('\n'));
   }
   if (checkPassword(req.body.password)) {
-    return sendErrMsg('Invalid password');
+    return sendErrMsg('View our Constraints');
+  }
+  if (checkPassword(req.body.safetyAnswerOne)) {
+    return sendErrMsg('View our Constraints');
+  }
+  if (checkPassword(req.body.password.safetyAnswerTwo)) {
+    return sendErrMsg('View our Constraints');
   }
   if (req.body.password !== req.body.passwordCheck) {
     console.log(req.body.password + ' ' + req.body.passwordCheck);
@@ -274,10 +280,11 @@ router.delete('/sign-out', (req, res) => {
   res.status(200).end();
 });
 
-router.delete('/', authService.authenticationMiddleware, async (req, res) => {
+router.delete('/delete', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-
-  userDAO.delete(res.locals.user.id);
+  console.log(res.locals.user);
+  const result = await userDAO.delete(res.locals.user.id);
+  console.log(result);
 
   authService.removeToken(res);
   res.status(200).end();
@@ -334,6 +341,12 @@ function checkEmail(email: string) {
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   return !re.test(email);
 }
+
+function checkAnswer(answer: string) {
+  const reSQ = /^[\w-.]{4,32}$/;
+  return !reSQ.test(answer);
+}
+
 function createNumber() {
   const randomNumber = Math.floor(100000 + Math.random() * 900000); // Generiert eine Zufallszahl zwischen 100000 und 999999
   return randomNumber;
