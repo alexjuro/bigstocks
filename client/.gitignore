@@ -10,5 +10,4 @@ dist/
 # Mac only
 .DS_Store
 
-# neovim null-ls
-.null-ls-root
+

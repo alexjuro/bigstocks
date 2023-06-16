@@ -21,7 +21,7 @@ export const PageMixin = <T extends new (...args: any[]) => LitElement>(base: T)
     protected showNotification(content = '', type: 'error' | 'info' = 'info') {
       this.notification = { content, type };
       if (content) {
-        setTimeout(() => this.showNotification(), 5000);
+        setTimeout(() => this.showNotification(), 3000);
       }
     }
 

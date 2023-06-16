@@ -1,8 +1,10 @@
+/* Autor: Prof. Dr. Norman Lahme-Hütig (FH Münster) */
+
 import { Request, Response, NextFunction } from 'express';
 
 class CorsService {
   corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    if (this.isOriginAllowed(req.get('Origin')) /*&& this.isSecureRequest(req)*/) {
+    if (this.isOriginAllowed(req.get('Origin'))) {
       res.set('Access-Control-Allow-Origin', req.get('Origin'));
       res.set('Access-Control-Allow-Credentials', 'true');
     }
@@ -21,11 +23,6 @@ class CorsService {
 
   isOriginAllowed(origin?: string) {
     return !!origin;
-  }
-
-  isSecureRequest(req: Request) {
-    // Überprüft ob es eine HTTPS Anfrage ist
-    return req.secure;
   }
 }
 
