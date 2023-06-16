@@ -15,7 +15,6 @@ import { router } from '../../../router/router';
 @customElement('app-market')
 export class MarketComponent extends TradingComponent {
   static styles = [sharedStyle, componentStyle, sharedTradingStyle];
-  static publicUrl = './../../../../public/';
   @state() searchText = '';
   @property({ type: Object })
   stockService = new StockService();
@@ -27,6 +26,9 @@ export class MarketComponent extends TradingComponent {
     this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'Market', bubbles: true, composed: true }));
     try {
       this.startAsyncInit();
+      await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+        if (e.statusCode === 401) router.navigate('/users/sign-in');
+      });
       const response = await httpClient.get('trading/market' + location.search);
       const data = await response.json();
       const userTransactions = data.results;

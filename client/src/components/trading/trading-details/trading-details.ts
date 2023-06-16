@@ -60,6 +60,9 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
   async firstUpdated() {
     try {
       this.startAsyncInit();
+      await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+        if (e.statusCode === 401) router.navigate('/users/sign-in');
+      });
       this.name = this.getParamsFromURL().name;
       this.symbol = this.getParamsFromURL().symbol;
       this.dispatchEvent(new CustomEvent('update-pagename', { detail: `${this.name}`, bubbles: true, composed: true }));
