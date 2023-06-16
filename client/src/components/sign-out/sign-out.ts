@@ -110,7 +110,7 @@ class SignOutComponent extends PageMixin(LitElement) {
     } else if (comment.trim().length === 0) {
       this.commentElement.setCustomValidity('Invalid Input');
     } else {
-      const re = /\w/gm;
+      const re = /^\w[\w ]+$/gm;
       if (!re.test(this.commentElement.value)) {
         this.commentElement.setCustomValidity('Invalid Input');
       } else {
