@@ -5,7 +5,7 @@ import { GenericDAO } from '../models/generic.dao.js';
 import { Role, User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
 import nodemailer from 'nodemailer';
-import { equal } from 'assert';
+import config from '../../e2e/src/config.js';
 
 const router = express.Router();
 const transporter = nodemailer.createTransport({
@@ -41,10 +41,10 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
   if (checkPassword(req.body.password)) {
     return sendErrMsg('View our Constraints');
   }
-  if (checkPassword(req.body.safetyAnswerOne)) {
+  if (checkAnswer(req.body.safetyAnswerOne)) {
     return sendErrMsg('View our Constraints');
   }
-  if (checkPassword(req.body.password.safetyAnswerTwo)) {
+  if (checkAnswer(req.body.password.safetyAnswerTwo)) {
     return sendErrMsg('View our Constraints');
   }
   if (req.body.password !== req.body.passwordCheck) {
@@ -76,6 +76,7 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
 router.post('/forgotPassword', async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const errors: string[] = [];
+  console.log('post /forgotPassword');
 
   const sendErrMsg = (message: string) => {
     authService.removeToken(res);
@@ -84,6 +85,10 @@ router.post('/forgotPassword', async (req, res) => {
 
   if (hasNotRequiredFields(req.body, ['username', 'safetyAnswerOne'], errors)) {
     return sendErrMsg(errors.join('\n'));
+  }
+
+  if (checkAnswer(req.body.safetyAnswerOne)) {
+    return sendErrMsg('Invalid Input!');
   }
 
   if (checkUsername(req.body.username)) {
@@ -138,6 +143,10 @@ router.post('/resetPassword', authService.authenticationMiddlewareActivation, as
   }
   if (checkPassword(req.body.password)) {
     return sendErrMsg('Invalid password');
+  }
+
+  if (checkAnswer(req.body.safetyAnswerTwo)) {
+    return sendErrMsg('Invalid Input!');
   }
   if (req.body.password !== req.body.passwordCheck) {
     console.log(req.body.password + ' ' + req.body.passwordCheck);
@@ -353,7 +362,7 @@ function createNumber() {
 }
 
 async function sendCode(userEmail: string, code: number) {
-  if (userEmail === 'testuser1@email.de') {
+  if (config.testProfile) {
     return;
   }
   transporter
