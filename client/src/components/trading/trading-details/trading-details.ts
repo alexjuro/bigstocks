@@ -10,7 +10,6 @@ import { router } from '../../../router/router';
 import { Chart, ChartData, ChartOptions } from 'chart.js/auto';
 import { StockService } from '../../../stock-service';
 import { PageMixin } from '../../page.mixin';
-import xss from 'xss';
 import { UserStock } from '../stock-interface';
 
 export interface Note {
@@ -131,11 +130,10 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
       const note: Note = {
         ...this.note,
         symbol: this.symbol,
-        note: noteText
+        note: this.sanitizeInput(noteText)
       };
       try {
         await httpClient.post('trading/details/', { note });
-        console.log('Form submitted!', noteText);
         router.navigate('/trading/market');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
@@ -152,17 +150,36 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
 
   validate(note: string) {
     let result = true;
-    const nosqlInjectionPattern = /[$\\'"]/;
+    const allowedCharacters = /^[a-zA-Z0-9 !.<>()$]+$/;
 
-    if (nosqlInjectionPattern.test(note)) {
-      result = false;
-    }
-
-    const sanitizedNote = xss(note);
-    if (sanitizedNote !== note) {
+    if (!allowedCharacters.test(note)) {
       result = false;
     }
     return result;
+  }
+
+  sanitizeInput(input: string) {
+    const sanitizedInput = input
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+
+    return sanitizedInput;
+  }
+
+  desanitizeInput(input: string) {
+    const desanitizedInput = input
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&#x27;/g, "'")
+      .replace(/&#x2F;/g, '/');
+
+    return desanitizedInput;
   }
 
   /*
@@ -198,7 +215,7 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
             <p>IPO: ${this.companyData.ipo}</p>
             <form @submit=${this.handleSubmit} novalidate>
               <label for="ftext">Your notes:</label><br>
-              <textarea id="ftext" name="ftext" rows="1" cols="50" placeholder="Enter your notes here">${
+              <textarea id="ftext" name="ftext" rows="1" cols="50" maxlength="500" placeholder="Enter your notes here">${
                 this.note ? this.note.note : ''
               }</textarea>
               <button type="submit">Submit</button>
