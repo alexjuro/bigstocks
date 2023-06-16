@@ -259,6 +259,13 @@ export class SecretAppComponent extends LitElement {
     }, 1000);
   }
 
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
+  }
+
   @eventOptions({ capture: true })
   async firstUpdated() {
     this.initGame();
@@ -289,11 +296,7 @@ export class SecretAppComponent extends LitElement {
       const triesElem = this.shadowRoot?.getElementById('tries');
       triesElem!.innerHTML = `Tries left: ${this.tries}`;
     } catch (e) {
-      if ((e as Error).message == 'Unauthorized!') {
-        router.navigate('/users/sign-in');
-      } else {
-        console.log((e as Error).message);
-      }
+      console.log((e as Error).message);
     }
   }
 

@@ -85,4 +85,19 @@ describe('app-friends', () => {
     e._displaySuccess();
     expect(feedback.classList.contains('yes')).to.be.true;
   });
+
+  //+
+  it('should feedback _displayError() with content Invalid username', async () => {
+    const input = e.shadowRoot!.querySelector('#input') as HTMLInputElement;
+    const sendBtn = e.shadowRoot!.querySelector('#sendbtn') as HTMLElement;
+    const feedback = e.shadowRoot!.querySelector('#feedback') as HTMLElement;
+
+    input.value = 'dfgfua///jksgf';
+    input.dispatchEvent(new Event('input'));
+
+    sendBtn.click();
+
+    expect(feedback.classList.contains('no')).to.be.true;
+    expect(feedback.innerHTML).to.equal('Invalid username');
+  });
 });
