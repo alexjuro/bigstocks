@@ -17,8 +17,8 @@ class ProfileAvatar extends LitElement {
   @property() file = 'No file chosen.';
 
   @query('input') input!: HTMLInputElement;
-  @query('button') button!: HTMLButtonElement;
   @query('img') img!: HTMLImageElement;
+  @query('#upload') upload!: HTMLButtonElement;
 
   private readonly mimeTypes = ['image/png', 'image/jpeg'];
   // via https://en.wikipedia.org/wiki/List_of_file_signatures
@@ -36,13 +36,13 @@ class ProfileAvatar extends LitElement {
           <img src="${this.data.avatar || 'avatar.png'}" />
           <div>
             <h4>Change avatar</h4>
-            <div>
-              <label for="input">Choose file...</label>
+            <div class="controls">
+              <input type="file" accept="${this.mimeTypes.join(',')}" @change="${this.updateFile}" />
+              <button type="button" @click="${() => this.input.click()}">Choose file...</button>
               <p id="file">${this.file}</p>
-              <input id="input" type="file" accept="${this.mimeTypes.join(',')}" @change="${this.updateFile}" />
             </div>
             <p id="size">Image size must not exceed 200KiB.</p>
-            <button type="button" @click="${this.submit}">Upload</button>
+            <button id="upload" type="button" @click="${this.submit}">Upload</button>
           </div>
         </div>
       </form>
@@ -59,7 +59,7 @@ class ProfileAvatar extends LitElement {
   updateFile() {
     if (this.input.files) {
       this.file = decodeURIComponent(this.input.files[0].name);
-      this.button.style.visibility = 'visible';
+      this.upload.style.visibility = 'visible';
     }
   }
 

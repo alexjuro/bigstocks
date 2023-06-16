@@ -10,10 +10,11 @@ import style from './style.css?inline';
 import sharedStyle from '../shared.css?inline';
 
 @customElement('sign-out')
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class SignOutComponent extends PageMixin(LitElement) {
   static styles = [style, sharedStyle];
-  @query('comment') private commentElement!: HTMLInputElement;
-  @query('form') private form!: HTMLInputElement;
+  @query('#comment') private commentElement!: HTMLInputElement;
+  @query('#ratingForm') private form!: HTMLFormElement;
   @query('my-rating') private myRating!: HTMLElement;
   @query('#valueInput') private valueInput!: HTMLInputElement;
 
@@ -25,7 +26,7 @@ class SignOutComponent extends PageMixin(LitElement) {
       ${this.renderNotification()}
       <div class="Rating-Page">
         <div class="Rating-Form">
-          <form id="ratingForm">
+          <form id="ratingForm" novalidate>
             <h1>Did you like your visit?</h1>
             <div class="stars">
               <my-rating value="0" max="5"></my-rating>
@@ -38,14 +39,16 @@ class SignOutComponent extends PageMixin(LitElement) {
               <input
                 type="textarea"
                 required
-                form="rating"
+                form="ratingForm"
                 id="comment"
+                form="ratingForm"
                 placeholder="Maximum comment length:300 characters"
                 maxlength="300"
                 cols=""
                 .value=${this.comment}
                 @input=${this.handleCommentChange}
               />
+              <div class="invalid-feedback">Comment must be valid!</div>
             </div>
             <button type="button" @click=${this.sendRating}>Send!</button>
             <button type="button" @click=${this.skip}>Skip</button>
@@ -56,6 +59,7 @@ class SignOutComponent extends PageMixin(LitElement) {
   }
 
   async firstUpdated() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const appHeader = this.dispatchEvent(
       new CustomEvent('update-pagename', { detail: this.pageName, bubbles: true, composed: true })
     );
@@ -101,24 +105,27 @@ class SignOutComponent extends PageMixin(LitElement) {
   }
 
   validate(comment: string, rating: number) {
-    let result = true;
     if (rating > 5 || rating < 0) {
-      result = false;
+      this.commentElement.setCustomValidity('Invalid Rating');
+    } else if (comment.trim().length === 0) {
+      this.commentElement.setCustomValidity('Invalid Input');
+    } else {
+      const re = /^\w[\w ]+$/gm;
+      if (!re.test(this.commentElement.value)) {
+        this.commentElement.setCustomValidity('Invalid Input');
+      } else {
+        const nosqlInjectionPattern = /[$\\'"]/;
+        if (nosqlInjectionPattern.test(this.commentElement.value)) {
+          this.commentElement.setCustomValidity('Invalid Input');
+        } else {
+          this.commentElement.setCustomValidity('');
+        }
+      }
     }
 
-    // Überprüfung auf potenzielle NOSQL-Injection
-    const nosqlInjectionPattern = /[$\\'"]/;
+    console.log(this.form.checkValidity());
 
-    if (nosqlInjectionPattern.test(comment)) {
-      result = false;
-    }
-
-    // Überprüfung auf potenzielle XSS-Attacken
-    const sanitizedComment = xss(comment);
-    if (sanitizedComment !== comment) {
-      result = false;
-    }
-    return result;
+    return this.form.checkValidity();
   }
   handleCommentChange(event: InputEvent) {
     this.comment = (event.target as HTMLInputElement).value;

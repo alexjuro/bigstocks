@@ -33,18 +33,15 @@ function validation(comment: Comment, errors: string[]) {
     errors.push('Rating is invalid');
   }
 
-  // Überprüfung auf potenzielle SQL-Injection
-  const sqlInjectionPattern = /[';]|--|\/\*|\*\//gi;
-  if (sqlInjectionPattern.test(comment.comment)) {
+  const nosqlInjectionPattern = /[$\\'"]/;
+  if (nosqlInjectionPattern.test(comment.comment)) {
     result = true;
-    errors.push('Potential SQL injection detected in comment');
+    errors.push('Potential NoSQL injection detected in comment');
   }
 
-  // Überprüfung auf potenzielle XSS-Attacken
-  const sanitizedComment = xss(comment.comment);
-  if (sanitizedComment !== comment.comment) {
-    result = true;
-    errors.push('Potential XSS attack detected in comment');
+  const re = /^\w[\w ]+$/gm;
+  if (re.test(comment.comment)) {
+    errors.push('Invalid Comment!!');
   }
 
   return result;

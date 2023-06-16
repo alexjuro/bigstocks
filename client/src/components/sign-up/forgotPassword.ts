@@ -28,12 +28,12 @@ class forgotPasswordOne extends PageMixin(LitElement) {
           <h1>Forgot Password</h1>
           <form novalidate>
             <div>
-              <label for="username">Username</label>
+              <label id='usernameLabel' for="username">Username</label>
               <input type="text" autofocus required id="username" placeholder="Username" />
               <div class="invalid-feedback">Username is required</div>
             </div>
             <div>
-              <label for="safetyAnswerOne">What is your favorite food?</label>
+              <label id='safetyAnswerOneLabel' for="safetyAnswerOne">What is your favorite food?</label>
               <input type="password" id="safetyAnswerOne" placeholder="Please enter here" autocomplete="off" required/>
               <div class="invalid-feedback">Entering a answer is mandatory</div> 
             </div>      
@@ -59,7 +59,6 @@ class forgotPasswordOne extends PageMixin(LitElement) {
         router.navigate('/users/resetPassword');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
-        // router.navigate('/sign-up');
       }
     } else {
       this.form.classList.add('was-validated');
@@ -73,6 +72,7 @@ class forgotPasswordOne extends PageMixin(LitElement) {
   }
 
   async firstUpdated() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const appHeader = this.dispatchEvent(
       new CustomEvent('update-pagename', { detail: this.pageName, bubbles: true, composed: true })
     );

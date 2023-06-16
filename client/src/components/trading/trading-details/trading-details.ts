@@ -5,12 +5,13 @@ import { customElement, property, query } from 'lit/decorators.js';
 import sharedStyle from '../../shared.css?inline';
 import componentStyle from './trading-details.css?inline';
 import sharedTradingStyle from '../shared-trading.css?inline';
-import { TradingComponent } from '../tradingcomponent.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
 import { Chart, ChartData, ChartOptions } from 'chart.js/auto';
 import { StockService } from '../../../stock-service';
 import { PageMixin } from '../../page.mixin';
+import xss from 'xss';
+import { UserStock } from '../stock-interface';
 
 export interface Note {
   symbol: string;
@@ -24,6 +25,8 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
   @property({ type: Object })
   stockService = new StockService();
 
+  @query('#bar') bar!: HTMLCanvasElement;
+
   @property({ type: Object })
   private ChartBar = {};
 
@@ -34,10 +37,18 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
   private symbol = '';
 
   @property({ type: Object })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private companyData: any = {};
 
   @property()
-  private stock: any = {};
+  private stock: UserStock = {
+    shares: 0,
+    name: '',
+    symbol: '',
+    image: '',
+    price: 0,
+    dailyPercentage: 0
+  };
 
   @property()
   private note: Note = {
@@ -47,17 +58,12 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
 
   @query('form') private form!: HTMLFormElement;
 
-  // eslint-disable-next-line @typescript-eslint/member-ordering
-  @query('#bar') bar!: HTMLCanvasElement;
-
   async firstUpdated() {
     try {
       this.startAsyncInit();
       this.name = this.getParamsFromURL().name;
       this.symbol = this.getParamsFromURL().symbol;
-      this.dispatchEvent(
-        new CustomEvent('update-pagename', { detail: `${this.symbol}-Details`, bubbles: true, composed: true })
-      );
+      this.dispatchEvent(new CustomEvent('update-pagename', { detail: `${this.name}`, bubbles: true, composed: true }));
       const response = await httpClient.get('trading/details/' + this.symbol);
       const data = await response.json();
       this.stock = data.stock;
@@ -83,6 +89,7 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
     return { symbol, name };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createBar(data: any) {
     const bar = this.shadowRoot?.querySelector('#bar') as HTMLCanvasElement;
 
@@ -120,27 +127,54 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
     event.preventDefault();
     const formData = new FormData(this.form);
     const noteText = formData.get('ftext') as string;
-    if (this.isFormValid()) {
+    if (this.isFormValid() && this.validate(noteText)) {
       const note: Note = {
         ...this.note,
         symbol: this.symbol,
         note: noteText
       };
       try {
-        const response = await httpClient.post('trading/details/', { note });
+        await httpClient.post('trading/details/', { note });
         console.log('Form submitted!', noteText);
         router.navigate('/trading/market');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
       }
     } else {
-      this.form.classList.add('was-validated');
+      this.showNotification('Please submit a valid note', 'error');
+      this.form.classList.add('error-validation');
     }
   }
 
   isFormValid() {
     return this.form.checkValidity();
   }
+
+  validate(note: string) {
+    let result = true;
+    const nosqlInjectionPattern = /[$\\'"]/;
+
+    if (nosqlInjectionPattern.test(note)) {
+      result = false;
+    }
+
+    const sanitizedNote = xss(note);
+    if (sanitizedNote !== note) {
+      result = false;
+    }
+    return result;
+  }
+
+  /*
+
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
+  }
+
+  */
 
   render() {
     return html`
@@ -150,7 +184,6 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
           <div class="stock">
             <div class="card-title">
               <img src="${this.stock.image}"> </img>
-              <h1>${this.name}</h1>
             </div>
             <div class="canvas">
               <canvas id="bar"></canvas>

@@ -10,15 +10,22 @@
   font-size: 0.8rem;
 }
 
+#upload {
+  visibility: hidden;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  gap: 0.8rem;
+  align-items: baseline;
+  z-index: 10000;
+}
+
 .inner {
   display: inline-flex;
   gap: 2rem;
   align-items: flex-start;
-}
-
-button {
-  visibility: hidden;
-  margin: 0;
 }
 
 h4 {
@@ -57,6 +64,6 @@ label:hover {
 
 @media (min-width: 900px) {
   #file {
-    display: inline;
+    display: inline-flex;
   }
 }

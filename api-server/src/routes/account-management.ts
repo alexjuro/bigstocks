@@ -7,12 +7,12 @@ import { authService } from '../services/auth.service.js';
 import bcrypt from 'bcryptjs';
 
 const isValid = <T>(properties: Map<string, string>, obj: unknown): obj is T => {
-  return (
-    Object.getOwnPropertyNames(obj)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map(p => (obj as any)[p] !== null && properties.has(p) && properties.get(p) === typeof (obj as any)[p])
-      .filter(Boolean).length === properties.size
+  const map = Object.getOwnPropertyNames(obj).map(
+    // unknown appropriate for pramater; needs cast to validate property
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    p => (obj as any)[p] !== null && properties.has(p) && properties.get(p) === typeof (obj as any)[p]
   );
+  return map.length === properties.size && map.every(Boolean);
 };
 
 const router = express.Router();
@@ -35,6 +35,7 @@ router.post('/avatar', authService.authenticationMiddleware, async (req, res) =>
   type Avatar = Pick<User, 'id' | 'avatar'>;
 
   const re = /^data:image\/(jpe?g|png);base64,/;
+  const prefixLength = 'data:image/jpeg;base64,'.length;
   const dao: GenericDAO<User> = req.app.locals.userDAO;
 
   if (
@@ -45,7 +46,9 @@ router.post('/avatar', authService.authenticationMiddleware, async (req, res) =>
           ['avatar', 'string']
         ]),
         req.body
-      ) && re.test(req.body.avatar)
+      ) &&
+      (re.test(req.body.avatar) || req.body.avatar === '') &&
+      req.body.avatar.length <= 1024 * 200 + prefixLength
     )
   )
     return res.status(400).json({ status: 'bad request' });

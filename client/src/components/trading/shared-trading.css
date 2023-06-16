@@ -5,7 +5,7 @@ button {
   border: 2px solid #6a5acd;
   color: #373737;
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: bold;
   text-decoration: none;
   cursor: pointer;
@@ -16,8 +16,8 @@ button:hover {
   color: #ffffff;
 }
 
-#upp {
-  font-size: 26px;
+.upp {
+  font-size: 20px;
   color: #373737;
   text-align: center;
 }
@@ -70,19 +70,11 @@ img {
   top: 10px;
 }
 
-.setTextRed {
-  color: red;
-}
-
-.setTextGreen {
-  color: green;
-}
-
 .percentages {
   position: absolute;
   right: 5px;
   top: 4.5px;
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .info-div {
@@ -115,11 +107,12 @@ img {
 }
 
 .account {
-  font-size: 20px;
+  margin-top: 2%;
+  font-size: 16px;
   text-align: center;
 }
 .pValue {
-  font-size: 25px;
+  font-size: 20px;
   text-align: center;
   color: #373737;
 }
@@ -128,7 +121,7 @@ img {
   position: absolute;
   left: 5px;
   top: 0.5px;
-  font-size: 16px;
+  font-size: 12px;
   border-radius: 20%;
   padding: 4px;
   background-color: #f6f6f6;

@@ -2,9 +2,8 @@
 import { PageMixin } from '../page.mixin';
 import { LitElement } from 'lit';
 import { StockService } from '../../stock-service.js';
-import { UserStock, Stock } from '../../interfaces/stock-interface.js';
+import { UserStock } from './stock-interface.js';
 import Chart from 'chart.js/auto';
-import { router } from '../../router/router.js';
 import { httpClient } from '../../http-client';
 import { PortfolioComponent } from './portfolio/portfolio';
 import { CandleComponent } from './trading-widgets/candlecomponent';
@@ -15,7 +14,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
   public stockService: StockService | null = null;
   public stockCandle: Chart | null = null;
   public money = 0;
-  public publicUrl = './../../../../public/';
   private tradeLock = false;
   private notificationTimeout: NodeJS.Timeout | undefined;
 
@@ -85,10 +83,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         console.log('FAIL');
         return;
       }
-
-      element.classList.remove('setTextGreen', 'setTextRed');
-      const cssClass = percentage >= 0 ? 'setTextGreen' : 'setTextRed';
-      element.classList.add(cssClass);
       stock.dailyPercentage = percentage;
     }
   }
@@ -111,11 +105,11 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         stockDiv.appendChild(candleComponent);
         candleComponent.updateComplete.then(() => {
           this.createStockCandles(candleComponent.candle, stockDiv.id, 'M');
+          // Wenn mehr Zeit da ist dann auch mit Tagen und Jahren ( Funktion ist ja da )
         });
 
         const infoComponent = new TradingInfoComponent();
         infoComponent.stock = stock;
-        infoComponent.publicUrl = this.publicUrl;
         infoComponent.buyStock = this.buyStock.bind(this);
         infoComponent.sellStock = this.sellStock.bind(this);
         stockDiv.appendChild(infoComponent);
@@ -138,11 +132,12 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
           notification.style.opacity = '0';
           notification.classList.remove(type);
           notification.textContent = '';
-        }, 3000);
+        }, 5000);
       }
     }
   }
 
+  // Wenn mehr Zeit da ist dann auch mit Tagen und Jahren
   async createStockCandles(element: HTMLCanvasElement, symbol: string, intervall: string) {
     const a = this.unixTimestamp(intervall);
     const data = await this.stockService!.getStockCandles(symbol, intervall, a!.timestamp, a!.now)
@@ -176,6 +171,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         plugins: {
           tooltip: {
             callbacks: {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               label: (context: any) => {
                 const currentValue = context.raw.toFixed(2);
                 return `${currentValue}$`;
@@ -241,7 +237,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
   }
 
   async buyStock(event: Event, stock: UserStock) {
-    console.log('BUY!');
     if (this.tradeLock) {
       return;
     }

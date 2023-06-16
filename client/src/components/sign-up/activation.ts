@@ -153,16 +153,19 @@ class ActivationComponent extends PageMixin(LitElement) {
     return html`
       <div class="Login-page">
         <div class="form">
-          <h1>Password Constraints:</h1>
-          <div class="password-constraints">
-            <ul>
-              <li>Password must be between 8 and 32 characters long</li>
-              <li>One lowercase letter [a-z]</li>
-              <li>One uppercase letter [A-Z]</li>
-              <li>One digit [0-9]</li>
-            </ul>
+          <h1>Constraints:</h1>
+            <div class="constraints">
+              <ul>
+                <li>Password must be between 8 and 32 characters long</li>
+                <li>One lowercase letter [a-z]</li>
+                <li>One uppercase letter [A-Z]</li>
+                <li>One digit [0-9]</li>
+                <li>The safety Answers must be between 4 and 32 characters long,which can be alphanumeric (letters and numbers), hyphens, or
+                periods.</li>
+              </ul>
+            </div>
+            <button type="button" @click="${this.toggleConstraints}">Go Back!</button>
           </div>
-          <button type="button" @click="${this.toggleConstraints}">Go Back!</button>
         </div>
       </div>
     `;
@@ -198,12 +201,16 @@ class ActivationComponent extends PageMixin(LitElement) {
 
   isFormValid() {
     const re = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d).{8,32}$/;
+    const reSQ = /^[\w-.]{4,32}$/;
     this.passwordElement.setCustomValidity(re.test(this.passwordElement.value) ? '' : 'Invalid Input');
     this.passwordCheckElement.setCustomValidity(
       this.passwordElement.value === this.passwordCheckElement.value
         ? ''
         : 'Please ensure that your passwords are identical'
     );
+    this.safetyAnswerOne.setCustomValidity(reSQ.test(this.safetyAnswerOne.value) ? '' : 'Invalid Input');
+    this.safetyAnswerTwo.setCustomValidity(reSQ.test(this.safetyAnswerTwo.value) ? '' : 'Invalid Input');
+
     return this.form.checkValidity();
   }
 

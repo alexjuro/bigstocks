@@ -1,6 +1,6 @@
 /* Autor: Alexander Schellenberg */
 
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { html } from 'lit';
 import { property, query } from 'lit-element';
 import sharedStyle from '../../shared.css?inline';
@@ -9,10 +9,9 @@ import sharedTradingStyle from '../shared-trading.css?inline';
 import { StockService } from '../../../stock-service.js';
 import Chart from 'chart.js/auto';
 import { TradingComponent } from '../tradingcomponent.js';
-import { UserStock } from '../../../interfaces/stock-interface.js';
+import { UserStock } from '../stock-interface.js';
 import { httpClient } from '../../../http-client';
 import { router } from '../../../router/router';
-// import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 @customElement('app-portfolio')
 export class PortfolioComponent extends TradingComponent {
@@ -45,9 +44,13 @@ export class PortfolioComponent extends TradingComponent {
   @property({ type: Object })
   stockService = new StockService();
   @property({ type: Object })
-  ChartDoughnut: any = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ChartDoughnut: any;
   @property({ type: Object })
-  ChartGraph: any = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ChartGraph: any;
+
+  private sortBy: 'shares' | 'alphabet' = 'alphabet';
 
   constructor() {
     super();
@@ -97,6 +100,17 @@ export class PortfolioComponent extends TradingComponent {
     return cum;
   }
 
+  /*
+
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
+  }
+
+  */
+
   disconnectedCallback() {
     super.disconnectedCallback();
     this.stockService.closeSocket();
@@ -129,9 +143,8 @@ export class PortfolioComponent extends TradingComponent {
         plugins: {
           tooltip: {
             callbacks: {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               label: (context: any) => {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const label = context.label;
                 const currentValue = context.raw.toFixed(2);
                 const total = context.chart._metasets[context.datasetIndex].total;
                 const percentage = parseFloat(((currentValue / total) * 100).toFixed(1));
@@ -143,15 +156,16 @@ export class PortfolioComponent extends TradingComponent {
 
           subtitle: {
             display: true,
+            position: 'left',
             text: 'You have ' + this.userStocks.length + ' stocks!',
             font: {
-              size: 16
+              size: 14
             }
           },
           legend: {
             labels: {
               font: {
-                size: 14
+                size: 12
               }
             }
           }
@@ -203,7 +217,7 @@ export class PortfolioComponent extends TradingComponent {
           subtitle: {
             display: true,
             text: `${percentageChange.toFixed(2)}% from ${labels[0]} to ${labels[labels.length - 1]}`,
-            font: { size: 16, weight: 'bold' },
+            font: { size: 14, weight: 'bold' },
             position: 'top'
           },
           legend: {
@@ -228,8 +242,10 @@ export class PortfolioComponent extends TradingComponent {
     const labels = this.ChartGraph.data.labels ?? [];
     const lastLabel = labels[labels?.length - 1];
     const data = this.ChartGraph.data.datasets[0].data;
-    const day = new Date().toLocaleDateString().slice(0, lastLabel.length);
-    if (day == lastLabel) {
+    let day = new Date().toLocaleDateString();
+    day = day.split('/').join('.');
+    const slicedDay = day.slice(0, day.indexOf('.') + 2);
+    if (slicedDay == lastLabel) {
       data.pop();
       data.push(this.money + this.calculateTotalValue());
     } else {
@@ -237,7 +253,7 @@ export class PortfolioComponent extends TradingComponent {
         labels.shift();
         data.shift();
       }
-      labels?.push(day);
+      labels?.push(slicedDay);
       data.push(this.money + this.calculateTotalValue());
     }
     const firstValue = data[0];
@@ -250,17 +266,43 @@ export class PortfolioComponent extends TradingComponent {
     this.requestUpdate();
   }
 
+  sortStocks() {
+    if (this.sortBy === 'alphabet') {
+      this.userStocks.sort((a, b) => {
+        return a.symbol.localeCompare(b.symbol);
+      });
+    } else if (this.sortBy === 'shares') {
+      this.userStocks.sort((a, b) => {
+        return b.shares - a.shares;
+      });
+    }
+    this.requestUpdate();
+  }
+
+  toggleSort() {
+    this.sortBy = this.sortBy == 'alphabet' ? 'shares' : 'alphabet';
+    const candle = this.shadowRoot!.querySelector('app-trading-candle');
+    const info = this.shadowRoot!.querySelector('app-trading-info');
+    if (candle) {
+      candle.remove();
+    }
+    if (info) {
+      info.remove();
+    }
+    this.sortStocks();
+  }
+
   render() {
     return html`
       ${this.renderNotification()}
       <div class="container">
         <app-trading-notification></app-trading-notification>
         <div class="part-container graph-container">
-          <h1 id="upp">Portfolio-Graph</h1>
+          <h1 id="pUpp" class="upp">Portfolio-Graph</h1>
           <div class="graph">
             <canvas id="graph"></canvas>
           </div>
-          <h1 id="upp">Portfolio-Allocation</h1>
+          <h1 id="aUpp" class="upp">Portfolio-Allocation</h1>
           <div class="allo">
             <canvas id="doughnut"></canvas>
           </div>
@@ -268,20 +310,24 @@ export class PortfolioComponent extends TradingComponent {
         <div class="part-container info-container">
           <div style="margin-top: 0px" class="money">
             <p class="account" style="color: ${PortfolioComponent.colorArray[0]}">
-              <img src="${this.publicUrl}dollar.png" alt="Cash Icon" class="icon" /> ${this.money}$
+              <img src="dollar.png" alt="Cash Icon" class="icon" />
+              ${this.money}$
             </p>
-            <img src="${this.publicUrl}up.png" alt="Up Icon" class="icon" />
+            <img src="up.png" alt="Up Icon" class="icon" />
             <p class="account pValue">${(this.money + this.calculateTotalValue()).toFixed(1)}$</p>
-            <img src="${this.publicUrl}down.png" alt="Down Icon" class="icon" />
+            <img src="down.png" alt="Down Icon" class="icon" />
             <p class="account" style="color: ${PortfolioComponent.colorArray[1]}">
-              <img src="${this.publicUrl}stock.png" alt="Stock Icon" class="icon" />
+              <img src="stock.png" alt="Stock Icon" class="icon" />
               ${this.calculateTotalValue()}$
             </p>
           </div>
           ${this.userStocks.length > 0
             ? html`
                 <div class="portfolio-page">
-                  <h1 id="upp">Your Stocks</h1>
+                  <button id="sort" @click=${this.toggleSort}>
+                    ${this.sortBy === 'alphabet' ? 'Sort Shares' : 'Sort Alphabetically'}
+                  </button>
+                  <h1 class="upp">Your Stocks</h1>
                   ${this.userStocks.map(
                     stock => html`
                       <app-stock class="stock" id=${stock.symbol}>
@@ -291,7 +337,11 @@ export class PortfolioComponent extends TradingComponent {
                         <p class="prices" id="price${stock.symbol}">
                           Price: ${stock.price ? stock.price + '$' : 'N/A'}
                         </p>
-                        <p class="percentages" id="perc${stock.symbol}">
+                        <p
+                          class="percentages"
+                          id="perc${stock.symbol}"
+                          style="color: ${stock.dailyPercentage >= 0 ? 'green' : 'red'}"
+                        >
                           ${stock.dailyPercentage ? stock.dailyPercentage + '%' : 'N/A'}
                         </p>
                         <p class="shares" id="shares${stock.symbol}">${stock.shares}x</p>

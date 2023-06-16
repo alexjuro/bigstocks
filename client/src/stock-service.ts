@@ -1,13 +1,13 @@
 /* Autor: Alexander Schellenberg */
-
-import { PortfolioComponent } from './components/trading/portfolio/portfolio';
+import { PortfolioComponent } from './components/trading/portfolio/portfolio.js';
 import { TradingComponent } from './components/trading/tradingcomponent.js';
 
 const apiKey = [
   'cgsjqchr01qkrsgj9tk0cgsjqchr01qkrsgj9tkg',
   'chm9grpr01qs8kipkgf0chm9grpr01qs8kipkgfg',
   'chm9k69r01qs8kipkhlgchm9k69r01qs8kipkhm0',
-  'chm9lj9r01qs8kipki20chm9lj9r01qs8kipki2g'
+  'chm9lj9r01qs8kipki20chm9lj9r01qs8kipki2g',
+  'chvpmcpr01qp0736hs1gchvpmcpr01qp0736hs20'
 ];
 
 export class StockService {
@@ -18,7 +18,7 @@ export class StockService {
   private apiCounter = 0;
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
-  public isConnected = false; // Verbindungsstatus des WebSockets
+  public isConnected = false;
 
   public async connectSocket(): Promise<void> {
     if (this.isConnected) {
@@ -41,23 +41,22 @@ export class StockService {
           };
         });
       } catch (error) {
-        console.log('WebSocket connection failed. Retrying in 2 seconds...');
+        console.log('WebSocket connection failed. Retrying in 0.5 seconds...');
         this.socket?.close();
-        await new Promise<void>(resolve => setTimeout(resolve, 2000));
+        await new Promise<void>(resolve => setTimeout(resolve, 500));
       }
     }
 
     this.socket!.onclose = event => {
       if (!event.wasClean) {
         console.log('WebSocket connection closed unexpectedly. Trying to reconnect...');
-        this.isConnected = false; // WebSocket-Verbindung ist geschlossen
+        this.isConnected = false;
         this.connectSocket();
       }
     };
 
     this.socket!.onmessage = event => {
       if (!this.isConnected) {
-        // WebSocket ist nicht verbunden, daher Operation abbrechen
         console.log('WebSocket is not connected. Ignoring incoming message.');
         return;
       }
@@ -119,7 +118,7 @@ export class StockService {
         }, delay);
       }
       this.observer!.requestUpdate();
-    }, 20000);
+    }, 8000);
   }
 
   public stopUpdatingStockPercentages() {
