@@ -13,7 +13,7 @@ class AppComponent extends LitElement {
   static styles = [componentStyle, sharedStyle];
   constructor() {
     super();
-    const port = 3000;
+    const port = location.protocol === 'https:' ? 3443 : 3000;
     httpClient.init({ baseURL: `${location.protocol}//${location.hostname}:${port}/api/` });
   }
 
