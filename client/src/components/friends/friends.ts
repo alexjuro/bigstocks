@@ -21,6 +21,13 @@ export class AppFriendsComponent extends LitElement {
   @state() requests: any[] = [];
   @state() friends: any[] = [];
 
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
+  }
+
   @eventOptions({ capture: true })
   protected async firstUpdated() {
     const appHeader = this.dispatchEvent(
@@ -38,11 +45,7 @@ export class AppFriendsComponent extends LitElement {
       console.log(this.friends);
       console.log(this.requests);
     } catch (e) {
-      if ((e as Error).message == 'Unauthorized!') {
-        router.navigate('/users/sign-in');
-      } else {
-        console.log((e as Error).message);
-      }
+      console.log((e as Error).message);
     }
   }
 
@@ -224,6 +227,16 @@ export class AppFriendsComponent extends LitElement {
     scroll!.scrollIntoView({ behavior: 'smooth' });
   }
 
+  isFormValid() {
+    const reUsername = /^[\w-.]{4,32}$/;
+    const friendname = this.nameElement.value;
+    if (!reUsername.test(friendname)) {
+      this._displayError('Invalid username');
+      return false;
+    }
+    return true;
+  }
+
   async addFriend() {
     const friendname = this.nameElement.value;
 
@@ -232,31 +245,35 @@ export class AppFriendsComponent extends LitElement {
       return;
     }
 
+    if (!this.isFormValid()) {
+      return;
+    }
+
     try {
       const response = await httpClient.post('friends', { username: friendname });
-      console.log('succes');
+      console.log('success');
       this._displaySuccess();
     } catch (e) {
-      //redirect if the user isnt logged in(never appears)
+      // redirect if the user isn't logged in (never appears)
       if ((e as Error).message == 'Unauthorized!') {
         router.navigate('/users/sign-in');
       }
-      //print error when the user isnt found
+      // print error when the user isn't found
       else if ((e as Error).message == 'Not Found') {
         this._displayError('User not found');
         console.log('User not found');
       }
-      //print error if the friend is already in friends or requests
+      // print error if the friend is already in friends or requests
       else if ((e as Error).message == 'Conflict') {
-        this._displayError('This friend already send you an request');
-        console.log('This friend already send you an request');
+        this._displayError('This friend already sent you a request');
+        console.log('This friend already sent you a request');
       }
-      //If you already send a Request to that person
+      // If you already sent a request to that person
       else if ((e as Error).message == 'Not Acceptable') {
-        this._displayError('You have already send a Request to that person');
-        console.log('You have already send a Request to that person');
+        this._displayError('You have already sent a request to that person');
+        console.log('You have already sent a request to that person');
       }
-      //print error if the user to add himself
+      // print error if the user tries to add themselves
       else if ((e as Error).message == 'Bad Request') {
         this._displayError('You tried to add yourself');
         console.log('You tried to add yourself');

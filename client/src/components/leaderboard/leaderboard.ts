@@ -18,6 +18,13 @@ export class AppLeaderboardComponent extends LitElement {
 
   dayTrading = false;
 
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
+  }
+
   @eventOptions({ capture: true })
   protected async firstUpdated() {
     const appHeader = this.dispatchEvent(
@@ -41,11 +48,7 @@ export class AppLeaderboardComponent extends LitElement {
         this.avatars.push(this.leaderboard[2].avatar);
       }
     } catch (e) {
-      if ((e as Error).message == 'Unauthorized!') {
-        router.navigate('/users/sign-in');
-      } else {
-        console.log((e as Error).message);
-      }
+      console.log((e as Error).message);
     }
   }
 
