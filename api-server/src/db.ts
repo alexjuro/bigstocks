@@ -6,9 +6,12 @@ import { Express } from 'express';
 import { MongoGenericDAO } from './models/mongo-generic.dao.js';
 import { PsqlGenericDAO } from './models/psql-generic.dao.js';
 import { InMemoryGenericDAO } from './models/in-memory-generic.dao.js';
-// TODO: Models importieren
-
 import config from '../config.json' assert { type: 'json' };
+import { User } from './models/user.js';
+import { Stock } from './models/stock.js';
+import { Transaction } from './models/transaction.js';
+import { Note } from './models/note.js';
+import { Comment } from './models/comment.js';
 const { MongoClient } = mongodb;
 const { Client } = pg;
 
@@ -24,13 +27,23 @@ export default async function startDB(app: Express) {
 }
 
 async function startInMemoryDB(app: Express) {
-  // TODO: DAOs erzeugen
+  app.locals.stockDAO = new InMemoryGenericDAO<Stock>();
+  app.locals.transactionDAO = new InMemoryGenericDAO<Transaction>();
+  app.locals.userDAO = new InMemoryGenericDAO<User>();
+  app.locals.noteDAO = new InMemoryGenericDAO<Note>();
   return async () => Promise.resolve();
 }
 
 async function startMongoDB(app: Express) {
   const client = await connectToMongoDB();
-  const db = client.db('myapp');
+  const db = client.db('bigstocks');
+  //app.locals.userDAO = new MongoGenericDAO<User>(db, 'users');
+  app.locals.userDAO = new MongoGenericDAO<User>(db, 'users');
+  app.locals.stockDAO = new MongoGenericDAO<Stock>(db, 'stocks');
+  app.locals.transactionDAO = new MongoGenericDAO<Transaction>(db, 'transactions');
+  app.locals.noteDAO = new MongoGenericDAO<Note>(db, 'notes');
+  app.locals.commentDAO = new MongoGenericDAO<Comment>(db, 'comments');
+
   // TODO: DAOs erzeugen
   return async () => await client.close();
 }
@@ -52,7 +65,10 @@ async function connectToMongoDB() {
 
 async function startPsql(app: Express) {
   const client = await connectToPsql();
-  // TODO: DAOs erzeugen
+  app.locals.transactionDAO = new PsqlGenericDAO<Transaction>(client!, 'transactions');
+  app.locals.stockkDAO = new PsqlGenericDAO<Stock>(client!, 'stocks');
+  app.locals.userDAO = new PsqlGenericDAO<User>(client, 'users');
+  app.locals.noteDAO = new PsqlGenericDAO<Note>(client, 'notes');
   return async () => await client.end();
 }
 
