@@ -1,0 +1,37 @@
+/* Autor: Nico Pareigis */
+
+:host {
+  display: block;
+  margin: 1rem;
+}
+
+a {
+  text-decoration: underline;
+}
+
+a:hover {
+  cursor: pointer;
+  color: var(--secondary);
+}
+
+dialog {
+  border: 0.4rem solid var(--secondary);
+  border-radius: 6px;
+}
+
+dialog::backdrop {
+  background-color: rgba(70, 70, 70, 0.3);
+}
+
+hr {
+  border: none;
+  border-bottom: 2px solid #aaa;
+  border-radius: 2px;
+  width: 100%;
+}
+
+.divider {
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
