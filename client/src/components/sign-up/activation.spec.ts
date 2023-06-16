@@ -57,7 +57,7 @@ describe('ActivationComponent', () => {
     passwordInput!.value = 'Password123';
     passwordCheckInput!.value = 'Password123';
     safetyAnswerOneInput!.value = 'Pizza';
-    safetyAnswerTwoInput!.value = 'Dog';
+    safetyAnswerTwoInput!.value = 'Tiger';
 
     submitButton!.click();
 
@@ -67,7 +67,7 @@ describe('ActivationComponent', () => {
         password: 'Password123',
         passwordCheck: 'Password123',
         safetyAnswerOne: 'Pizza',
-        safetyAnswerTwo: 'Dog'
+        safetyAnswerTwo: 'Tiger'
       })
     ).to.be.true;
 

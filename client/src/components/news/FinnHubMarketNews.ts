@@ -133,4 +133,13 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
       </div>
     `;
   }
+
+  async deleteUser() {
+    try {
+      await httpClient.delete('users/delete');
+      router.navigate('/users/sign-in');
+    } catch (e) {
+      this.showNotification((e as Error).message, 'error');
+    }
+  }
 }
