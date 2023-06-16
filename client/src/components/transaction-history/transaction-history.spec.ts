@@ -67,7 +67,7 @@ describe('transaction-history', () => {
     // detail
     const p1 = TransactionHistory.prototype.getProfitDetails(t1.bPrice, t1.sPrice);
     expect((sr.querySelector('.transaction-summary > .profit') as HTMLParagraphElement).textContent).to.equal(
-      `${p1.prefix} ${p1.profit}€`
+      `${p1.prefix} ${p1.profit}$`
     );
 
     // t2
@@ -78,6 +78,6 @@ describe('transaction-history', () => {
     const p2 = TransactionHistory.prototype.getProfitDetails(t2.bPrice, t2.sPrice);
     expect(
       (sr.querySelectorAll('.transaction-summary > .profit').item(1) as HTMLParagraphElement).textContent
-    ).to.equal(`${p2.prefix} ${p2.profit}€`);
+    ).to.equal(`${p2.prefix} ${p2.profit}$`);
   });
 });
