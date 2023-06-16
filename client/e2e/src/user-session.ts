@@ -45,8 +45,8 @@ export class UserSession {
 
   async deleteUser() {
     const response = await fetch(config.serverUrl('users'), {
-      method: 'DELETE'
-      // headers: { Cookie: `jwt-token=${this.token}` }
+      method: 'DELETE',
+      headers: { Cookie: `jwt-token=${this.token}` }
     });
     if (response.status !== 200) {
       throw new Error('Failed to delete user for token ' + this.token);

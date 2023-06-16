@@ -9,7 +9,6 @@
     "build": "vite build",
     "lint": "eslint . --ext .ts",
     "test": "wtr --coverage --watch",
-    "test-puppeteer": "wtr --coverage --watch --puppeteer",
     "e2e": "npm run build && mocha --config e2e/.mocharc.json"
   },
   "keywords": [],
@@ -39,12 +38,6 @@
     "vite": "^4.1.4"
   },
   "dependencies": {
-    "@types/bcryptjs": "^2.4.2",
-    "@web/test-runner-puppeteer": "^0.13.1",
-    "bcryptjs": "^2.4.3",
-    "chart.js": "^4.2.1",
-    "font-awesome": "^4.7.0",
-    "lit": "^2.6.1",
-    "xss": "^1.0.14"
+    "lit": "^2.6.1"
   }
 }
