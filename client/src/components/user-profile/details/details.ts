@@ -103,7 +103,7 @@ export class ProfileMain extends PageMixin(LitElement) {
             this.data.username = this.name.value;
 
             await httpClient
-              .post('/users/account/details', this.data)
+              .put('/users/account/details', this.data)
               .then(() =>
                 this.dispatchEvent(
                   new CustomEvent('submit-suc', { bubbles: true, detail: 'Profile update successful.' })

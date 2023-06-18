@@ -37,16 +37,16 @@ describe('/users/account', () => {
   before(async () => (user.token = await signIn(user.name, user.password)));
 
   after(async () => {
-    await createFetch('POST', '/users/account/avatar', {
+    await createFetch('PUT', '/users/account/avatar', {
       id: user.id,
       avatar: ''
     });
-    await createFetch('POST', '/users/account/details', {
+    await createFetch('PUT', '/users/account/details', {
       id: user.id,
       username: user.name,
       email: user.email
     });
-    await createFetch('POST', '/users/account/password', {
+    await createFetch('PUT', '/users/account/password', {
       id: user.id,
       password: user.password
     });
@@ -54,7 +54,7 @@ describe('/users/account', () => {
 
   describe('generic', () => {
     it('should reject with additional properties', async () => {
-      const res = await createFetch('POST', '/users/account/avatar', {
+      const res = await createFetch('PUT', '/users/account/avatar', {
         id: user.id,
         avatar: 'data:image/png;base64,imgdata',
         field: 'value'
@@ -65,14 +65,14 @@ describe('/users/account', () => {
     });
 
     it('should reject with missing properties', async () => {
-      const res = await createFetch('POST', '/users/account/avatar', { id: user.id });
+      const res = await createFetch('PUT', '/users/account/avatar', { id: user.id });
 
       expect(res.status).to.equal(400);
       expect(((await res.json()) as Res).status).to.equal('bad request');
     });
 
     it('should reject with incorrect property type', async () => {
-      const res = await createFetch('POST', '/users/account/avatar', {
+      const res = await createFetch('PUT', '/users/account/avatar', {
         id: user.id,
         avatar: 1
       });
@@ -84,7 +84,7 @@ describe('/users/account', () => {
 
   describe('/avatar', () => {
     it('should reject invalid image string', async () => {
-      const res = await createFetch('POST', '/users/account/avatar', {
+      const res = await createFetch('PUT', '/users/account/avatar', {
         id: user.id,
         avatar: 'invalid-string-data'
       });
@@ -94,7 +94,7 @@ describe('/users/account', () => {
     });
 
     it('should accept valid body', async () => {
-      const res = await createFetch('POST', '/users/account/avatar', {
+      const res = await createFetch('PUT', '/users/account/avatar', {
         id: user.id,
         avatar: 'data:image/png;base64,imgdata'
       });
@@ -106,7 +106,7 @@ describe('/users/account', () => {
 
   describe('/details', async () => {
     it('should reject invalid name', async () => {
-      const res = await createFetch('POST', '/users/account/details', {
+      const res = await createFetch('PUT', '/users/account/details', {
         id: user.id,
         username: 'abc',
         email: user.email
@@ -117,7 +117,7 @@ describe('/users/account', () => {
     });
 
     it('should reject invalid email', async () => {
-      const res = await createFetch('POST', '/users/account/details', {
+      const res = await createFetch('PUT', '/users/account/details', {
         id: user.id,
         username: user.name,
         email: 'invalid@email.'
@@ -128,7 +128,7 @@ describe('/users/account', () => {
     });
 
     it('should accept valid body', async () => {
-      const res = await createFetch('POST', '/users/account/details', {
+      const res = await createFetch('PUT', '/users/account/details', {
         id: user.id,
         username: user.name,
         email: 'testmail@bigstocks.com'
@@ -141,7 +141,7 @@ describe('/users/account', () => {
 
   describe('/password', async () => {
     it('should reject invalid password', async () => {
-      const res = await createFetch('POST', '/users/account/password', {
+      const res = await createFetch('PUT', '/users/account/password', {
         id: user.id,
         password: 'invalidpassword'
       });
@@ -151,7 +151,7 @@ describe('/users/account', () => {
     });
 
     it('should accept valid body', async () => {
-      const res = await createFetch('POST', '/users/account/password', {
+      const res = await createFetch('PUT', '/users/account/password', {
         id: user.id,
         password: 'ValidPassword1'
       });
