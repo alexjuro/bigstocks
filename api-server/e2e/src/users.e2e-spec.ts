@@ -77,7 +77,6 @@ describe('users/forgotPassword', () => {
     const cookie = res.headers.raw()['set-cookie'].find(cookie => cookie.startsWith('jwt-token'));
     expect(res.status).to.equal(201);
     expect(cookie).to.not.be.null;
-    //Error mit keiner Email ist gewollt !!
   });
 
   it('reset Password without forgotPassword ', async () => {
@@ -89,5 +88,6 @@ describe('users/forgotPassword', () => {
       safetyAnswerTwo: 'this.safetyAnswerTwo.value'
     });
     expect(res.status).to.equal(401);
+    //validation Exception wird geworfen --> ist gewollt
   });
 });
