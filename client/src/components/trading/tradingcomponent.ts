@@ -147,7 +147,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         console.error('Error:', error);
       });
     const percentage = 100 - (data[0] / data[5]) * 100;
-    const labels = this.getMonthLabels(data.length);
+    const labels = this.getMonthLabels(6);
     this.stockCandle = new Chart(element, {
       type: 'line',
       data: {
@@ -206,15 +206,13 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     const labels: string[] = [];
     const currentDate = new Date();
     let currentMonth = currentDate.getMonth();
-    let currentYear = currentDate.getFullYear();
 
     for (let i = 0; i < numLabels; i++) {
       const month = this.getMonthName(currentMonth);
-      labels.push(`${month} ${currentYear}`);
+      labels.push(`${month}`);
 
       if (currentMonth === 0) {
         currentMonth = 11;
-        currentYear--;
       } else {
         currentMonth--;
       }
