@@ -31,7 +31,7 @@ describe('SignUpComponent', () => {
     const constraintButton = element.shadowRoot!.querySelector('#constraintButton') as HTMLButtonElement;
     await constraintButton.click();
 
-    const constraints = element.shadowRoot!.querySelector('.password-constraints');
+    const constraints = element.shadowRoot!.querySelector('.constraints');
     expect(constraints).to.not.be.null;
   });
 });

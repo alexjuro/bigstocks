@@ -84,7 +84,7 @@ describe('ActivationComponent', () => {
     constraintButton.click();
 
     await activationComponent.updateComplete;
-    const constraintsContainer = element.shadowRoot!.querySelector('.password-constraints');
+    const constraintsContainer = element.shadowRoot!.querySelector('.constraints');
 
     expect(constraintsContainer).to.not.be.null;
     expect(constraintsContainer!.textContent).to.contain('Password must be between 8 and 32 characters long');

@@ -42,7 +42,10 @@ class SignInComponent extends PageMixin(LitElement) {
 
     if (changedProperties.has('step') && this.step === 2) {
       setTimeout(() => {
-        this.passwordElement.focus();
+        const passwordElement = this.shadowRoot?.querySelector('#password') as HTMLInputElement;
+        if (passwordElement) {
+          passwordElement.focus();
+        }
       }, 0);
     }
   }
