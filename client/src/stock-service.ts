@@ -11,14 +11,12 @@ const apiKey = [
 ];
 
 export class StockService {
+  public isConnected = false;
   private socket: WebSocket | null = null;
   private subscriptions: Set<string> = new Set();
   private observer: TradingComponent | null = null;
   private intervalId: NodeJS.Timeout | null = null;
   private apiCounter = 0;
-
-  // eslint-disable-next-line @typescript-eslint/member-ordering
-  public isConnected = false;
 
   public async connectSocket(): Promise<void> {
     if (this.isConnected) {
@@ -173,7 +171,6 @@ export class StockService {
   private sendRequest(symbol: string, action = 'subscribe'): void {
     const message = JSON.stringify({ type: action, symbol: symbol });
     this.socket?.send(message);
-    console.log(this.socket + ' sendRequest: ' + action + ' ' + symbol);
   }
 
   private notifyPriceObserver(symbol: string, price: number): void {

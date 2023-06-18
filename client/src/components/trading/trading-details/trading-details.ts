@@ -1,6 +1,7 @@
 /* Autor: Alexander Schellenberg */
 
 import { LitElement, html } from 'lit';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { customElement, property, query } from 'lit/decorators.js';
 import sharedStyle from '../../shared.css?inline';
 import componentStyle from './trading-details.css?inline';
@@ -129,7 +130,13 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
     event.preventDefault();
     const formData = new FormData(this.form);
     const noteText = formData.get('ftext') as string;
+    const sanNote = this.sanitizeInput(noteText);
     if (this.isFormValid() && this.validate(noteText)) {
+      if (sanNote == 'Invalid Input') {
+        this.showNotification('Please submit a valid note. Potential attack detected.', 'error');
+        this.form.classList.add('error-validation');
+        return;
+      }
       const note: Note = {
         ...this.note,
         symbol: this.symbol,
@@ -153,7 +160,7 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
 
   validate(note: string) {
     let result = true;
-    const allowedCharacters = /^[a-zA-Z0-9 !.<>()$]+$/;
+    const allowedCharacters = /^[a-zA-Z0-9 !.&<$!?]+$/;
 
     if (!allowedCharacters.test(note)) {
       result = false;
@@ -162,7 +169,12 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
   }
 
   sanitizeInput(input: string) {
-    const sanitizedInput = input
+    const safeCharacters = /^[a-zA-Z0-9 !.&<$!?#;]+$/;
+    const safeTags = /<(?!(?:\/\s*)?(?:script|template|style)\b)[^>]*>/i;
+    const safeEventHandlers = /(?<!\w)on\w+=/i;
+    const safeInput = input.replace(safeTags, '').replace(safeEventHandlers, '');
+
+    const sanitizedInput = safeInput
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/&/g, '&amp;')
@@ -170,7 +182,11 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
       .replace(/'/g, '&#x27;')
       .replace(/\//g, '&#x2F;');
 
-    return sanitizedInput;
+    if (!safeCharacters.test(sanitizedInput)) {
+      return 'Invalid Input';
+    }
+
+    return safeInput;
   }
 
   desanitizeInput(input: string) {
@@ -197,6 +213,7 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
   */
 
   render() {
+    const safeNote = this.note ? this.note.note : '';
     return html`
       ${this.renderNotification()}
       <div>
@@ -218,9 +235,9 @@ export class TradingDetailsComponent extends PageMixin(LitElement) {
             <p>IPO: ${this.companyData.ipo}</p>
             <form @submit=${this.handleSubmit} novalidate>
               <label for="ftext">Your notes:</label><br>
-              <textarea id="ftext" name="ftext" rows="1" cols="50" maxlength="500" placeholder="Enter your notes here">${
-                this.note ? this.note.note : ''
-              }</textarea>
+              <textarea id="ftext" name="ftext" rows="1" cols="50" maxlength="500" placeholder="Enter your notes here">${unsafeHTML(
+                safeNote
+              )}</textarea>
               <button type="submit">Submit</button>
             </form>
           </div>
