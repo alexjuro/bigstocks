@@ -8,7 +8,7 @@ class CorsService {
     }
     if (this.isPreflight(req)) {
       res.set('Access-Control-Allow-Headers', 'Content-Type');
-      res.set('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+      res.set('Access-Control-Allow-Methods', 'GET, PUT, POST, PATCH, DELETE');
       res.status(204).end();
     } else {
       next();
