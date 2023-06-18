@@ -80,7 +80,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     if (this.shadowRoot) {
       const element = this.shadowRoot.getElementById(`perc${stock.symbol}`);
       if (!element) {
-        console.log('FAIL');
         return;
       }
       stock.dailyPercentage = percentage;
@@ -137,7 +136,7 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
     }
   }
 
-  // Wenn mehr Zeit da ist dann auch mit Tagen und Jahren
+  // Wenn mehr Zeit da ist dann auch mit Tagen und Jahren, Funktion ist ja da
   async createStockCandles(element: HTMLCanvasElement, symbol: string, intervall: string) {
     const a = this.unixTimestamp(intervall);
     const data = await this.stockService!.getStockCandles(symbol, intervall, a!.timestamp, a!.now)
@@ -256,7 +255,6 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         return;
       }
       const pValue: number = parseFloat((this.money + this.calculateTotalValue()).toFixed(2));
-      console.log(pValue);
       const response = await httpClient.post('/trading/', {
         symbol: stock.symbol,
         name: stock.name,

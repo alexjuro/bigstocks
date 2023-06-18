@@ -105,7 +105,8 @@ router.get('/details/:symbol', authService.authenticationMiddleware, async (req,
     const note = await noteDAO.findOne({ symbol, userId });
 
     if (note) {
-      note.note = cryptoService.decrypt(decodeFromMongoDB(note.note));
+      const n = cryptoService.decrypt(note.note);
+      note.note = decodeFromMongoDB(n);
     }
 
     if (!stock) {
@@ -188,10 +189,12 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
 
   const { note } = req.body;
   const userId = res.locals.user.id;
-  const cryptNote = cryptoService.encrypt(escapeForMongoDB(note.note));
+  const safeNote = sanitizeInput(note.note);
+
+  const cryptNote = cryptoService.encrypt(escapeForMongoDB(safeNote));
 
   try {
-    if (validate(note.note)) {
+    if (!validate(note.note) || safeNote == 'Invalid Input') {
       res.status(403).json({ error: 'Potential Attack detected' });
       return;
     }
@@ -202,15 +205,16 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
       res.status(200).json({ message: 'Note saved successfully' });
       return;
     }
-    const newNote = await noteDAO.create({
+    await noteDAO.create({
       symbol: note.symbol,
       userId,
       note: cryptNote
     });
 
-    res
-      .status(200)
-      .json({ message: 'Note saved successfully', note: cryptoService.encrypt(newNote.note || exNote!.note) });
+    res.status(200).json({
+      message: 'Note saved successfully',
+      note: cryptoService.encrypt(escapeForMongoDB(cryptNote))
+    });
   } catch (error) {
     res.status(500).json({ error: `An error occurred while saving the note ${noteDAO}` });
   }
@@ -272,7 +276,7 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
 
 function validate(note: string) {
   let result = true;
-  const allowedCharacters = /^[a-zA-Z0-9 !.<>()$]+$/;
+  const allowedCharacters = /^[a-zA-Z0-9 !.<>()$&#;]+$/;
 
   if (!allowedCharacters.test(note)) {
     result = false;
@@ -282,6 +286,27 @@ function validate(note: string) {
     result = false;
   }
   return result;
+}
+
+function sanitizeInput(input: string) {
+  const safeCharacters = /^[a-zA-Z0-9 !.&<$!?#;]+$/;
+  const safeTags = /<(?!(?:\/\s*)?(?:script|template|style)\b)[^>]*>/i;
+  const safeEventHandlers = /(?<!\w)on\w+=/i;
+  const safeInput = input.replace(safeTags, '').replace(safeEventHandlers, '');
+
+  const sanitizedInput = safeInput
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+
+  if (!safeCharacters.test(sanitizedInput)) {
+    return 'Invalid Input';
+  }
+
+  return safeInput;
 }
 
 function hasNotRequiredFields(object: { [key: string]: unknown }, requiredFields: string[], errors: string[]) {
@@ -301,11 +326,10 @@ function escapeForMongoDB(value: string) {
   }
 
   const escapedValue = value
-    .replace(/\\/g, '\\\\') // Backslash (\)
-    .replace(/\$/g, '\\$') // Dollar sign ($)
     .replace(/:/g, '\\:') // Colon (:)
     .replace(/"/g, '\\"') // Double quotes (")
-    .replace(/'/g, "\\'"); // Single quotes (')
+    .replace(/'/g, "\\'") // Single quotes (')
+    .replace(/\\/g, '\\\\'); // Backslash (\)
 
   return escapedValue;
 }
@@ -319,8 +343,7 @@ function decodeFromMongoDB(value: string) {
     .replace(/\\'/g, "'") // Single quotes (')
     .replace(/\\"/g, '"') // Double quotes (")
     .replace(/\\:/g, ':') // Colon (:)
-    .replace(/\\\\/g, '\\') // Backslash (\)
-    .replace(/\\$/g, '$'); // Dollar sign ($)
+    .replace(/\\\\/g, '\\'); // Backslash (\)
 
   return decodedValue;
 }
