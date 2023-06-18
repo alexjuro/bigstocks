@@ -51,5 +51,13 @@ describe('/users/forgotPassword', () => {
       await page.getByRole('button', { name: 'Reset Password' }).click();
       expect(page.getByText('Username is required')).to.not.be.null;
     });
+
+    it('answer to short', async () => {
+      await page.goto(config.clientUrl('/users/forgotPassword'));
+      await page.fill('#username', 'testForgetPasswordUser');
+      await page.fill('#safetyAnswerOne', 'piz');
+      await page.getByRole('button', { name: 'Reset Password' }).click();
+      expect(page.getByText('Entering a answer is mandatory')).to.not.be.null;
+    });
   });
 });

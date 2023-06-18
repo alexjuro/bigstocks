@@ -39,11 +39,11 @@ class SignUpComponent extends PageMixin(LitElement) {
               <div class="invalid-feedback">Username must be valid</div>
             </div>
             <div class="emailContainer">
-              <label id=emailLabel for="email">E-Mail</label>
+              <label id="emailLabel" for="email">E-Mail</label>
               <input type="email" required id="email" placeholder="Email"  @input=${this.handleEmailChange} .value=${this.email}/>
               <div class="invalid-feedback">Email is required and must be valid</div>
             </div>
-            <p class="message">
+            <p class="message" id="alreadyMessage">
               Already registered? <button id="signInButton" @click="${this.signIn}">Sign-In</button>  </p>
               <button type="button" id="signUpButton" @click="${this.submit}">Create account</button>
             </p>
@@ -66,7 +66,7 @@ class SignUpComponent extends PageMixin(LitElement) {
               </li>
             </ul>
           </div>
-          <button type="button" @click="${this.toggleConstraints}">Go it!</button>
+          <button id="gotItbBtn" type="button" @click="${this.toggleConstraints}">Go it!</button>
         </div>
       </div>
     `;

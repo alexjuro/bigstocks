@@ -90,4 +90,15 @@ describe('users/forgotPassword', () => {
     expect(res.status).to.equal(401);
     //validation Exception wird geworfen --> ist gewollt
   });
+
+  it('to short answer ', async () => {
+    const res = await createFetch('POST', 'users/forgotPassword', {
+      code: '123456',
+      password: 'password1',
+      passwordCheck: 'password1',
+      safetyAnswerOne: 'ths',
+      safetyAnswerTwo: 'this.safetyAnswerTwo.value'
+    });
+    expect(res.status).to.equal(400);
+  });
 });
