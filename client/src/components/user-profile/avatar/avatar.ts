@@ -78,7 +78,7 @@ class ProfileAvatar extends LitElement {
             try {
               await this.base64enc(file!).then(base64 => (this.data.avatar = base64));
               await httpClient
-                .post('/users/account/avatar', this.data)
+                .put('/users/account/avatar', this.data)
                 .then(() =>
                   this.dispatchEvent(
                     new CustomEvent('submit-suc', { bubbles: true, detail: 'Avatar update successful.' })

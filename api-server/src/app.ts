@@ -28,7 +28,7 @@ import { xFrameMiddleware } from './services/xFrameMiddleware.js';
 
 function configureApp(app: Express) {
   app.use(express.urlencoded({ extended: true }));
-  app.use(express.json({ limit: 1024 * 200 }));
+  app.use(express.json({ limit: 1024 * 240 }));
   app.use(cookieParser());
   app.use(corsService.corsMiddleware);
   app.use(cspMiddleware);
