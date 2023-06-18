@@ -147,10 +147,11 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         console.error('Error:', error);
       });
     const percentage = 100 - (data[0] / data[5]) * 100;
+    const labels = this.getMonthLabels(data.length);
     this.stockCandle = new Chart(element, {
       type: 'line',
       data: {
-        labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN'],
+        labels: labels,
         datasets: [
           {
             data: data,
@@ -199,6 +200,32 @@ export abstract class TradingComponent extends PageMixin(LitElement) {
         }
       }
     });
+  }
+
+  getMonthLabels(numLabels: number): string[] {
+    const labels: string[] = [];
+    const currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let currentYear = currentDate.getFullYear();
+
+    for (let i = 0; i < numLabels; i++) {
+      const month = this.getMonthName(currentMonth);
+      labels.push(`${month} ${currentYear}`);
+
+      if (currentMonth === 0) {
+        currentMonth = 11;
+        currentYear--;
+      } else {
+        currentMonth--;
+      }
+    }
+
+    return labels.reverse();
+  }
+
+  getMonthName(monthIndex: number): string {
+    const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    return monthNames[monthIndex];
   }
 
   unixTimestamp(s: string) {
