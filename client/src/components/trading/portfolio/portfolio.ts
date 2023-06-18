@@ -60,6 +60,9 @@ export class PortfolioComponent extends TradingComponent {
     this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'Portfolio', bubbles: true, composed: true }));
     try {
       this.startAsyncInit();
+      await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+        if (e.statusCode === 401) router.navigate('/users/sign-in');
+      });
       const response = await httpClient.get('trading' + location.search);
       const data = await response.json();
       const userTransactions = data.results;

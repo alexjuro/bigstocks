@@ -25,7 +25,7 @@ describe('/users/forgotPassword', () => {
   describe('render forgotPassword', () => {
     it('should render the page correctly', async () => {
       await page.goto(config.clientUrl('/users/forgotPassword'));
-      await page.fill('#username', 'testuser1');
+      await page.fill('#username', 'testForgetPasswordUser');
       await page.fill('#safetyAnswerOne', 'pizza');
       expect(page.getByRole('button', { name: 'Reset Password' })).to.not.be.null;
       expect(await page.textContent('app-header a')).to.equal('Forgot Password');

@@ -1,5 +1,4 @@
 /* Author: Alexander Lensjak */
-//TODO: username hardcoded
 
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';
@@ -8,6 +7,15 @@ import { Transaction } from '../models/transaction.js';
 import { authService } from '../services/auth.service.js';
 
 const router = express.Router();
+
+function isFormValid(username: string) {
+  const reUsername = /^[\w-.]{4,32}$/;
+  const friendname = username;
+  if (!reUsername.test(friendname)) {
+    return false;
+  }
+  return true;
+}
 
 router.get('/', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
@@ -63,6 +71,11 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
   const userId = res.locals.user.id;
   const friendname = req.body.username;
 
+  if (!isFormValid(friendname)) {
+    res.status(418).json('Invalid username');
+    return;
+  }
+
   const user = await userDAO.findOne({ id: userId });
   const friend = await userDAO.findOne({ username: friendname });
 
@@ -74,7 +87,7 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
     }
 
     if (user.friends.some(f => f.username === friend.username)) {
-      const alreadyAddedError = 'Error: This friend already send you an request';
+      const alreadyAddedError = 'Error: This friend already send you an request or you are already friends';
       res.status(409).json(alreadyAddedError);
       return;
     }
@@ -102,6 +115,11 @@ router.post('/accept', authService.authenticationMiddleware, async (req, res) =>
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const userId = res.locals.user.id;
   const friendname = req.body.username;
+
+  if (!isFormValid(friendname)) {
+    res.status(418).json('Invalid username');
+    return;
+  }
 
   const user = await userDAO.findOne({ id: userId });
   const friend = await userDAO.findOne({ username: friendname });
@@ -136,6 +154,11 @@ router.post('/decline', authService.authenticationMiddleware, async (req, res) =
   const userId = res.locals.user.id;
   const friendname = req.body.username;
 
+  if (!isFormValid(friendname)) {
+    res.status(418).json('Invalid username');
+    return;
+  }
+
   const user = await userDAO.findOne({ id: userId });
   const friend = await userDAO.findOne({ username: friendname });
 
@@ -160,6 +183,11 @@ router.post('/delete', authService.authenticationMiddleware, async (req, res) =>
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const userId = res.locals.user.id;
   const friendname = req.body.username;
+
+  if (!isFormValid(friendname)) {
+    res.status(418).json('Invalid username');
+    return;
+  }
 
   const user = await userDAO.findOne({ id: userId });
   const friend = await userDAO.findOne({ username: friendname });

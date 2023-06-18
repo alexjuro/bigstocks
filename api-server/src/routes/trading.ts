@@ -9,7 +9,6 @@ import { User } from '../models/user.js';
 import { authService } from '../services/auth.service.js';
 import { cryptoService } from '../services/crypto.service.js';
 import { Note } from '../models/note.js';
-import xss from 'xss';
 
 const router = express.Router();
 
@@ -36,6 +35,7 @@ async function updatePerformance(user: User, pValue: number): Promise<void> {
   }
 }
 
+// get user stocks for portfolio
 router.get('/', authService.authenticationMiddleware, async (req, res) => {
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
@@ -64,6 +64,7 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
   }
 });
 
+// get all stocks in market with or without shares
 router.get('/market', authService.authenticationMiddleware, async (req, res) => {
   const stockDAO: GenericDAO<Stock> = req.app.locals.stockDAO;
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
@@ -92,6 +93,7 @@ router.get('/market', authService.authenticationMiddleware, async (req, res) => 
   }
 });
 
+// get details for stock
 router.get('/details/:symbol', authService.authenticationMiddleware, async (req, res) => {
   const stockDAO: GenericDAO<Stock> = req.app.locals.stockDAO;
   const noteDAO: GenericDAO<Note> = req.app.locals.noteDAO;
@@ -103,7 +105,7 @@ router.get('/details/:symbol', authService.authenticationMiddleware, async (req,
     const note = await noteDAO.findOne({ symbol, userId });
 
     if (note) {
-      note.note = cryptoService.decrypt(note.note);
+      note.note = cryptoService.decrypt(decodeFromMongoDB(note.note));
     }
 
     if (!stock) {
@@ -117,6 +119,7 @@ router.get('/details/:symbol', authService.authenticationMiddleware, async (req,
   }
 });
 
+// buy stock
 router.post('/', authService.authenticationMiddleware, async (req, res) => {
   const stockDAO: GenericDAO<Stock> = req.app.locals.stockDAO;
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
@@ -172,6 +175,7 @@ router.post('/', authService.authenticationMiddleware, async (req, res) => {
   }
 });
 
+// post note to details
 router.post('/details', authService.authenticationMiddleware, async (req, res) => {
   const noteDAO: GenericDAO<Note> = req.app.locals.noteDAO;
 
@@ -184,11 +188,12 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
 
   const { note } = req.body;
   const userId = res.locals.user.id;
-  const cryptNote = cryptoService.encrypt(note.note);
+  const cryptNote = cryptoService.encrypt(escapeForMongoDB(note.note));
 
   try {
-    if (validation(note)) {
+    if (validate(note.note)) {
       res.status(403).json({ error: 'Potential Attack detected' });
+      return;
     }
     const exNote = await noteDAO.findOne({ userId, symbol: note.symbol });
     if (exNote) {
@@ -211,6 +216,7 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
   }
 });
 
+// sell stock
 router.patch('/', authService.authenticationMiddleware, async (req, res) => {
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
@@ -264,19 +270,17 @@ router.patch('/', authService.authenticationMiddleware, async (req, res) => {
   }
 });
 
-function validation(note: Note) {
-  let result = false;
+function validate(note: string) {
+  let result = true;
+  const allowedCharacters = /^[a-zA-Z0-9 !.<>()$]+$/;
 
-  const sqlInjectionPattern = /[';]|--|\/\*|\*\//gi;
-  if (sqlInjectionPattern.test(note.note)) {
-    result = true;
+  if (!allowedCharacters.test(note)) {
+    result = false;
   }
 
-  const sanitizedComment = xss(note.note);
-  if (sanitizedComment !== note.note) {
-    result = true;
+  if (note.length > 500) {
+    result = false;
   }
-
   return result;
 }
 
@@ -289,6 +293,36 @@ function hasNotRequiredFields(object: { [key: string]: unknown }, requiredFields
     }
   });
   return hasErrors;
+}
+
+function escapeForMongoDB(value: string) {
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  const escapedValue = value
+    .replace(/\\/g, '\\\\') // Backslash (\)
+    .replace(/\$/g, '\\$') // Dollar sign ($)
+    .replace(/:/g, '\\:') // Colon (:)
+    .replace(/"/g, '\\"') // Double quotes (")
+    .replace(/'/g, "\\'"); // Single quotes (')
+
+  return escapedValue;
+}
+
+function decodeFromMongoDB(value: string) {
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  const decodedValue = value
+    .replace(/\\'/g, "'") // Single quotes (')
+    .replace(/\\"/g, '"') // Double quotes (")
+    .replace(/\\:/g, ':') // Colon (:)
+    .replace(/\\\\/g, '\\') // Backslash (\)
+    .replace(/\\$/g, '$'); // Dollar sign ($)
+
+  return decodedValue;
 }
 
 export default router;

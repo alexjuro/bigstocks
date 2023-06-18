@@ -24,7 +24,7 @@ class PageNavigator extends LitElement {
     this.maxPage = Math.ceil(this.length / this.pageSize) - 1;
 
     return html`<div class="page ${this.maxPage === 0 ? 'hidden' : ''}">
-        <div @click="${() => this.changePage('b')}">&#x23f4</div>
+        <div @click="${() => this.changePage('b')}">&lt;</div>
 
         <div
           class="${this.pageNumber === this.maxPage && this.maxPage > 1 ? '' : 'hidden'}"
@@ -52,7 +52,7 @@ class PageNavigator extends LitElement {
           ${this.pageDisplay + 2}
         </div>
 
-        <div @click="${() => this.changePage('f')}">&#x23f5</div>
+        <div @click="${() => this.changePage('f')}">&gt;</div>
       </div>
     </div>`;
   }

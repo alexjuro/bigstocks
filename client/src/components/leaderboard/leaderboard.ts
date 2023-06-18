@@ -18,6 +18,13 @@ export class AppLeaderboardComponent extends LitElement {
 
   dayTrading = false;
 
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
+  }
+
   @eventOptions({ capture: true })
   protected async firstUpdated() {
     const appHeader = this.dispatchEvent(
@@ -41,64 +48,62 @@ export class AppLeaderboardComponent extends LitElement {
         this.avatars.push(this.leaderboard[2].avatar);
       }
     } catch (e) {
-      if ((e as Error).message == 'Unauthorized!') {
-        router.navigate('/users/sign-in');
-      } else {
-        console.log((e as Error).message);
-      }
+      console.log((e as Error).message);
     }
   }
 
   render() {
-    return html` <div id="content">
-      <div id="pagetitle">
-        <button id="change" @click="${this._changeBoard}">${this.nottype} profit</button>
-        <button @click="${this.redirectMinesweeper}">need cash?</button>
-      </div>
+    return html`
+      <div id="content">
+        <div id="pagetitle">
+          <button id="change" @click="${this._changeBoard}">${this.nottype} profit</button>
+          <button id="btnMinesweeper" @click="${this.redirectMinesweeper}">need cash?</button>
+        </div>
 
-      <div id="imagesflex">
-        <div id="images">
-          <div class="frame">
-            <img src="${this.avatars[2]}" />
-          </div>
-          <div class="frame">
-            <img src="${this.avatars[0]}" />
-          </div>
-          <div class="frame">
-            <img src="${this.avatars[1]}" />
+        <div id="imagesflex">
+          <div id="images">
+            <div class="frame">
+              <img src="${this.avatars[2]}" />
+            </div>
+            <div class="frame">
+              <img src="${this.avatars[0]}" />
+            </div>
+            <div class="frame">
+              <img src="${this.avatars[1]}" />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div id="namesflex">
-        <div id="names">
-          <div>3.</div>
-          <div>1.</div>
-          <div>2.</div>
+        <div id="namesflex">
+          <div id="names">
+            <div>3.</div>
+            <div>1.</div>
+            <div>2.</div>
+          </div>
+        </div>
+
+        <div id="placementsflex">
+          <div id="placements">
+            <ol>
+              ${this.leaderboard.map(
+                entry => html`
+                  <li>
+                    <div class="position">
+                      <div>${entry.username}</div>
+                      <div>${entry.profit} $</div>
+                    </div>
+                  </li>
+                `
+              )}
+            </ol>
+          </div>
+        </div>
+
+        <div id="background">
+          <div id="kreis"></div>
         </div>
       </div>
-
-      <div id="placementsflex">
-        <div id="placements">
-          <ol>
-            ${this.leaderboard.map(
-              entry => html`
-                <li>
-                  <div class="position">
-                    <div>${entry.username}</div>
-                    <div>${entry.profit} $</div>
-                  </div>
-                </li>
-              `
-            )}
-          </ol>
-        </div>
-      </div>
-
-      <div id="background">
-        <div id="kreis"></div>
-      </div>
-    </div>`;
+    `;
   }
 
   /*

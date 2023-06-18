@@ -22,6 +22,12 @@ const createFetch = async (method: string, url: string, body?: unknown) => {
 };
 
 describe('users/sign-in', () => {
+  before(() => {
+    config.activateTestProfile();
+  });
+  after(() => {
+    config.deactivateTestProfile();
+  });
   it('successfull sign-in', async () => {
     const res = await createFetch('POST', '/users/sign-in', { username: user.name, password: user.password });
     const cookie = res.headers.raw()['set-cookie'].find(cookie => cookie.startsWith('jwt-token'));
@@ -49,6 +55,12 @@ describe('users/sign-in', () => {
 });
 
 describe('users/forgotPassword', () => {
+  before(() => {
+    config.activateTestProfile();
+  });
+  after(() => {
+    config.deactivateTestProfile();
+  });
   it('false Parameters', async () => {
     const res = await createFetch('POST', '/users/forgotPassword', {
       username: 'testForgetPasswordUser',
