@@ -31,7 +31,7 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
     .catch(() => res.status(404).json({ status: 'failed to fetch user information' }));
 });
 
-router.post('/avatar', authService.authenticationMiddleware, async (req, res) => {
+router.put('/avatar', authService.authenticationMiddleware, async (req, res) => {
   type Avatar = Pick<User, 'id' | 'avatar'>;
 
   const re = /^data:image\/(jpe?g|png);base64,/;
@@ -59,7 +59,7 @@ router.post('/avatar', authService.authenticationMiddleware, async (req, res) =>
     .catch(() => res.status(500).json({ status: 'error' }));
 });
 
-router.post('/details', authService.authenticationMiddleware, async (req, res) => {
+router.put('/details', authService.authenticationMiddleware, async (req, res) => {
   type Details = Pick<User, 'id' | 'email' | 'username'>;
 
   // equivalent to internal validation for 'input type="email"' (see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/email#basic_validation)
@@ -90,7 +90,7 @@ router.post('/details', authService.authenticationMiddleware, async (req, res) =
     .catch(() => res.status(500).json({ status: 'error' }));
 });
 
-router.post('/password', authService.authenticationMiddleware, async (req, res) => {
+router.put('/password', authService.authenticationMiddleware, async (req, res) => {
   type Password = Pick<User, 'id' | 'password'>;
   const dao: GenericDAO<User> = req.app.locals.userDAO;
   const re = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d).{8,32}$/;

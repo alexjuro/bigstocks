@@ -61,17 +61,17 @@ class Profile extends PageMixin(LitElement) {
             ></user-profile-avatar>
             <div class="divider"><hr /></div>
             <user-profile-details
+              .data="${{ id: this.user.id, email: this.user.email, username: this.user.username }}"
               @submit-req="${this.submitRequest}"
               @submit-suc="${this.submitSuccess}"
               @submit-err="${this.submitError}"
-              .data="${{ id: this.user.id, email: this.user.email, username: this.user.username }}"
             ></user-profile-details>
             <div class="divider"><hr /></div>
             <user-profile-password
+              .data="${{ id: this.user.id, password: this.user.password }}"
               @submit-req="${this.submitRequest}"
               @submit-suc="${this.submitSuccess}"
               @submit-err="${this.submitError}"
-              .data="${{ id: this.user.id, password: this.user.password }}"
             ></user-profile-password>
 
             <div class="divider"><hr /></div>

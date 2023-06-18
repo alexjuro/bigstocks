@@ -152,7 +152,7 @@ export class ProfilePassword extends PageMixin(LitElement) {
             this.data.password = this.pass.value;
 
             await httpClient
-              .post('/users/account/password', this.data)
+              .put('/users/account/password', this.data)
               .then(() => httpClient.delete('/users/sign-out'))
               .then(() => {
                 router.navigate('/users/sign-in');
