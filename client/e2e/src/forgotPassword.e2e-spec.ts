@@ -35,6 +35,30 @@ describe('/users/forgotPassword', () => {
     });
   });
 
+  it('forgetPassword incorrectly username to short', async () => {
+    await page.goto(config.clientUrl('/users/forgotPassword'));
+    await page.fill('#username', 'tes');
+    await page.getByRole('button', { name: 'Reset Password' }).click();
+    expect(page.getByText('Username is required')).to.not.be.null;
+  });
+
+  it('answer to short', async () => {
+    await page.goto(config.clientUrl('/users/forgotPassword'));
+    await page.fill('#username', 'testForgetPasswordUser');
+    await page.fill('#safetyAnswerOne', 'piz');
+    await page.getByRole('button', { name: 'Reset Password' }).click();
+    expect(page.getByText('Entering a answer is mandatory')).to.not.be.null;
+  });
+
+  it('forgot incorrectly', async () => {
+    await page.goto(config.clientUrl('/users/forgotPassword'));
+    await page.fill('#username', 'testForgetPasswordUser');
+    await page.fill('#safetyAnswerOne', 'pizzasaa');
+    await page.getByRole('button', { name: 'Reset Password' }).click();
+    const response = await page.waitForResponse('**/forgotPassword');
+    expect(response.status()).to.equal(401);
+  });
+
   describe('forgotPassword process', () => {
     it('forgot correctly', async () => {
       await page.goto(config.clientUrl('/users/forgotPassword'));
@@ -43,21 +67,6 @@ describe('/users/forgotPassword', () => {
       await page.getByRole('button', { name: 'Reset Password' }).click();
       const response = await page.waitForResponse('**/forgotPassword');
       expect(response.status()).to.equal(201);
-    });
-
-    it('forgetPassword incorrectly username to short', async () => {
-      await page.goto(config.clientUrl('/users/forgotPassword'));
-      await page.fill('#username', 'tes');
-      await page.getByRole('button', { name: 'Reset Password' }).click();
-      expect(page.getByText('Username is required')).to.not.be.null;
-    });
-
-    it('answer to short', async () => {
-      await page.goto(config.clientUrl('/users/forgotPassword'));
-      await page.fill('#username', 'testForgetPasswordUser');
-      await page.fill('#safetyAnswerOne', 'piz');
-      await page.getByRole('button', { name: 'Reset Password' }).click();
-      expect(page.getByText('Entering a answer is mandatory')).to.not.be.null;
     });
   });
 });
