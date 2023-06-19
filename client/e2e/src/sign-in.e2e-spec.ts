@@ -56,6 +56,7 @@ describe('/users/sign-in', () => {
       await page.fill('#username', 'admin123');
       await page.getByRole('button', { name: 'Next' }).click();
       await page.fill('#password', 'Password1');
+      await page.waitForTimeout(100);
       await page.getByRole('button', { name: 'Sign-In' }).click();
       const response = await page.waitForResponse('**/sign-in');
       expect(response.status()).to.equal(401);
@@ -65,6 +66,7 @@ describe('/users/sign-in', () => {
       await page.fill('#username', 'admin123');
       await page.getByRole('button', { name: 'Next' }).click();
       await page.fill('#password', 'Password123');
+      await page.waitForTimeout(100);
       await page.getByRole('button', { name: 'Sign-In' }).click();
       const response = await page.waitForResponse('**/sign-in');
       expect(response.status()).to.equal(401);
@@ -73,6 +75,7 @@ describe('/users/sign-in', () => {
     it('Username to short', async () => {
       await page.fill('#username', 'ad');
       await page.getByRole('button', { name: 'Next' }).click();
+      await page.waitForTimeout(100);
       expect(page.getByText('Invalid Input')).to.not.be.null;
     });
 
@@ -81,6 +84,7 @@ describe('/users/sign-in', () => {
       await page.fill('#username', 'admin123');
       await page.getByRole('button', { name: 'Next' }).click();
       await page.fill('#password', 'Pas');
+      await page.waitForTimeout(100);
       await page.getByRole('button', { name: 'Sign-In' }).click();
       expect(page.getByText('Invalid Input')).to.not.be.null;
     });

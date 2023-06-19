@@ -55,6 +55,7 @@ describe('/users/forgotPassword', () => {
     await page.fill('#username', 'testForgetPasswordUser');
     await page.fill('#safetyAnswerOne', 'pizzasaa');
     await page.getByRole('button', { name: 'Reset Password' }).click();
+    await page.waitForTimeout(100);
     const response = await page.waitForResponse('**/forgotPassword');
     expect(response.status()).to.equal(401);
   });
