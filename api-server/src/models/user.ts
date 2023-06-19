@@ -1,4 +1,4 @@
-/* Author: Nico Pareigis and Lakzan Nathan */
+/* Autor: Nico Pareigis */
 
 import { Entity } from './entity';
 
