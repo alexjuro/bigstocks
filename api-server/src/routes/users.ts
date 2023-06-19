@@ -22,7 +22,7 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
     return;
   }
   if (res.locals.user.exp < Math.floor(Date.now() / 1000)) {
-    const result = await userDAO.delete(res.locals.user.id); // User wird nach Ablauf des Tokens gelöscht
+    await userDAO.delete(res.locals.user.id); // User wird nach Ablauf des Tokens gelöscht
     authService.removeToken(res);
     res.status(401).json({ message: 'Token expired!' });
     return;
@@ -98,7 +98,7 @@ router.post('/forgotPassword', async (req, res) => {
     const code = createNumber();
     user.code = code;
     if (await userDAO.update(user)) {
-      await sendCode(user.email, code);
+      sendCode(user.email, code);
       res.status(201).json(user);
     } else {
       const message = 'Something went wrong, please try again!';
@@ -124,7 +124,7 @@ router.post('/resetPassword', authService.authenticationMiddlewareActivation, as
   }
 
   if (res.locals.user.exp < Math.floor(Date.now() / 1000)) {
-    const result = await userDAO.delete(req.body.id);
+    await userDAO.delete(req.body.id);
     authService.removeToken(res);
     res.status(401).json({ message: 'Token has expired!' });
     return;
@@ -280,7 +280,7 @@ router.delete('/sign-out', (req, res) => {
 
 router.delete('/delete', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-  const result = await userDAO.delete(res.locals.user.id);
+  await userDAO.delete(res.locals.user.id);
 
   authService.removeToken(res);
   res.status(200).end();
@@ -364,10 +364,17 @@ Please enter this code: ${code} to activate your account.
 Best regards,
 The FH Muenster Sweng Team`
     })
+    .then(() => {
+      return true;
+    })
+    .catch(() => {
+      return false;
+    });
 }
 
 async function sendCodeActivation(userEmail: string, code: number) {
-  if (userEmail === 'testuser1@email.de') {
+  console.log(config.testProfile);
+  if (config.testProfile) {
     return;
   }
   transporter
@@ -382,6 +389,12 @@ Please enter this code: ${code} to activate your account.
 Best regards,
 The FH Muenster Sweng Team`
     })
+    .then(() => {
+      return true;
+    })
+    .catch(() => {
+      return false;
+    });
 }
 
 export default router;
