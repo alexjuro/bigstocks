@@ -228,7 +228,6 @@ export class SecretAppComponent extends LitElement {
   }
 
   async showGameOver() {
-    console.log('game over');
     const messageElement = this.shadowRoot!.getElementById('message');
     messageElement!.innerHTML = 'Game Over';
 
@@ -240,7 +239,6 @@ export class SecretAppComponent extends LitElement {
   }
 
   showVictory() {
-    console.log('great success');
     const messageElement = this.shadowRoot!.getElementById('message');
     messageElement!.innerHTML = 'You won!';
 

@@ -23,19 +23,12 @@ export class AppFriendsComponent extends LitElement {
   protected async firstUpdated() {
     this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'friends', bubbles: true, composed: true }));
 
-    try {
-      const response = await httpClient.get('friends');
+    const response = await httpClient.get('friends');
 
-      const data = await response.json();
+    const data = await response.json();
 
-      this.friends = data.friends;
-      this.requests = data.requests;
-
-      console.log(this.friends);
-      console.log(this.requests);
-    } catch (e) {
-      console.log((e as Error).message);
-    }
+    this.friends = data.friends;
+    this.requests = data.requests;
   }
 
   async connectedCallback() {
@@ -256,24 +249,18 @@ export class AppFriendsComponent extends LitElement {
       // print error when the user isn't found
       else if ((e as Error).message == 'Not Found') {
         this._displayError('User not found');
-        console.log('User not found');
       }
       // print error if the friend is already in friends or requests
       else if ((e as Error).message == 'Conflict') {
         this._displayError('This friend already sent you a request');
-        console.log('This friend already sent you a request');
       }
       // If you already sent a request to that person
       else if ((e as Error).message == 'Not Acceptable') {
         this._displayError('You have already sent a request to that person');
-        console.log('You have already sent a request to that person');
       }
       // print error if the user tries to add themselves
       else if ((e as Error).message == 'Bad Request') {
         this._displayError('You tried to add yourself');
-        console.log('You tried to add yourself');
-      } else {
-        console.log((e as Error).message);
       }
     }
 
@@ -281,7 +268,6 @@ export class AppFriendsComponent extends LitElement {
   }
 
   async _displaySuccess() {
-    console.log('success');
     const feedbackElement = this.shadowRoot!.getElementById('feedback');
     feedbackElement!.classList.remove('yes');
     feedbackElement!.classList.remove('no');
@@ -310,7 +296,6 @@ export class AppFriendsComponent extends LitElement {
   async acceptRequest(name: string) {
     try {
       await httpClient.post('friends/accept', { username: name });
-      console.log('accepted');
       this.reloadComponent();
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {
@@ -324,7 +309,6 @@ export class AppFriendsComponent extends LitElement {
   async declineRequest(name: string) {
     try {
       await httpClient.post('friends/decline', { username: name });
-      console.log('declined'); //TODO: das wird nicht ausgefuehrt
       this.reloadComponent();
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {

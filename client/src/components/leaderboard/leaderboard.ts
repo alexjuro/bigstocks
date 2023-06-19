@@ -21,26 +21,22 @@ export class AppLeaderboardComponent extends LitElement {
   protected async firstUpdated() {
     this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'Leaderboard', bubbles: true, composed: true }));
 
-    try {
-      const response = await httpClient.get('leaderboard/lastWeek');
-      const data = await response.json();
+    const response = await httpClient.get('leaderboard/lastWeek');
+    const data = await response.json();
 
-      this.leaderboard = data.leaderboard;
-      this.nottype = data.nottype;
+    this.leaderboard = data.leaderboard;
+    this.nottype = data.nottype;
 
-      if (this.leaderboard[0]) {
-        this.avatars.push(this.leaderboard[0].avatar);
-      }
-      if (this.leaderboard[1]) {
-        this.avatars.push(this.leaderboard[1].avatar);
-      }
-      if (this.leaderboard[2]) {
-        this.avatars.push(this.leaderboard[2].avatar);
-      }
-    } catch (e) {
-      console.log((e as Error).message);
+    if (this.leaderboard[0]) {
+      this.avatars.push(this.leaderboard[0].avatar);
     }
-  }
+    if (this.leaderboard[1]) {
+      this.avatars.push(this.leaderboard[1].avatar);
+    }
+    if (this.leaderboard[2]) {
+      this.avatars.push(this.leaderboard[2].avatar);
+    }
+}
 
   async connectedCallback() {
     super.connectedCallback();
@@ -179,11 +175,7 @@ export class AppLeaderboardComponent extends LitElement {
   */
 
   async redirectMinesweeper() {
-    try {
-      router.navigate('/minesweeper');
-    } catch (e) {
-      console.log(e);
-    }
+    router.navigate('/minesweeper');
   }
 
   async _changeBoard() {
@@ -212,8 +204,6 @@ export class AppLeaderboardComponent extends LitElement {
       } catch (e) {
         if ((e as Error).message == 'Unauthorized!') {
           router.navigate('/users/sign-in');
-        } else {
-          console.log((e as Error).message);
         }
       }
     } else {
@@ -241,8 +231,6 @@ export class AppLeaderboardComponent extends LitElement {
       } catch (e) {
         if ((e as Error).message == 'Unauthorized!') {
           router.navigate('/users/sign-in');
-        } else {
-          console.log((e as Error).message);
         }
       }
     }
