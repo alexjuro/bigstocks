@@ -1,3 +1,5 @@
+/* Autor: Alexander Lesnjak */
+
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import componentStyle from './header.css?inline';

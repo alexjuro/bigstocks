@@ -1,3 +1,5 @@
+/* Autor: Alexander Lesnjak */
+
 import { LitElement, html, css } from 'lit';
 import { httpClient } from '../../http-client.js';
 import { customElement, eventOptions, property, state } from 'lit/decorators.js';
