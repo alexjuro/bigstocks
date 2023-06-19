@@ -47,15 +47,12 @@ class forgotPasswordOne extends PageMixin(LitElement) {
 
   async submit() {
     if (this.isFormValid()) {
-      console.log('submit');
       const accountData = {
         username: this.username.value,
         safetyAnswerOne: this.safetyAnswerOne.value
       };
-      console.log(accountData);
       try {
         await httpClient.post('users/forgotPassword', accountData);
-        console.log('after post');
         router.navigate('/users/resetPassword');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');

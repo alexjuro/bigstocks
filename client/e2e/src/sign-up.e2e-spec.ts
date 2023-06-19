@@ -35,7 +35,6 @@ describe('/users/sign-up', () => {
       expect(await page.textContent('p')).to.contain('Already registered?');
       await page.getByRole('button', { name: '?' }).click();
       expect(await page.textContent('h1')).to.contain('Username Constraints');
-      console.log(await page.textContent('.constraints li'));
       expect(await page.textContent('.constraints li')).to.contains('4 to 32 characters');
       await page.getByRole('button', { name: 'Go it!' }).click();
     });

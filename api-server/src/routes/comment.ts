@@ -15,7 +15,6 @@ router.post('/rating', async (req, res) => {
   if (validation(req.body, errors)) {
     sendErrMsg(errors.join('\n'));
   }
-  console.log(req.body.rating + req.body.comment);
 
   await commentDAO.create({
     rating: req.body.rating,

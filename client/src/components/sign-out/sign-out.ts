@@ -66,7 +66,6 @@ class SignOutComponent extends PageMixin(LitElement) {
       this.startAsyncInit();
       const ratingStatusJSON = await httpClient.get('/users/rating' + location.search);
       const ratingStatus = (await ratingStatusJSON.json()).rating;
-      console.log(ratingStatus);
       await httpClient.delete('/users/sign-out');
       if (ratingStatus) {
         router.navigate('/users/sign-in');
@@ -121,8 +120,6 @@ class SignOutComponent extends PageMixin(LitElement) {
         }
       }
     }
-
-    console.log(this.form.checkValidity());
 
     return this.form.checkValidity();
   }

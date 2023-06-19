@@ -23,14 +23,12 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
   }
   if (res.locals.user.exp < Math.floor(Date.now() / 1000)) {
     const result = await userDAO.delete(res.locals.user.id); // User wird nach Ablauf des Tokens gelöscht
-    console.log(result);
     authService.removeToken(res);
     res.status(401).json({ message: 'Token expired!' });
     return;
   }
 
   const sendErrMsg = (message: string) => {
-    console.log(message);
     res.status(400).json({ message });
   };
   if (
@@ -48,7 +46,6 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
     return sendErrMsg('View our Constraints');
   }
   if (req.body.password !== req.body.passwordCheck) {
-    console.log(req.body.password + ' ' + req.body.passwordCheck);
     return sendErrMsg('The two passwords do not match.');
   }
 
@@ -76,7 +73,6 @@ router.post('/activation', authService.authenticationMiddlewareActivation, async
 router.post('/forgotPassword', async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const errors: string[] = [];
-  console.log('post /forgotPassword');
 
   const sendErrMsg = (message: string) => {
     authService.removeToken(res);
@@ -97,9 +93,7 @@ router.post('/forgotPassword', async (req, res) => {
 
   const filter: Partial<User> = { username: req.body.username };
   const user = await userDAO.findOne(filter);
-  console.log('found User');
   if (user && (await bcrypt.compare(req.body.safetyAnswerOne, user.safetyAnswerOne))) {
-    console.log('correct Answer');
     authService.createAndSetShortToken({ id: user.id }, res);
     const code = createNumber();
     user.code = code;
@@ -131,7 +125,6 @@ router.post('/resetPassword', authService.authenticationMiddlewareActivation, as
 
   if (res.locals.user.exp < Math.floor(Date.now() / 1000)) {
     const result = await userDAO.delete(req.body.id);
-    console.log(result);
     authService.removeToken(res);
     res.status(401).json({ message: 'Token has expired!' });
     return;
@@ -149,13 +142,10 @@ router.post('/resetPassword', authService.authenticationMiddlewareActivation, as
     return sendErrMsg('Invalid Input!');
   }
   if (req.body.password !== req.body.passwordCheck) {
-    console.log(req.body.password + ' ' + req.body.passwordCheck);
     return sendErrMsg('The two passwords do not match.');
   }
 
   if (parseInt(req.body.code) !== user?.code) {
-    console.log(req.body.code);
-    console.log(user?.code);
     return sendErrMsg('invalid code!');
   }
   if (!(await bcrypt.compare(req.body.safetyAnswerTwo, user.safetyAnswerTwo))) {
@@ -191,7 +181,6 @@ router.post('/sign-up', async (req, res) => {
   const filter: Partial<User> = { compareEmail: req.body.email };
   filter.compareEmail = filter.compareEmail?.toUpperCase();
   if (await userDAO.findOne(filter)) {
-    console.log(filter.compareEmail?.toUpperCase());
     return sendErrMsg('Invalid Input (EMAIL)');
   }
 
@@ -291,9 +280,7 @@ router.delete('/sign-out', (req, res) => {
 
 router.delete('/delete', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
-  console.log(res.locals.user);
   const result = await userDAO.delete(res.locals.user.id);
-  console.log(result);
 
   authService.removeToken(res);
   res.status(200).end();
@@ -306,7 +293,6 @@ router.get('/new', authService.authenticationMiddleware, async (req, res) => {
   const status = newUser?.new;
   filter.new = false;
   await userDAO.update(filter);
-  console.log('User status:' + newUser?.new);
   res.json({ new: status });
 });
 
@@ -315,7 +301,6 @@ router.get('/rating', authService.authenticationMiddleware, async (req, res) => 
   const filter: Partial<User> = { id: res.locals.user.id };
   const newUser = await userDAO.findOne(filter);
   if (newUser && newUser.rating) {
-    console.log(newUser.rating);
     res.json({ rating: newUser?.rating });
   } else {
     filter.rating = true;
@@ -379,12 +364,6 @@ Please enter this code: ${code} to activate your account.
 Best regards,
 The FH Muenster Sweng Team`
     })
-    .then(() => {
-      console.log('Email sent');
-    })
-    .catch(error => {
-      console.error('Error sending email:', error);
-    });
 }
 
 async function sendCodeActivation(userEmail: string, code: number) {
@@ -403,12 +382,6 @@ Please enter this code: ${code} to activate your account.
 Best regards,
 The FH Muenster Sweng Team`
     })
-    .then(() => {
-      console.log('Email sent');
-    })
-    .catch(error => {
-      console.error('Error sending email:', error);
-    });
 }
 
 export default router;

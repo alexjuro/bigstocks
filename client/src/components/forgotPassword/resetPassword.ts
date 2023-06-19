@@ -142,7 +142,6 @@ class ActivationComponent extends PageMixin(LitElement) {
 
   async submit() {
     if (this.isFormValid()) {
-      console.log('submit');
       const accountData = {
         code: this.codeElement.value,
         password: this.passwordElement.value,
@@ -151,7 +150,6 @@ class ActivationComponent extends PageMixin(LitElement) {
       };
       try {
         await httpClient.post('users/resetPassword', accountData);
-        console.log('after post');
         router.navigate('/news');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
@@ -200,7 +198,6 @@ class ActivationComponent extends PageMixin(LitElement) {
     }
   }
   updateEntropy = (event: InputEvent) => {
-    console.log('provoced updateEntropy');
     const str = this.passwordElement.value;
 
     const unique = new Set();
@@ -225,7 +222,6 @@ class ActivationComponent extends PageMixin(LitElement) {
       }
     });
     this.pw = (event.target as HTMLInputElement).value;
-    console.log(this.color);
   };
   handlePasswordCheckChange(event: InputEvent) {
     this.pwCheck = (event.target as HTMLInputElement).value;

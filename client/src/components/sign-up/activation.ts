@@ -177,7 +177,6 @@ class ActivationComponent extends PageMixin(LitElement) {
 
   async submit() {
     if (this.isFormValid()) {
-      console.log('submit');
       const accountData = {
         code: this.codeElement.value,
         password: this.passwordElement.value,
@@ -185,10 +184,8 @@ class ActivationComponent extends PageMixin(LitElement) {
         safetyAnswerOne: this.safetyAnswerOne.value,
         safetyAnswerTwo: this.safetyAnswerTwo.value
       };
-      console.log(accountData);
       try {
         await httpClient.post('users/activation', accountData);
-        console.log('after post');
         router.navigate('/news');
       } catch (e) {
         this.showNotification((e as Error).message, 'error');
@@ -240,7 +237,6 @@ class ActivationComponent extends PageMixin(LitElement) {
   }
 
   updateEntropy(_event: InputEvent) {
-    console.log('provoced Method updateEntropy');
     const str = this.passwordElement.value;
 
     const unique = new Set();

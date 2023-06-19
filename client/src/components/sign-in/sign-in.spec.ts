@@ -44,7 +44,6 @@ describe('SignInComponent', () => {
   it('renders the username step after clicking "Back"', async () => {
     const usernameInput = element.shadowRoot!.querySelector('#username') as HTMLInputElement;
     const nextButton = element.shadowRoot!.querySelector('#nextButton') as HTMLButtonElement;
-    console.log(usernameInput);
     usernameInput.value = 'testuser';
     nextButton.click();
     await element.updateComplete;

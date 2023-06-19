@@ -284,7 +284,6 @@ describe('TradingComponent', () => {
       await marketComponent.buyStock(new Event('click'), stock);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.log('error ' + error);
       expect(error).to.be.an.instanceOf(Error);
       expect(error.message).to.include('Insufficient funds');
     }

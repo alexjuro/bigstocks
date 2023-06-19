@@ -98,10 +98,8 @@ class SignUpComponent extends PageMixin(LitElement) {
   }
 
   isFormValid() {
-    console.log('is Form valid function');
     const reUsername = /^[\w-.]{4,32}$/;
     this.usernameElement.setCustomValidity(reUsername.test(this.username) ? '' : 'pattern-missmatch');
-    console.log(reUsername.test(this.usernameElement.value) ? '' : 'pattern-missmatch');
     return this.form.checkValidity();
   }
 

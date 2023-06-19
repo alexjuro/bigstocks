@@ -24,7 +24,6 @@ describe('AppResetPassword', () => {
 
     const computedStyle = window.getComputedStyle(passwordInput);
     const color = computedStyle.getPropertyValue('color');
-    console.log(color);
     expect(color).to.equal('rgb(255, 13, 13)');
     expect(pwStrengthText.textContent).to.equal(' Weak!');
 

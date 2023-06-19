@@ -72,8 +72,6 @@ describe('ActivationComponent', () => {
     ).to.be.true;
 
     expect(stubNavigate.calledWith('/news'));
-
-    console.log(stubGet.calledWith); // Überprüfe, ob der Spion aufgerufen wurde
   });
 
   it('displays password constraints when "?" button is clicked', async () => {

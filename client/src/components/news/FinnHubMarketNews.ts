@@ -49,7 +49,6 @@ class FinnHubMarketNews extends PageMixin(LitElement) {
       await httpClient.get('/users/auth' + location.search);
       const newStatusJSON = await httpClient.get('/users/new' + location.search);
       const newStatus = (await newStatusJSON.json()).new;
-      console.log(newStatus);
       if (newStatus) {
         this.showNotification('New user was created successfully', 'info');
       }
