@@ -3,7 +3,6 @@
 import { expect } from 'chai';
 import config from './config.js';
 import { Browser, BrowserContext, Page, chromium } from 'playwright';
-import fetch from 'node-fetch';
 
 describe('/users/sign-up', () => {
   let browser: Browser;

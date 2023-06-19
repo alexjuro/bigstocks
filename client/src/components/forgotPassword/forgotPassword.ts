@@ -73,6 +73,7 @@ class forgotPasswordOne extends PageMixin(LitElement) {
   }
 
   async firstUpdated() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const appHeader = this.dispatchEvent(
       new CustomEvent('update-pagename', { detail: this.pageName, bubbles: true, composed: true })
     );

@@ -1,11 +1,12 @@
 /* Autor: Prof. Dr. Norman Lahme-Hütig (FH Münster) */
 
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { PageMixin } from '../../page.mixin';
 import componentStyle from './ratingStyle.css?inline';
 
 @customElement('my-rating')
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class RatingComponent extends PageMixin(LitElement) {
   static styles = componentStyle;
 
