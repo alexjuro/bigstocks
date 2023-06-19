@@ -1,3 +1,4 @@
+//Autor: Lakzan Natnan
 import { expect } from 'chai';
 import { fixture, html, nextFrame } from '@open-wc/testing-helpers';
 import './resetPassword.js';

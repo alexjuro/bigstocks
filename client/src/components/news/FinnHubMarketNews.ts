@@ -1,3 +1,4 @@
+//Autor: Lakzan Nathan
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { PageMixin } from '../page.mixin';
