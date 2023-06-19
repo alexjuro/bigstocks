@@ -1,35 +1,25 @@
 /* Autor: Alexander Lesnjak */
 
 import { LitElement, html } from 'lit';
-import { customElement, property, eventOptions, state } from 'lit/decorators.js';
+import { customElement, eventOptions, state } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import componentStyle from './leaderboard.css?inline';
 import { router } from '../../router/router.js';
-import { until } from 'lit/directives/until.js';
 
 @customElement('app-leaderboard')
 export class AppLeaderboardComponent extends LitElement {
   static styles = componentStyle;
 
   //@state() request = httpClient.get('leaderboard/lastWeek').then(async res => (await res.json()) as any);
-  @state() leaderboard: any[] = [];
-  @state() nottype: string = '';
-  @state() avatars: any = [];
+  @state() leaderboard: { username: string; avatar: string; profit: string }[] = [];
+  @state() avatars: string[] = [];
+  @state() nottype = '';
 
   dayTrading = false;
 
-  async connectedCallback() {
-    super.connectedCallback();
-    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
-      if (e.statusCode === 401) router.navigate('/users/sign-in');
-    });
-  }
-
   @eventOptions({ capture: true })
   protected async firstUpdated() {
-    const appHeader = this.dispatchEvent(
-      new CustomEvent('update-pagename', { detail: 'Leaderboard', bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'Leaderboard', bubbles: true, composed: true }));
 
     try {
       const response = await httpClient.get('leaderboard/lastWeek');
@@ -50,6 +40,13 @@ export class AppLeaderboardComponent extends LitElement {
     } catch (e) {
       console.log((e as Error).message);
     }
+  }
+
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
   }
 
   render() {

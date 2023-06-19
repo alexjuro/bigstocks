@@ -1,15 +1,17 @@
 /* Autor: Alexander Lesnjak */
 
-import { LitElement, PropertyValueMap, html } from 'lit';
+import { LitElement, html } from 'lit';
 import { httpClient } from '../../http-client.js';
-import { customElement, query, property, eventOptions, state } from 'lit/decorators.js';
+import { customElement, query, eventOptions, state } from 'lit/decorators.js';
 import { router } from '../../router/router.js';
 import componentStyle from './friends.css?inline';
-import { until } from 'lit/directives/until.js';
 
 @customElement('app-friends')
 export class AppFriendsComponent extends LitElement {
   static styles = componentStyle;
+
+  @state() requests: { username: string; accepted: boolean; avatar: string; profit: string }[] = [];
+  @state() friends: { username: string; accepted: boolean; avatar: string; profit: string }[] = [];
 
   @query('#input') private nameElement!: HTMLInputElement;
 
@@ -17,22 +19,9 @@ export class AppFriendsComponent extends LitElement {
     super();
   }
 
-  //@state() request: Promise<any> = httpClient.get('friends').then(async res => (await res.json()) as any);
-  @state() requests: any[] = [];
-  @state() friends: any[] = [];
-
-  async connectedCallback() {
-    super.connectedCallback();
-    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
-      if (e.statusCode === 401) router.navigate('/users/sign-in');
-    });
-  }
-
   @eventOptions({ capture: true })
   protected async firstUpdated() {
-    const appHeader = this.dispatchEvent(
-      new CustomEvent('update-pagename', { detail: 'friends', bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'friends', bubbles: true, composed: true }));
 
     try {
       const response = await httpClient.get('friends');
@@ -47,6 +36,13 @@ export class AppFriendsComponent extends LitElement {
     } catch (e) {
       console.log((e as Error).message);
     }
+  }
+
+  async connectedCallback() {
+    super.connectedCallback();
+    await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
+      if (e.statusCode === 401) router.navigate('/users/sign-in');
+    });
   }
 
   render() {
@@ -250,8 +246,7 @@ export class AppFriendsComponent extends LitElement {
     }
 
     try {
-      const response = await httpClient.post('friends', { username: friendname });
-      console.log('success');
+      await httpClient.post('friends', { username: friendname });
       this._displaySuccess();
     } catch (e) {
       // redirect if the user isn't logged in (never appears)
@@ -287,7 +282,6 @@ export class AppFriendsComponent extends LitElement {
 
   async _displaySuccess() {
     console.log('success');
-    const inputElement = this.shadowRoot!.getElementById('input');
     const feedbackElement = this.shadowRoot!.getElementById('feedback');
     feedbackElement!.classList.remove('yes');
     feedbackElement!.classList.remove('no');
@@ -301,7 +295,6 @@ export class AppFriendsComponent extends LitElement {
   }
 
   async _displayError(msg: string) {
-    const inputElement = this.shadowRoot!.getElementById('input');
     const feedbackElement = this.shadowRoot!.getElementById('feedback');
     feedbackElement!.classList.remove('yes');
     feedbackElement!.classList.remove('no');
@@ -316,7 +309,7 @@ export class AppFriendsComponent extends LitElement {
 
   async acceptRequest(name: string) {
     try {
-      const response = await httpClient.post('friends/accept', { username: name });
+      await httpClient.post('friends/accept', { username: name });
       console.log('accepted');
       this.reloadComponent();
     } catch (e) {
@@ -330,7 +323,7 @@ export class AppFriendsComponent extends LitElement {
 
   async declineRequest(name: string) {
     try {
-      const response = await httpClient.post('friends/decline', { username: name });
+      await httpClient.post('friends/decline', { username: name });
       console.log('declined'); //TODO: das wird nicht ausgefuehrt
       this.reloadComponent();
     } catch (e) {
@@ -349,7 +342,7 @@ export class AppFriendsComponent extends LitElement {
     }
 
     try {
-      const response = await httpClient.post('friends/delete', { username: name });
+      await httpClient.post('friends/delete', { username: name });
       this.reloadComponent();
     } catch (e) {
       if ((e as Error).message == 'Unauthorized!') {

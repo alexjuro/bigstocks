@@ -1,6 +1,6 @@
 /* Autor: Alexander Lesnjak */
 
-import { Browser, BrowserContext, Page, chromium, Locator } from 'playwright';
+import { Browser, BrowserContext, Page, chromium } from 'playwright';
 import { expect } from 'chai';
 import config from './config.js';
 import fetch from 'node-fetch';

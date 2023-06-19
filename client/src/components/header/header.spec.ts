@@ -51,7 +51,6 @@ describe('app-header', () => {
     const mnav = e.shadowRoot!.querySelector('#mnav') as HTMLElement;
     const circle = e.shadowRoot!.querySelector('#circle') as HTMLElement;
     const dnav = e.shadowRoot!.querySelector('#dnav') as HTMLElement;
-    const btn = e.shadowRoot!.querySelector('#btn') as HTMLElement;
 
     //test visability of the mnav, btn and circle
     expect(getComputedStyle(mnav).visibility).to.equal('hidden');

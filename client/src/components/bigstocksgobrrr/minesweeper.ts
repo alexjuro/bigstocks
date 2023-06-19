@@ -1,8 +1,8 @@
 /* Autor: Alexander Lesnjak */
 
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { httpClient } from '../../http-client.js';
-import { customElement, eventOptions, property, state } from 'lit/decorators.js';
+import { customElement, eventOptions, property } from 'lit/decorators.js';
 import componentStyle from './minesweeper.css?inline';
 import { router } from '../../router/router.js';
 
@@ -10,17 +10,17 @@ import { router } from '../../router/router.js';
 export class SecretAppComponent extends LitElement {
   static styles = componentStyle;
 
-  @state() request = httpClient.get('minesweeper').then(async res => (await res.json()) as any);
+  //@state() request = httpClient.get('minesweeper').then(async res => (await res.json()) as any);
 
   @property()
-  username: string = '';
+  username = '';
 
   @property()
-  tries: number = 0;
+  tries = 0;
 
   @property()
-  cash: number = 0;
-  cashString: string = '';
+  cash = 0;
+  cashString = '';
 
   rows = 8;
   cols = 8;
@@ -41,6 +41,34 @@ export class SecretAppComponent extends LitElement {
     this.handleClick = this.handleClick.bind(this);
     this.handleRightClick = this.handleRightClick.bind(this);
     this.restartGame = this.restartGame.bind(this);
+  }
+
+  @eventOptions({ capture: true })
+  async firstUpdated() {
+    this.initGame();
+
+    this.dispatchEvent(new CustomEvent('update-pagename', { detail: 'Minesweeper', bubbles: true, composed: true }));
+
+    const response = await httpClient.get('minesweeper');
+    const data = await response.json();
+
+    this.username = data.username;
+    this.tries = data.tries.value;
+    this.cash = data.money;
+    this.cashString = this.cash.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      useGrouping: false
+    });
+
+    const usernameElem = this.shadowRoot?.getElementById('username');
+    usernameElem!.innerHTML = `${this.username}`;
+
+    const cashElem = this.shadowRoot?.getElementById('cash');
+    cashElem!.innerHTML = `cash: ${this.cashString} $`;
+
+    const triesElem = this.shadowRoot?.getElementById('tries');
+    triesElem!.innerHTML = `Tries left: ${this.tries}`;
   }
 
   createBoard() {
@@ -174,12 +202,7 @@ export class SecretAppComponent extends LitElement {
   }
 
   async restartPost() {
-    try {
-      const response = await httpClient.post('minesweeper/restart', '');
-      console.log('updated tries');
-    } catch (e) {
-      console.log('error');
-    }
+    await httpClient.post('minesweeper/restart', '');
   }
 
   initGame() {
@@ -197,8 +220,6 @@ export class SecretAppComponent extends LitElement {
           allMinesMarked = false;
           break;
         }
-      }
-      if (!allMinesMarked) {
       }
     }
     if (allMinesMarked) {
@@ -243,12 +264,7 @@ export class SecretAppComponent extends LitElement {
   }
 
   async victoryPost() {
-    try {
-      const response = await httpClient.post('minesweeper/victory', '');
-      console.log('updated money');
-    } catch (e) {
-      console.log('error');
-    }
+    await httpClient.post('minesweeper/victory', '');
   }
 
   changeTries() {
@@ -266,40 +282,6 @@ export class SecretAppComponent extends LitElement {
     await httpClient.get('/users/auth').catch((e: { statusCode: number }) => {
       if (e.statusCode === 401) router.navigate('/users/sign-in');
     });
-  }
-
-  @eventOptions({ capture: true })
-  async firstUpdated() {
-    this.initGame();
-
-    const appHeader = this.dispatchEvent(
-      new CustomEvent('update-pagename', { detail: 'Minesweeper', bubbles: true, composed: true })
-    );
-
-    try {
-      const response = await httpClient.get('minesweeper');
-      const data = await response.json();
-
-      this.username = data.username;
-      this.tries = data.tries.value;
-      this.cash = data.money;
-      this.cashString = this.cash.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        useGrouping: false
-      });
-
-      const usernameElem = this.shadowRoot?.getElementById('username');
-      usernameElem!.innerHTML = `${this.username}`;
-
-      const cashElem = this.shadowRoot?.getElementById('cash');
-      cashElem!.innerHTML = `cash: ${this.cashString} $`;
-
-      const triesElem = this.shadowRoot?.getElementById('tries');
-      triesElem!.innerHTML = `Tries left: ${this.tries}`;
-    } catch (e) {
-      console.log((e as Error).message);
-    }
   }
 
   render() {

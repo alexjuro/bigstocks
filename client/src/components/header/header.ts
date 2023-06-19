@@ -4,7 +4,6 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import componentStyle from './header.css?inline';
 import { PageMixin } from '../page.mixin';
-import { httpClient } from '../../http-client';
 import { router } from '../../router/router';
 
 @customElement('app-header')

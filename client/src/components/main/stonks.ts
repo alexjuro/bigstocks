@@ -1,4 +1,4 @@
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { PageMixin } from '../page.mixin';
 import { LitElement, html } from 'lit';
 import sharedStyle from '../shared.css?inline';
