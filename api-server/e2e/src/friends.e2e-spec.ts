@@ -4,8 +4,6 @@ import { expect } from 'chai';
 import fetch from 'node-fetch';
 import config from './config.js';
 
-type Res = { status: string };
-
 const user = {
   id: '4c099ea7-b869-4445-89f5-eb32c535a6e6',
   name: 'test2',

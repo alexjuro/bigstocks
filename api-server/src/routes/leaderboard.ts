@@ -1,6 +1,6 @@
 /* Author: Alexander Lesnjak */
 
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { GenericDAO } from '../models/generic.dao';
 import { User } from '../models/user';
 import { Transaction } from '../models/transaction';
@@ -38,7 +38,6 @@ router.get('/', async (req, res) => {
 router.get('/lastWeek', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
-  const userId = res.locals.user.id;
 
   //const randomdate = new Date('June 7, 2023 23:15:30');
 
@@ -115,11 +114,10 @@ function calculateTotalProfit(userProfits: UserProfit[]): { [userId: string]: nu
 router.get('/lastDay', authService.authenticationMiddleware, async (req, res) => {
   const userDAO: GenericDAO<User> = req.app.locals.userDAO;
   const transactionDAO: GenericDAO<Transaction> = req.app.locals.transactionDAO;
-  const userId = res.locals.user.id;
 
   //const randomdate = new Date('June 7, 2023 23:15:30');
 
-  let dateOneWeekAgo = new Date();
+  const dateOneWeekAgo = new Date();
   dateOneWeekAgo.setHours(0, 0, 0, 0);
 
   const allTransaction = await transactionDAO.findAll({ status: false });

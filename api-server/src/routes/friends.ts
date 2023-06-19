@@ -57,8 +57,12 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
       }
     }
 
-    const friends = friendsWithData.filter((friend: any) => friend.accepted === true);
-    const requests = friendsWithData.filter((friend: any) => friend.accepted === false);
+    const friends = friendsWithData.filter(
+      (friend: { username: string; accepted: boolean }) => friend.accepted === true
+    );
+    const requests = friendsWithData.filter(
+      (friend: { username: string; accepted: boolean }) => friend.accepted === false
+    );
 
     res.status(200).json({ friends: friends, requests: requests });
   } catch (error) {
