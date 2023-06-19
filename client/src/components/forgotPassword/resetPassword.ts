@@ -11,7 +11,7 @@ import componentStyle from '../sign-in/style.css?inline';
 
 @customElement('app-resetpassword')
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class ActivationComponent extends PageMixin(LitElement) {
+class ResetPasswordComponent extends PageMixin(LitElement) {
   static styles = [componentStyle, sharedStyle];
   @state() showConstraints = false;
   @state() entropy = 0;
@@ -108,7 +108,7 @@ class ActivationComponent extends PageMixin(LitElement) {
                 Re-entering the password is required and must match the first password entered
               </div>
             </div>       
-            <button type="button" @click="${this.submit}">Create account</button>
+            <button type="button" @click="${this.submit}">Reset Password!</button>
           </form>
             </p>
            

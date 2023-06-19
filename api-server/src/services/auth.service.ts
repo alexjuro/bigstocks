@@ -25,7 +25,7 @@ class AuthService {
     const token = jwt.sign(userClaimSet, SECRET, { algorithm: 'HS256', expiresIn: '1h' });
     res.cookie('jwt-token', token);
   }
-
+  //Vom Lakzan Nathan
   createAndSetShortToken(userClaimSet: Record<string, unknown>, res: Response) {
     const token = jwt.sign(userClaimSet, SECRET, { algorithm: 'HS256', expiresIn: '10min' });
     res.cookie('jwt-token', token);
@@ -35,25 +35,20 @@ class AuthService {
     res.clearCookie('jwt-token');
   }
 
-  //Für Activation dass danach der Accoutn gelöscht wird
+  //Für Activation dass danach der Account gelöscht wird, Von Lakzan Nathan
   authenticationMiddlewareActivation = (req: Request, res: Response, next: NextFunction) => {
     if (res.locals.user) {
-      console.log(res.locals.user);
       next();
     } else {
-      console.log(req.cookies);
       const token = req.cookies['jwt-token'] || '';
       try {
         res.locals.user = jwt.verify(token, SECRET);
         next();
       } catch (error) {
         if (error instanceof TokenExpiredError) {
-          console.log('Token Expired');
           res.locals.user = jwt.decode(token);
-          console.log(res.locals.user);
           next();
         } else {
-          console.error(error);
           res.status(401).json({ message: 'Unauthorized!' });
         }
       }

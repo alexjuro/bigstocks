@@ -342,9 +342,7 @@ function checkAnswer(answer: string) {
 }
 
 function createNumber() {
-  let randomNumber = Math.floor(100000 + Math.random() * 900000); // Generiert eine Zufallszahl zwischen 100000 und 999999
-  randomNumber = randomNumber * 11;
-  randomNumber = randomNumber % 999999; // Wert hashen
+  const randomNumber = Math.floor(100000 + Math.random() * 900000); // Generiert eine Zufallszahl zwischen 100000 und 999999
   return randomNumber;
 }
 
