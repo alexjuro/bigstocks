@@ -265,6 +265,7 @@ export class SecretAppComponent extends LitElement {
 
   async victoryPost() {
     await httpClient.post('minesweeper/victory', '');
+    await httpClient.post('minesweeper/restart', '');
   }
 
   changeTries() {
