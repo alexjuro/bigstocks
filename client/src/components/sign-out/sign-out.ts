@@ -4,7 +4,6 @@ import { customElement, query } from 'lit/decorators.js';
 import { httpClient } from '../../http-client.js';
 import { PageMixin } from '../page.mixin.js';
 import { router } from '../../router/router.js';
-import xss from 'xss';
 
 import style from './style.css?inline';
 import sharedStyle from '../shared.css?inline';

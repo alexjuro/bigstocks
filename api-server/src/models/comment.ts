@@ -1,3 +1,4 @@
+//Autor: Lakzan Nathan
 import { Entity } from './entity';
 
 export interface Comment extends Entity {

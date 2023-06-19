@@ -1,3 +1,4 @@
+//Autor: Lakzan Nathan
 import express from 'express';
 import { GenericDAO } from '../models/generic.dao.js';
 import { Comment } from '../models/comment.js';
