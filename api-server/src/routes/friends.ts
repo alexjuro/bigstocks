@@ -39,7 +39,7 @@ router.get('/', authService.authenticationMiddleware, async (req, res) => {
 
         let profit = 0;
         for (let j = 0; j < transactions.length; j++) {
-          profit += transactions[i].sPrice - transactions[i].bPrice;
+          profit += transactions[j].sPrice - transactions[j].bPrice;
         }
 
         const friendspush = {
