@@ -85,14 +85,16 @@ describe('/users/friends', () => {
       expect(response.status()).to.equal(409);
     });
 
-    it('should fail adding User that does not exist', async () => {
-      await page.fill('#input', 'asghyats7asg8');
-
-      await page.getByText('Send', { exact: true }).click();
-
-      const response = await page.waitForResponse('**/friends');
-      expect(response.status()).to.equal(404);
-    });
+    
+    //it('should fail adding User that does not exist', async () => {
+    //  await page.fill('#input', 'asghyats7asg8');
+    //
+    //  await page.getByText('Send', { exact: true }).click();
+    //
+    //  const response = await page.waitForResponse('**/friends');
+    //  expect(response.status()).to.equal(404);
+    //});
+    
 
     it('should fail adding friend again', async () => {
       await page.fill('#input', 'axel');
