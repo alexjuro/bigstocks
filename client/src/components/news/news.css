@@ -1,0 +1,110 @@
+/* Autor: Lakzan Nathan */
+:host {
+  display: block;
+}
+
+.market-news {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(30%, 2fr));
+  gap: 1.75rem;
+  justify-items: center;
+  margin: 1.75rem;
+}
+
+.article {
+  background: linear-gradient(var(--primary), var(--secondary), var(--primary));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  max-width: 500px;
+  /* height: 400px; Hier legen wir die Höhe der Artikel fest */
+  padding: 1rem;
+  background-color: ghostwhite;
+  border-radius: 1em;
+  overflow: hidden; /* Fügt einen Überlauf für den Inhalt hinzu */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.article-image-container {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 1em;
+}
+
+.article-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.article-headline {
+  margin: 0;
+  padding: 8px;
+  background-color: transparent;
+  color: ghostwhite;
+  font-size: 1rem;
+  line-height: 1.2;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 0 0 1em 1em;
+  grid-row: 1;
+}
+
+.article-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  font-size: small;
+  padding: 1rem 0;
+  overflow: hidden; /* Fügt Überlauf für den Inhalt hinzu */
+  text-overflow: ellipsis; /* Fügt Auslassungspunkte hinzu, wenn der Inhalt zu groß ist */
+}
+
+.article-summary {
+  font-size: 1rem;
+  text-align: left;
+  margin: 1rem 0;
+  color: ghostwhite;
+}
+
+.article-headline + .article-summary {
+  margin-top: 2rem;
+}
+
+a {
+  display: inline-block;
+  font-size: 1rem;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background-color: #6a5acd;
+  color: ghostwhite;
+  text-decoration: none;
+  border-radius: 5px;
+  margin: 1rem 0;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+a:hover {
+  filter: saturate(180%);
+}
+
+.article-link {
+  margin-top: auto;
+  margin-bottom: 0;
+  align-self: flex-start;
+}
+
+/* Responsives Layout für Handys */
+@media (max-width: 980px) {
+  .market-news {
+    grid-template-columns: 1fr;
+  }
+}

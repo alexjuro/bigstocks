@@ -1,0 +1,17 @@
+.rating {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rating span {
+  font-size: 2rem;
+  color: var(--secondary);
+  cursor: pointer;
+  transition: color 0.2s;
+  z-index: 1;
+}
+
+.rating span.checked {
+  color: gold;
+}

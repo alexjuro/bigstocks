@@ -1,0 +1,69 @@
+/* Autor: Nico Pareigis */
+
+#file {
+  font-size: 0.9rem;
+  display: none;
+}
+
+#size {
+  color: gray;
+  font-size: 0.8rem;
+}
+
+#upload {
+  visibility: hidden;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  gap: 0.8rem;
+  align-items: baseline;
+  z-index: 10000;
+}
+
+.inner {
+  display: inline-flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+h4 {
+  margin: 0;
+}
+
+img {
+  display: inline;
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  background-color: #f0f0f8;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  margin-left: 0;
+}
+
+input {
+  display: none;
+}
+
+label {
+  font-size: 0.9rem;
+  display: inline-block;
+  color: ghostwhite;
+  background-color: var(--primary);
+  border-radius: 0.2rem;
+  padding: 0.5rem 0.4rem;
+  transition: 0.15s;
+}
+
+label:hover {
+  cursor: pointer;
+  background-color: var(--primaryVariation);
+}
+
+@media (min-width: 900px) {
+  #file {
+    display: inline-flex;
+  }
+}

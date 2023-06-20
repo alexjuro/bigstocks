@@ -51,6 +51,7 @@ export class Router {
     for (const routePath of Reflect.ownKeys(routeHandlerMap)) {
       if (typeof routePath !== 'string') continue;
       const match = matcher.match(routePath);
+      console.log(match);
       if (match) {
         return routeHandlerMap[routePath](match);
       }

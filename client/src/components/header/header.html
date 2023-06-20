@@ -1,0 +1,72 @@
+<!-- Autor: Alexander Lesnjak -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="header.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="background">
+      <div id="circle"></div>
+    </div>
+    <div id="background2">
+      <nav id="mnav">
+        <ul>
+          <li><a href="">news</a></li>
+          <li><a href="">portfolio</a></li>
+          <li><a href="">profile</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div id="flexheader">
+      <div id="left" class="headelem"><a href="">bigstocks</a></div>
+      <div id="mid" class="headelem"><a href="">pagename</a></div>
+      <div id="right" class="headelem">
+        <nav id="dnav">
+          <a href="">news</a>
+          <a href="">portfolio</a>
+          <a href="">profile</a>
+        </nav>
+        <button id="btn" onclick="toggle()"><img src="../../../public/list.svg" alt="" height="27px" /></button>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    const circle = document.getElementById('circle');
+    const mnav = document.getElementById('mnav');
+
+    let visable = false;
+
+    function toggle() {
+      if (visable) {
+        circle.style.width = '0px';
+        circle.style.height = '0px';
+        mnav.style.display = 'none';
+        visable = false;
+      } else {
+        circle.style.width = '220px';
+        circle.style.height = '220px';
+        setTimeout(function () {
+          mnav.style.display = 'block';
+        }, 280);
+        visable = true;
+      }
+    }
+
+    function autoResize() {
+      if (window.innerWidth >= 810) {
+        circle.style.width = '0px';
+        circle.style.height = '0px';
+        mnav.style.display = 'none';
+        visable = false;
+      }
+    }
+
+    window.addEventListener('resize', autoResize);
+  </script>
+</html>

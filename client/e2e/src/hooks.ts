@@ -24,7 +24,7 @@ async function startServer(name: string, url: string) {
   const childProcess = exec(`npm start`, { cwd: dir });
 
   // wait for the server to come up
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 150; i++) {
     try {
       await fetch(url);
       console.log(`${name} started`);

@@ -1,4 +1,4 @@
-/* Autor: Prof. Dr. Norman Lahme-Hütig (FH Münster) */
+/* Autor: Lakzan Nathan */
 
 import express, { Express } from 'express';
 import cookieParser from 'cookie-parser';
@@ -9,17 +9,44 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import startDB from './db.js';
 import { corsService } from './services/cors.service.js';
+import { cspMiddleware } from './services/cspMiddleware.js';
+import { hstsMiddleware } from './services/hstsMiddleware.js';
 import { pathToFileURL } from 'node:url';
-// TODO: Routen importieren
-
+import users from './routes/users.js';
+import account from './routes/account-management.js';
+import mainPage from './routes/mainPage.js';
+import trading from './routes/trading.js';
+import transaction from './routes/transaction.js';
+import friends from './routes/friends.js';
+import leaderboard from './routes/leaderboard.js';
+import minesweeper from './routes/minesweeper.js';
 import config from '../config.json' assert { type: 'json' };
+import comment from './routes/comment.js';
+import { referrerPolicyMiddleware } from './services/referrerPolicyMiddleware.js';
+import { xContentTypeMiddleware } from './services/xContentTypeMiddleware.js';
+import { xFrameMiddleware } from './services/xFrameMiddleware.js';
+import { corpMiddleware } from './services/corpMiddleware.js';
 
 function configureApp(app: Express) {
   app.use(express.urlencoded({ extended: true }));
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json({ limit: 1024 * 240 }));
   app.use(cookieParser());
   app.use(corsService.corsMiddleware);
+  app.use(corpMiddleware);
+  app.use(cspMiddleware);
+  app.use(hstsMiddleware);
+  app.use(referrerPolicyMiddleware);
+  app.use(xContentTypeMiddleware);
+  app.use(xFrameMiddleware);
+  app.use('/api/main', mainPage);
+  app.use('/api/trading', trading);
+  app.use('/api/users', users);
+  app.use('/api/users/account', account);
+  app.use('/api/users/transactions', transaction);
+  app.use('/api/comment', comment);
+  app.use('/api/friends', friends);
+  app.use('/api/leaderboard', leaderboard);
+  app.use('/api/minesweeper', minesweeper);
   // TODO: Routen einbinden
 }
 

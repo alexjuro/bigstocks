@@ -1,0 +1,11 @@
+/* Autor: Nico Pareigis */
+
+.annotation {
+  font-size: 0.8em;
+  margin-top: 4px;
+  color: gray;
+}
+
+input {
+  display: block;
+}
